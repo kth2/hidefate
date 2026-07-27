@@ -23,6 +23,47 @@ npm run dev
 
 打开 http://localhost:3000 。
 
+### 在手机上试用 PWA
+
+**要点：Service Worker 与「添加到主屏幕」只在安全上下文下可用** ——
+即 `https://` 或 `localhost`。这意味着：
+
+| 方式 | 能打开 | SW / 离线 | 可安装到主屏 |
+|---|---|---|---|
+| 电脑 `npm run dev` → localhost | ✅ | ❌（dev 模式刻意不注册 SW） | ❌ |
+| 电脑 `npm run build && npm start` → localhost | ✅ | ✅ | ✅ |
+| 手机连同一 WiFi 开 `http://<电脑IP>:3000` | ✅ | ❌ | ❌ |
+| 部署到 Vercel / Cloudflare 等（https） | ✅ | ✅ | ✅ |
+
+所以想在手机上完整体验 PWA（装到主屏、断网可用），需要 HTTPS。两条路：
+
+**一、部署到 Vercel（推荐）**
+
+```bash
+npx vercel
+```
+
+首次会问几个问题；**Root Directory 选 `apps/web`**，其余默认即可
+（`prebuild` 会自动把奇门引擎同步到 `public/vendor/`）。
+部署完拿到 `https://xxx.vercel.app`，手机浏览器打开 → 分享 →「添加到主屏幕」。
+
+**二、临时内网穿透（不想部署时）**
+
+```bash
+npm run build --workspace=@hidefate/web
+```
+
+```bash
+npm start --workspace=@hidefate/web
+```
+
+再另开一个终端跑 `npx cloudflared tunnel --url http://localhost:3000`，
+用它给出的 https 地址在手机上打开。
+
+**仅在电脑上看看**：`npm run build --workspace=@hidefate/web` 后
+`npm start --workspace=@hidefate/web`，浏览器开 localhost:3000 并切到手机尺寸即可
+（SW 与安装提示都正常）。
+
 ---
 
 ## 设计上的几条硬规则
