@@ -10,6 +10,8 @@
 import Link from 'next/link';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import {
+  AI_DIRECT_ONLY,
+  BROWSER_CORS,
   PROVIDERS,
   listModels,
   providerById,
@@ -200,16 +202,33 @@ export default function SettingsPage() {
           <p className="mt-1 text-xs text-ink-mute">Key 只存在本机浏览器（IndexedDB），不会同步到任何服务器。</p>
         </div>
 
-        <label className="flex cursor-pointer items-start gap-2 text-sm">
-          <input type="checkbox" className="mt-1 accent-cinnabar" checked={direct} onChange={(e) => setDirect(e.target.checked)} />
-          <span className="leading-relaxed">
-            浏览器直连供应商（不经本机中转）
-            <span className="block text-xs text-ink-mute">
-              默认关闭。关闭时请求会先到本机的 Next 服务再转发出去，可绕开多数供应商未开放的浏览器 CORS —— 兼容性最好。
-              打开则由浏览器直接请求供应商，少一跳，但若该供应商未开放 CORS 就会失败。
+        {AI_DIRECT_ONLY ? (
+          <p className="rounded-xl border border-gold/40 bg-gold/[0.06] p-3 text-[0.8125rem] leading-relaxed text-ink-soft">
+            此版本部署在纯静态托管（GitHub Pages）上，<b>没有服务器可作中转</b>，
+            因此 AI 请求由浏览器直连供应商。只有对浏览器开放了 CORS 的供应商才能用：
+            <b className="text-jade">
+              {' '}
+              {PROVIDERS.filter((p) => BROWSER_CORS[p.id] === '可直连').map((p) => p.label).join('、')}
+            </b>
+            。当前所选「{preset.label}」为
+            <b className={BROWSER_CORS[provider] === '可直连' ? 'text-jade' : 'text-cinnabar'}>
+              {' '}
+              {BROWSER_CORS[provider]}
+            </b>
+            。若拉取模型时报网络错误，多半就是该供应商不允许浏览器直连，换一家即可。
+          </p>
+        ) : (
+          <label className="flex cursor-pointer items-start gap-2 text-sm">
+            <input type="checkbox" className="mt-1 accent-cinnabar" checked={direct} onChange={(e) => setDirect(e.target.checked)} />
+            <span className="leading-relaxed">
+              浏览器直连供应商（不经本机中转）
+              <span className="block text-[0.8125rem] text-ink-mute">
+                默认关闭。关闭时请求会先到本机的 Next 服务再转发出去，可绕开多数供应商未开放的浏览器 CORS —— 兼容性最好。
+                打开则由浏览器直接请求供应商，少一跳，但若该供应商未开放 CORS 就会失败。
+              </span>
             </span>
-          </span>
-        </label>
+          </label>
+        )}
 
         <div className="flex flex-wrap gap-2">
           <button type="button" className="btn btn-primary" onClick={fetchModels} disabled={loading || !baseUrl.trim()}>

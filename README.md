@@ -35,34 +35,47 @@ npm run dev
 | 手机连同一 WiFi 开 `http://<电脑IP>:3000` | ✅ | ❌ | ❌ |
 | 部署到 Vercel / Cloudflare 等（https） | ✅ | ✅ | ✅ |
 
-所以想在手机上完整体验 PWA（装到主屏、断网可用），需要 HTTPS。两条路：
+所以想在手机上完整体验 PWA（装到主屏、断网可用），需要 HTTPS。
 
-**一、部署到 Vercel（推荐）**
+#### 推荐：GitHub Pages（不依赖任何第三方服务）
+
+仓库已带好 `.github/workflows/pages.yml`，推送到 `main` 就会自动构建静态版并发布。
+只需一次性设置：
+
+1. **仓库必须是 Public** —— GitHub 免费账号只能从公开仓库发布 Pages
+   （私有仓库发布 Pages 需要 GitHub Pro）。
+2. 仓库 **Settings → Pages → Build and deployment → Source** 选 **GitHub Actions**。
+3. 等 Actions 跑完，站点在 `https://<用户名>.github.io/<仓库名>/`。
+4. 手机浏览器打开该地址 → 分享 →「添加到主屏幕」。装好后断网也能用。
+
+静态版与本机版的**唯一差别**：Pages 没有服务器，`/api/ai/*` 转发路由不存在，
+因此 AI 只能由浏览器直连供应商。这意味着只有对浏览器开放 CORS 的供应商可用
+（OpenRouter / Groq / Gemini 已确认可直连；DeepSeek、硅基流动不确定）。
+设置页会直接标出当前所选供应商属于哪一类。其余全部功能 —— 三派排盘、预测、
+模拟、时间轴、报告 —— 都不受影响，因为它们本来就在本机算。
+
+本机自测静态版（模拟 Pages 的子路径）：
 
 ```bash
-npx vercel
+STATIC_EXPORT=1 NEXT_PUBLIC_BASE_PATH=/hidefate NEXT_PUBLIC_AI_DIRECT_ONLY=1 npm run build --workspace=@hidefate/web
 ```
 
-首次会问几个问题；**Root Directory 选 `apps/web`**，其余默认即可
-（`prebuild` 会自动把奇门引擎同步到 `public/vendor/`）。
-部署完拿到 `https://xxx.vercel.app`，手机浏览器打开 → 分享 →「添加到主屏幕」。
+产物在 `apps/web/out/`，用任意静态服务器挂到 `/hidefate/` 下即可。
 
-**二、临时内网穿透（不想部署时）**
+#### 其它方式
 
-```bash
-npm run build --workspace=@hidefate/web
-```
+- **不想公开仓库**：Cloudflare Pages / Netlify 都能从私有仓库免费部署静态站，
+  构建命令与上面的环境变量相同（`NEXT_PUBLIC_BASE_PATH` 留空即可）。
+- **临时内网穿透**：`npm run build && npm start`（在 `apps/web` 下），
+  再跑 `npx cloudflared tunnel --url http://localhost:3000`，用它给的 https 地址打开。
+  这条路保留了 `/api/ai/*` 转发，AI 不受 CORS 限制。
+- **仅在电脑上看看**：`npm run build --workspace=@hidefate/web` 后
+  `npm start --workspace=@hidefate/web`，浏览器开 localhost:3000 切到手机尺寸
+  （SW 与安装提示都正常）。
 
-```bash
-npm start --workspace=@hidefate/web
-```
-
-再另开一个终端跑 `npx cloudflared tunnel --url http://localhost:3000`，
-用它给出的 https 地址在手机上打开。
-
-**仅在电脑上看看**：`npm run build --workspace=@hidefate/web` 后
-`npm start --workspace=@hidefate/web`，浏览器开 localhost:3000 并切到手机尺寸即可
-（SW 与安装提示都正常）。
+> 已知小瑕疵：manifest 目前只声明了 SVG 图标。Android 可正常安装并显示，
+> iOS 的主屏图标需要 PNG 版 apple-touch-icon，暂缺，故 iOS 上会退化为页面截图 ——
+> 纯外观问题，补一张 180×180 PNG 即可。
 
 ---
 

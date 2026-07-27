@@ -11,7 +11,6 @@
  */
 
 import { useEffect, useMemo, useState } from 'react';
-import { useParams } from 'next/navigation';
 import Link from 'next/link';
 import {
   GRID_LAYOUT,
@@ -29,26 +28,16 @@ import {
   type AnalysisInput,
 } from '@hidefate/core-synthesis';
 import { computeShanXiang, type ShanXiangResult } from '@hidefate/core-qimen';
-import { db, type StoredCure, type StoredMember, type StoredProperty } from '../../../../lib/db';
-import { currentFengShuiTime, toCures, toMembers } from '../../../../lib/useAnalysis';
+import { currentFengShuiTime } from '../../lib/useAnalysis';
+import { useProperty } from '../../lib/PropertyContext';
 
 export default function ReportPage() {
-  const { id } = useParams<{ id: string }>();
-  const [property, setProperty] = useState<StoredProperty | null | undefined>(undefined);
-  const [memberRows, setMemberRows] = useState<StoredMember[]>([]);
-  const [cureRows, setCureRows] = useState<StoredCure[]>([]);
+  // 取「当前房屋」而非路由参数：静态导出没有服务器，动态段 [id] 无法预渲染，
+  // 且报告本来就只会针对当前选中的那处房屋出具。
+  const { property, members, cures, loading } = useProperty();
   const [now] = useState(() => currentFengShuiTime());
   const [qiMen, setQiMen] = useState<ShanXiangResult | null>(null);
   const [qiMenPending, setQiMenPending] = useState(false);
-
-  useEffect(() => {
-    void (async () => {
-      const d = db();
-      setProperty((await d.properties.get(id)) ?? null);
-      setMemberRows(await d.members.where('propertyId').equals(id).toArray());
-      setCureRows(await d.cures.where('propertyId').equals(id).toArray());
-    })();
-  }, [id]);
 
   // 报告须完整呈现「所有已启用门派」的盘，故此处主动把奇门层也载入，
   // 载入完成前不渲染报告 —— 否则会印出一份声称「未启用奇门」的错报告。
@@ -60,9 +49,6 @@ export default function ReportPage() {
       .catch(() => setQiMen(null))
       .finally(() => setQiMenPending(false));
   }, [property?.enableQiMen, property?.sitting, property?.moveInYear]);
-
-  const members = useMemo(() => toMembers(memberRows), [memberRows]);
-  const cures = useMemo(() => toCures(cureRows), [cureRows]);
 
   const data = useMemo(() => {
     if (!property) return null;
@@ -89,7 +75,7 @@ export default function ReportPage() {
     }
   }, [property, members, cures, now, qiMen]);
 
-  if (property === undefined) return <p className="text-sm text-ink-mute">读取中…</p>;
+  if (loading) return <p className="px-4 py-6 text-sm text-ink-mute">读取中…</p>;
   if (qiMenPending) {
     return <p className="text-sm text-ink-mute">正在载入山向奇门层，以确保报告涵盖全部已启用门派…</p>;
   }
@@ -105,7 +91,7 @@ export default function ReportPage() {
         <button type="button" className="btn btn-primary" onClick={() => window.print()}>
           打印 / 另存为 PDF
         </button>
-        <Link href={`/property/${id}`} className="btn">
+        <Link href="/house" className="btn">
           返回分析
         </Link>
         <span className="text-xs text-ink-mute">

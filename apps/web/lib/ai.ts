@@ -159,12 +159,37 @@ export function normaliseModels(payload: unknown): ModelInfo[] {
   return out.sort((a, b) => Number(b.free) - Number(a.free) || a.id.localeCompare(b.id));
 }
 
+/**
+ * 是否只能直连。
+ *
+ * 静态导出（GitHub Pages）没有服务器，`/api/ai/*` 转发路由不存在，
+ * 因此只能由浏览器直连供应商。构建时注入此标志，UI 据此隐藏「直连」开关
+ * 并改为提示哪些供应商对浏览器开放了 CORS。
+ */
+export const AI_DIRECT_ONLY = process.env.NEXT_PUBLIC_AI_DIRECT_ONLY === '1';
+
+/** 各供应商是否对浏览器开放 CORS —— 静态部署下这决定了它能不能用。 */
+export const BROWSER_CORS: Record<ProviderId, '可直连' | '不确定' | '需自行配置'> = {
+  openrouter: '可直连',
+  groq: '可直连',
+  gemini: '可直连',
+  deepseek: '不确定',
+  siliconflow: '不确定',
+  ollama: '需自行配置',
+  custom: '不确定',
+};
+
 export interface AiConfig {
   readonly baseUrl: string;
   readonly apiKey: string;
   readonly model?: string;
   /** 直连供应商而不经本机转发。默认 false（经转发，兼容性最好）。 */
   readonly direct?: boolean;
+}
+
+/** 本次请求是否走直连。静态部署下恒为 true。 */
+function useDirect(cfg: AiConfig): boolean {
+  return AI_DIRECT_ONLY || Boolean(cfg.direct);
 }
 
 function trimBase(u: string): string {
@@ -176,7 +201,7 @@ export async function listModels(cfg: AiConfig, signal?: AbortSignal): Promise<M
   const baseUrl = trimBase(cfg.baseUrl);
   if (!baseUrl) throw new Error('请先填写 API Base URL。');
 
-  const res = cfg.direct
+  const res = useDirect(cfg)
     ? await fetch(`${baseUrl}/models`, {
         headers: cfg.apiKey ? { Authorization: `Bearer ${cfg.apiKey}` } : {},
         signal,
@@ -230,7 +255,7 @@ export async function chatStream(
     temperature: 0.4, // 解读须稳，不要发散
   };
 
-  const res = cfg.direct
+  const res = useDirect(cfg)
     ? await fetch(`${baseUrl}/chat/completions`, {
         method: 'POST',
         headers: {

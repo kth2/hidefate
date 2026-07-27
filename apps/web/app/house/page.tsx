@@ -71,7 +71,7 @@ export default function HousePage() {
         title={property.name}
         subtitle={`${year} 年 · ${result.flyingStar.pattern} · ${result.overallRisk}`}
         right={
-          <Link href={`/property/${property.id}/report`} className="btn btn-sm">
+          <Link href="/report" className="btn btn-sm">
             报告
           </Link>
         }

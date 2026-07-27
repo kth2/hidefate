@@ -130,7 +130,7 @@ export default function MePage() {
                 <span className="flex-1">问答与 AI 对话</span>
                 <Chevron />
               </Link>
-              <Link href={`/property/${property.id}/report`} className="row">
+              <Link href="/report" className="row">
                 <span className="flex-1">生成 PDF 报告</span>
                 <Chevron />
               </Link>

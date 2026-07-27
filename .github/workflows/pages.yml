@@ -1,0 +1,73 @@
+# 构建静态版并发布到 GitHub Pages。
+#
+# 产物是纯静态文件，托管在 https://<user>.github.io/<repo>/ ——
+# 免费、自带 HTTPS，因此手机上可「添加到主屏幕」并离线使用。
+#
+# 与本机版的唯一差别：静态托管没有服务器，故 /api/ai/* 转发路由不存在，
+# AI 只能由浏览器直连供应商（见 apps/web/lib/ai.ts 的 AI_DIRECT_ONLY）。
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch: # 也可在 Actions 页面手动触发
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# 同时只跑一个部署；新的推送会取消排队中的旧构建（但不打断进行中的）
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: 安装依赖
+        run: npm ci
+
+      - name: 跑测试（不过就不发布）
+        run: npm test
+
+      - name: 移除 API 路由
+        # 静态导出不支持 route handler，构建会直接报错。
+        # 本机版仍保留这些文件，只在 Pages 构建时剔除。
+        run: rm -rf apps/web/app/api
+
+      - name: 构建静态站点
+        env:
+          STATIC_EXPORT: '1'
+          # Pages 项目站点位于 /<repo> 子路径下
+          NEXT_PUBLIC_BASE_PATH: /${{ github.event.repository.name }}
+          NEXT_PUBLIC_AI_DIRECT_ONLY: '1'
+        run: npm run build --workspace=@hidefate/web
+
+      - name: 关闭 Jekyll 处理
+        # 不加这个，GitHub Pages 会忽略 _next 这类下划线开头的目录，整站样式全丢
+        run: touch apps/web/out/.nojekyll
+
+      - uses: actions/configure-pages@v5
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: apps/web/out
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
