@@ -1,0 +1,251 @@
+'use client';
+
+/**
+ * AI 对话 —— 带完整宅盘上下文。
+ *
+ * 边界很清楚：确定性引擎已经把星位、宫位、概率、化解全部算好，
+ * 这里只是把它们连同用户的问题交给模型，让模型写成通顺中文。
+ * system 提示里明令禁止改数（见 core-synthesis 的 buildAnswerContext），
+ * 所以模型能做的只有「解释」，不能「重算」。
+ */
+
+import Link from 'next/link';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import type { AnswerContextOptions, Member, SynthesisResult } from '@hidefate/core-synthesis';
+import { buildAnswerContext } from '@hidefate/core-synthesis';
+import { chatStream, type AiConfig, type ChatMessage } from '../lib/ai';
+import { loadSettings, type AppSettings } from '../lib/db';
+
+interface Turn {
+  role: 'user' | 'assistant';
+  content: string;
+  /** 流式进行中 */
+  streaming?: boolean;
+  error?: string;
+}
+
+const SUGGESTIONS = [
+  '这间房子对我们全家来说最大的问题是什么？请按轻重排序。',
+  '今年最该先花钱处理哪一处？预算有限的话只做一件事，做哪件？',
+  '小孩的房间现在这个位置合适吗？如果不合适，换到哪里更好？',
+  '主卧的问题具体会怎么影响夫妻关系？有多大可能？',
+  '未来三年有哪些年份需要特别注意？为什么？',
+];
+
+export function AiChat({
+  result,
+  members,
+  simulation,
+}: {
+  result: SynthesisResult;
+  members: readonly Member[];
+  simulation?: AnswerContextOptions['simulation'];
+}) {
+  const [settings, setSettings] = useState<AppSettings | null>(null);
+  const [turns, setTurns] = useState<Turn[]>([]);
+  const [input, setInput] = useState('');
+  const [busy, setBusy] = useState(false);
+  const abortRef = useRef<AbortController | null>(null);
+  const scrollRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    void loadSettings().then(setSettings);
+  }, []);
+
+  useEffect(() => {
+    scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: 'smooth' });
+  }, [turns]);
+
+  const context = useMemo(
+    () => buildAnswerContext(result, { members, simulation: simulation ?? null }),
+    [result, members, simulation],
+  );
+
+  const configured = Boolean(settings?.aiBaseUrl && settings?.aiModel);
+  const consented = Boolean(settings?.aiConsent);
+
+  const send = useCallback(
+    async (text: string) => {
+      if (!text.trim() || busy || !settings) return;
+      const question = text.trim();
+      setInput('');
+
+      const history: ChatMessage[] = [
+        { role: 'system', content: `${context.system}\n\n===== 事实（由确定性引擎算出，不可修改） =====\n${context.facts}` },
+        // 只带最近 8 轮，避免上下文无限膨胀；事实区块每轮都会重新附上，故不会丢失盘面。
+        ...turns.slice(-8).map((t) => ({ role: t.role, content: t.content }) as ChatMessage),
+        { role: 'user', content: question },
+      ];
+
+      setTurns((prev) => [...prev, { role: 'user', content: question }, { role: 'assistant', content: '', streaming: true }]);
+      setBusy(true);
+
+      const ctrl = new AbortController();
+      abortRef.current = ctrl;
+      const cfg: AiConfig = {
+        baseUrl: settings.aiBaseUrl ?? '',
+        apiKey: settings.aiApiKey ?? '',
+        model: settings.aiModel,
+        direct: settings.aiDirect,
+      };
+
+      try {
+        await chatStream(
+          cfg,
+          history,
+          (delta) => {
+            setTurns((prev) => {
+              const next = [...prev];
+              const last = next[next.length - 1];
+              if (last?.role === 'assistant') next[next.length - 1] = { ...last, content: last.content + delta };
+              return next;
+            });
+          },
+          ctrl.signal,
+        );
+        setTurns((prev) => {
+          const next = [...prev];
+          const last = next[next.length - 1];
+          if (last?.role === 'assistant') next[next.length - 1] = { ...last, streaming: false };
+          return next;
+        });
+      } catch (e) {
+        const msg = ctrl.signal.aborted ? '已中断。' : e instanceof Error ? e.message : String(e);
+        setTurns((prev) => {
+          const next = [...prev];
+          const last = next[next.length - 1];
+          if (last?.role === 'assistant') {
+            next[next.length - 1] = { ...last, streaming: false, error: msg, content: last.content };
+          }
+          return next;
+        });
+      } finally {
+        setBusy(false);
+        abortRef.current = null;
+      }
+    },
+    [busy, settings, context, turns],
+  );
+
+  if (!settings) return <p className="text-sm text-ink-mute">读取设置中…</p>;
+
+  if (!configured) {
+    return (
+      <div className="card">
+        <h3 className="card-title">AI 对话尚未配置</h3>
+        <p className="text-sm leading-relaxed text-ink-soft">
+          填入任一 OpenAI 兼容端点的 Base URL 与 API Key，即可从该 API 拉取<b>实际可用的模型列表</b>并选用。
+        </p>
+        <p className="mt-2 text-xs leading-relaxed text-ink-mute">
+          不配置也完全不影响使用 —— 上方的内置作答同样输出「答案 / 理 / 化解建议」三段，
+          且完全离线，只是文字较为格式化。
+        </p>
+        <Link href="/settings" className="btn btn-primary mt-3">
+          前往 AI 设置
+        </Link>
+      </div>
+    );
+  }
+
+  if (!consented) {
+    return (
+      <div className="card border-gold/40 bg-gold/5">
+        <h3 className="card-title text-gold">需要你的确认</h3>
+        <p className="text-sm leading-relaxed text-ink-soft">
+          向 AI 提问会把本宅的九宫盘、房间布局，以及成员的姓名与出生资料，
+          作为上下文发送给你所选的供应商（{settings.aiBaseUrl}）。
+          这是本 App 唯一会把数据送出本机的功能。
+        </p>
+        <Link href="/settings" className="btn btn-primary mt-3">
+          到设置中确认
+        </Link>
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-3">
+      <div className="flex flex-wrap items-center gap-2 text-xs text-ink-mute">
+        <span className="tag border-rice-line">
+          模型 <b className="font-mono">{settings.aiModel}</b>
+        </span>
+        <span className="tag border-rice-line">{settings.aiDirect ? '浏览器直连' : '经本机转发'}</span>
+        <span className="tag border-jade/40 bg-jade/10 text-jade">
+          已附带完整盘面（九宫 · {members.length} 位成员 · {result.qiMenEnabled ? '三派' : '两派'}
+          {simulation ? ' · 模拟中' : ''}）
+        </span>
+        <Link href="/settings" className="ml-auto text-cinnabar hover:underline">
+          更改设置
+        </Link>
+      </div>
+
+      <div ref={scrollRef} className="max-h-[28rem] space-y-3 overflow-y-auto rounded-xl border border-rice-line bg-white/60 p-3">
+        {turns.length === 0 && (
+          <div className="py-4 text-center">
+            <p className="mb-3 text-sm text-ink-mute">问点什么吧。模型已经拿到这间房子的全部推算结果。</p>
+            <div className="flex flex-wrap justify-center gap-1.5">
+              {SUGGESTIONS.map((s) => (
+                <button key={s} type="button" className="btn text-xs" onClick={() => void send(s)}>
+                  {s}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {turns.map((t, i) => (
+          <div key={i} className={t.role === 'user' ? 'flex justify-end' : ''}>
+            <div
+              className={`max-w-[90%] rounded-xl px-3 py-2 text-sm leading-relaxed ${
+                t.role === 'user' ? 'bg-cinnabar text-white' : 'border border-rice-line bg-white'
+              }`}
+            >
+              {t.content ? (
+                <pre className="whitespace-pre-wrap font-sans">{t.content}</pre>
+              ) : t.streaming ? (
+                <span className="text-ink-mute">思考中…</span>
+              ) : null}
+              {t.streaming && t.content && <span className="ml-0.5 animate-pulse">▍</span>}
+              {t.error && <p className="mt-1.5 border-t border-rice-line pt-1.5 text-xs text-cinnabar">{t.error}</p>}
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <form
+        onSubmit={(e) => {
+          e.preventDefault();
+          void send(input);
+        }}
+        className="flex gap-2"
+      >
+        <input
+          className="field"
+          value={input}
+          onChange={(e) => setInput(e.target.value)}
+          placeholder="例：预算只够做一件事，先处理哪里？"
+          disabled={busy}
+        />
+        {busy ? (
+          <button type="button" className="btn" onClick={() => abortRef.current?.abort()}>
+            中断
+          </button>
+        ) : (
+          <button type="submit" className="btn btn-primary" disabled={!input.trim()}>
+            发送
+          </button>
+        )}
+        {turns.length > 0 && !busy && (
+          <button type="button" className="btn" onClick={() => setTurns([])}>
+            清空
+          </button>
+        )}
+      </form>
+
+      <p className="text-xs leading-relaxed text-ink-mute">
+        模型只负责组织语言。若它给出的星位或数字与上方九宫盘不一致，
+        <b className="text-ink-soft">以九宫盘为准</b> —— 那是确定性引擎算的，模型没有权限改动。
+      </p>
+    </div>
+  );
+}

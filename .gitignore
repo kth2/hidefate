@@ -1,0 +1,9 @@
+node_modules/
+.next/
+dist/
+*.tsbuildinfo
+.DS_Store
+.env
+.env.local
+apps/web/public/vendor/
+coverage/

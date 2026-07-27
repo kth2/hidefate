@@ -1,0 +1,156 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/*
+ * 移动优先（Mobile-First）。
+ *
+ * 基准是「一只手、站在屋子里、可能光线不好」的使用场景：
+ *   - 正文 16px 起跳（iOS 上小于 16px 的输入框会触发自动缩放，非常糟）
+ *   - 中文行高 1.8，字距略放，长段落才不闷
+ *   - 所有可点区域 ≥ 48px
+ *   - 底部留出 tab bar 与 iPhone home indicator 的安全区
+ * 桌面只是「把手机版放在中间」，不做另一套布局。
+ */
+
+:root {
+  color-scheme: light;
+  --tab-h: 3.75rem;
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-top: env(safe-area-inset-top, 0px);
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+html,
+body {
+  @apply bg-rice text-ink;
+  font-size: 16px;
+  line-height: 1.8;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  overscroll-behavior-y: none;
+}
+
+body {
+  /* 避免 iOS 双击缩放，但保留双指缩放（户型图要用） */
+  touch-action: manipulation;
+}
+
+/* 手机上不显示原生滚动条，但保留滚动 */
+.no-scrollbar {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+@layer components {
+  /* ── 卡片 ── */
+  .card {
+    @apply rounded-2xl border border-rice-line bg-white p-4;
+  }
+  .card-title {
+    @apply mb-3 font-serif text-[1.0625rem] font-semibold leading-snug text-ink;
+  }
+  .card-sub {
+    @apply text-[0.8125rem] leading-relaxed text-ink-mute;
+  }
+
+  /* ── 按钮：一律 ≥48px 高 ── */
+  .btn {
+    @apply inline-flex min-h-[3rem] items-center justify-center gap-1.5 rounded-xl border border-rice-line
+           bg-white px-4 text-[0.9375rem] font-medium text-ink-soft transition
+           active:scale-[0.98] disabled:opacity-40;
+  }
+  .btn-primary {
+    @apply border-cinnabar bg-cinnabar text-white;
+  }
+  .btn-sm {
+    @apply min-h-[2.5rem] rounded-lg px-3 text-[0.8125rem];
+  }
+  .btn-block {
+    @apply w-full;
+  }
+
+  /* ── 表单：16px 以避免 iOS 聚焦缩放 ── */
+  .field {
+    @apply w-full rounded-xl border border-rice-line bg-white px-3.5 py-3 text-base
+           outline-none transition focus:border-cinnabar;
+  }
+  .label {
+    @apply mb-1.5 block text-[0.8125rem] font-medium text-ink-mute;
+  }
+
+  /* ── 标签 ── */
+  .tag {
+    @apply inline-flex items-center rounded-md border px-2 py-0.5 text-[0.75rem] leading-[1.5];
+  }
+
+  /* ── 分段控件：横向滚动，手指友好 ── */
+  .seg {
+    @apply inline-flex min-h-[2.75rem] shrink-0 items-center rounded-xl border border-rice-line
+           bg-white px-3.5 text-[0.875rem] transition active:scale-[0.98];
+  }
+  .seg-on {
+    @apply border-cinnabar bg-cinnabar text-white;
+  }
+  .seg-row {
+    @apply -mx-4 flex gap-2 overflow-x-auto px-4 pb-1 no-scrollbar;
+  }
+
+  /* ── 列表行（设置类页面） ── */
+  .row {
+    @apply flex min-h-[3.25rem] w-full items-center gap-3 border-b border-rice-line
+           px-4 text-left text-[0.9375rem] last:border-b-0 active:bg-rice-deep/50;
+  }
+
+  /* ── 页面区块标题 ── */
+  .section-title {
+    @apply mb-2 px-1 font-serif text-[0.9375rem] font-semibold text-ink-soft;
+  }
+}
+
+/* 九宫格：正方形宫位 */
+.gong {
+  aspect-ratio: 1 / 1;
+}
+
+/* 底部安全区 —— 内容不被 tab bar 盖住 */
+.pb-tab {
+  padding-bottom: calc(var(--tab-h) + var(--safe-bottom) + 1.25rem);
+}
+
+/* 底部弹层动画 */
+@keyframes sheet-up {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+.animate-sheet {
+  animation: sheet-up 0.24s cubic-bezier(0.32, 0.72, 0, 1);
+}
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+.animate-fade {
+  animation: fade-in 0.18s ease-out;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-sheet,
+  .animate-fade {
+    animation: none;
+  }
+}

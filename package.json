@@ -1,0 +1,27 @@
+{
+  "name": "hidefate",
+  "version": "0.1.0",
+  "private": true,
+  "description": "藏聚 HideFate —— 玄空飞星 / 八宅 / 山向奇门 三派合参的住宅与商铺风水系统",
+  "workspaces": [
+    "packages/*",
+    "apps/*"
+  ],
+  "scripts": {
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "typecheck": "tsc -b packages/core-bazi packages/core-fengshui packages/core-qimen packages/core-synthesis",
+    "dev": "npm run dev --workspace=@hidefate/web",
+    "build": "npm run build --workspace=@hidefate/web",
+    "start": "npm run start --workspace=@hidefate/web",
+    "sync:vendor": "node scripts/sync-vendor.mjs"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.2",
+    "typescript": "^5.7.2",
+    "vitest": "^2.1.8"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

@@ -1,0 +1,4 @@
+{
+  "//": "上游 vendor 代码为 UMD/IIFE (CommonJS 语义)。父包声明了 \"type\": \"module\"，若不在此处覆盖，Node 会把本目录的 .js 当作 ESM 解析，导致 shanxiang.js 的 UMD 包装取到 undefined 的 root 而报错。此文件仅作模块系统标注，vendor 源码保持零修改。",
+  "type": "commonjs"
+}
