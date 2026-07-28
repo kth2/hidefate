@@ -13,12 +13,32 @@ import {
   floorLevelsOf,
   type PalaceIndex,
 } from '@hidefate/core-fengshui';
-import { RISK_COLOR, checkLayout, judgeRoomPlacement, layoutSummary } from '@hidefate/core-synthesis';
+import {
+  RISK_COLOR,
+  WINDFALL_NOTE,
+  checkLayout,
+  findOpportunities,
+  judgeRoomPlacement,
+  layoutSummary,
+  opportunitySummary,
+} from '@hidefate/core-synthesis';
+import { dailyStar, monthlyStar, solarMonthIndexOf, STAR_NAME as SN } from '@hidefate/core-fengshui';
 import { BigNineGrid, type LayerToggles } from '../../components/mobile/BigNineGrid';
 import { AppBar, Empty, Expandable, Sheet, Skeleton } from '../../components/mobile/ui';
 import { useProperty } from '../../lib/PropertyContext';
 
-type View = '九宫' | '布局' | '预测' | '化解';
+type View = '九宫' | '吉方' | '布局' | '预测' | '化解';
+
+const OPP_TONE: Record<string, string> = {
+  正财位: 'border-jade/40 bg-jade/10 text-jade',
+  偏财位: 'border-gold/40 bg-gold/10 text-gold',
+  文昌位: 'border-cinnabar/40 bg-cinnabar/10 text-cinnabar',
+  桃花位: 'border-cinnabar/30 bg-cinnabar/[0.07] text-cinnabar',
+  贵人位: 'border-gold/40 bg-gold/10 text-gold',
+  添丁位: 'border-jade/40 bg-jade/10 text-jade',
+  健康位: 'border-jade/40 bg-jade/10 text-jade',
+  当旺气口: 'border-jade/50 bg-jade/[0.12] text-jade',
+};
 
 const SEV_TONE: Record<string, string> = {
   严重: 'border-risk-crit/40 bg-risk-crit/10 text-risk-crit',
@@ -41,7 +61,7 @@ const SCHOOL_TONE: Record<string, string> = {
 };
 
 export default function HousePage() {
-  const { property, result, loading, enableQiMen, setEnableQiMen, qiMenLoading, qiMenError, retryQiMen, year } =
+  const { property, result, members, loading, enableQiMen, setEnableQiMen, qiMenLoading, qiMenError, retryQiMen, year } =
     useProperty();
   const [view, setView] = useState<View>('九宫');
   const [selected, setSelected] = useState<PalaceIndex | null>(null);
@@ -50,6 +70,30 @@ export default function HousePage() {
 
   const floors = property ? floorLevelsOf(property) : [];
   const layoutIssues = useMemo(() => (result ? checkLayout(result) : []), [result]);
+  const opportunities = useMemo(
+    () => (result ? findOpportunities(result, members) : []),
+    [result, members],
+  );
+
+  /**
+   * 年 / 月 / 日 三层紫白。
+   *
+   * 力量分级是关键：年为主，月为应，日时为触机。
+   * 日星逐日变动，若与年星等量呈现，用户会被颜色牵着走，反而抓不住重点。
+   */
+  const timeLayers = useMemo(() => {
+    const now = new Date();
+    try {
+      const mIdx = solarMonthIndexOf(now);
+      const d = dailyStar(now);
+      return {
+        month: { star: monthlyStar(year, mIdx), index: mIdx },
+        day: { star: d.star, label: d.label },
+      };
+    } catch {
+      return null;
+    }
+  }, [year]);
 
   /**
    * 多层住宅时，九宫上只显示当前楼层的房间。
@@ -113,9 +157,12 @@ export default function HousePage() {
 
       <div className="space-y-4 px-4 py-4">
         <div className="seg-row">
-          {(['九宫', '布局', '预测', '化解'] as View[]).map((v) => (
+          {(['九宫', '吉方', '布局', '预测', '化解'] as View[]).map((v) => (
             <button key={v} type="button" className={`seg ${view === v ? 'seg-on' : ''}`} onClick={() => setView(v)}>
               {v}
+              {v === '吉方' && opportunities.length > 0 && (
+                <span className="ml-1 text-[0.6875rem] opacity-75">{opportunities.length}</span>
+              )}
               {v === '布局' && layoutIssues.length > 0 && (
                 <span className="ml-1 text-[0.6875rem] opacity-75">{layoutIssues.length}</span>
               )}
@@ -191,6 +238,32 @@ export default function HousePage() {
 
             <BigNineGrid result={viewResult ?? result} layers={layers} onSelect={setSelected} />
 
+            {/* 年 / 月 / 日 三层紫白 —— 力量分级必须写清楚 */}
+            {timeLayers && (
+              <Expandable title="流年 · 流月 · 流日 紫白">
+                <div className="space-y-2 text-[0.875rem] leading-relaxed">
+                  <p>
+                    <b className="text-cinnabar">流年</b>：{SN[result.palaces[5].stars.annual]}入中 ——
+                    <span className="text-ink-mute">主一年之气，断吉凶以此为主。</span>
+                  </p>
+                  <p>
+                    <b className="text-gold">流月</b>：{SN[timeLayers.month.star]}入中（第 {timeLayers.month.index} 个节气月）——
+                    <span className="text-ink-mute">主一月之应期，用以定「何时发」。</span>
+                  </p>
+                  <p>
+                    <b className="text-ink-soft">流日</b>：{SN[timeLayers.day.star]}入中 ——
+                    <span className="text-ink-mute">仅为触机，宜用于择日，不宜据以论断吉凶。</span>
+                  </p>
+                  <p className="mt-1 text-[0.75rem] text-ink-mute">{timeLayers.day.label}</p>
+                </div>
+                <p className="mt-3 rounded-lg border border-rice-line bg-rice-deep/40 p-2.5 text-[0.8125rem] leading-relaxed text-ink-soft">
+                  <b>年为主，月为应，日时为触机。</b>
+                  日星逐日轮转，力量最微 —— 若把它与年星等量齐观，只会被日日变换的颜色牵着走，
+                  反而抓不住真正要紧的事。故本 App 的风险评分只计年与月，日星单列，供择日与应期参考。
+                </p>
+              </Expandable>
+            )}
+
             <Expandable title="本屋总述">
               <p className="text-[0.9375rem] leading-relaxed">{result.summary}</p>
               <p className="mt-3 text-[0.8125rem] font-medium text-ink-soft">置信度：{result.confidence.level}</p>
@@ -212,6 +285,71 @@ export default function HousePage() {
               </ol>
             </Expandable>
           </>
+        )}
+
+        {view === '吉方' && (
+          <div className="space-y-3">
+            <p className="card card-sub">{opportunitySummary(opportunities)}</p>
+
+            {opportunities.length === 0 ? (
+              <Empty
+                title="本宅当元未见明显旺位"
+                desc="元运流转，待流年吉星到方时另有可用之机。眼下以守成与化解为主。"
+              />
+            ) : (
+              opportunities.map((o, i) => (
+                <Expandable
+                  key={`${o.kind}-${o.palace}-${i}`}
+                  title={<span className="text-[0.9375rem] leading-snug">{o.headline}</span>}
+                  badge={<span className={`tag shrink-0 ${OPP_TONE[o.kind] ?? 'border-rice-line'}`}>{o.kind}</span>}
+                  defaultOpen={i < 2}
+                >
+                  <p className="text-[0.9375rem] leading-relaxed">{o.finding.statement}</p>
+                  <p className="mt-2 border-l-2 border-rice-line pl-2.5 text-[0.8125rem] leading-relaxed text-ink-mute">
+                    依据：{o.finding.principle}
+                  </p>
+
+                  <h4 className="mt-3 text-[0.875rem] font-semibold text-jade">怎么用起来</h4>
+                  <ul className="mt-1 list-disc space-y-1 pl-4 text-[0.875rem] leading-relaxed">
+                    {o.howToUse.map((h, k) => (
+                      <li key={k}>{h}</li>
+                    ))}
+                  </ul>
+
+                  <h4 className="mt-3 text-[0.875rem] font-semibold text-cinnabar">忌</h4>
+                  <ul className="mt-1 list-disc space-y-1 pl-4 text-[0.875rem] leading-relaxed text-ink-soft">
+                    {o.avoid.map((h, k) => (
+                      <li key={k}>{h}</li>
+                    ))}
+                  </ul>
+
+                  {o.bestFor.length > 0 && (
+                    <p className="mt-3 rounded-lg border border-jade/30 bg-jade/[0.05] p-2.5 text-[0.8125rem] leading-relaxed text-jade">
+                      此方对 {o.bestFor.map((id) => members.find((m) => m.id === id)?.name ?? id).join('、')} 尤其有利
+                      （其命卦四吉方之一）。
+                    </p>
+                  )}
+
+                  <button
+                    type="button"
+                    className="btn btn-sm mt-3"
+                    onClick={() => {
+                      setSelected(o.palace);
+                      setView('九宫');
+                    }}
+                  >
+                    看 {o.direction} 的完整盘面
+                  </button>
+                </Expandable>
+              ))
+            )}
+
+            <Expandable title="关于「偏财位」与中彩票">
+              <pre className="whitespace-pre-wrap font-sans text-[0.875rem] leading-relaxed text-ink-soft">
+                {WINDFALL_NOTE}
+              </pre>
+            </Expandable>
+          </div>
         )}
 
         {view === '布局' && (

@@ -110,6 +110,13 @@ export default function MePage() {
           <section>
             <h2 className="section-title">更多</h2>
             <div className="overflow-hidden rounded-2xl border border-rice-line bg-white">
+              <Link href="/edit" className="row">
+                <span className="flex-1">
+                  房屋设置
+                  <span className="block text-[0.75rem] text-ink-mute">修改坐向、元运、楼层、缺角</span>
+                </span>
+                <Chevron />
+              </Link>
               <Link href="/rooms" className="row">
                 <span className="flex-1">
                   房间管理

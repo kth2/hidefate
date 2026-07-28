@@ -18,10 +18,7 @@ import {
   PALACE_DIRECTION,
   PALACE_FAMILY,
   RESIDENTIAL_TYPES,
-  analyzeJianXiang,
-  buildHouseBaZhai,
-  degreeToMountain,
-  facingOf,
+  analyzeLine,
   periodOfYear,
   requiresFloor,
   requiresStoreys,
@@ -32,6 +29,7 @@ import {
 } from '@hidefate/core-fengshui';
 import { AppBar } from '../../components/mobile/ui';
 import { RoomEditor } from '../../components/mobile/RoomEditor';
+import { DirectionPicker, toSitting, type MeasureEnd } from '../../components/mobile/DirectionPicker';
 import { db, newId, type StoredProperty } from '../../lib/db';
 import { useProperty } from '../../lib/PropertyContext';
 
@@ -53,9 +51,10 @@ export default function NewPropertyPage() {
   const [moveInYear, setMoveInYear] = useState<number>(new Date().getFullYear());
   const [enableQiMen, setEnableQiMen] = useState(false);
 
+  const [end, setEnd] = useState<MeasureEnd>('向首');
   const [useDegree, setUseDegree] = useState(true);
-  const [degree, setDegree] = useState(0);
-  const [mountainName, setMountainName] = useState('子');
+  const [degree, setDegree] = useState(180);
+  const [mountainName, setMountainName] = useState('午');
 
   const [rooms, setRooms] = useState<RoomPlacement[]>([]);
   const [missing, setMissing] = useState<MissingCorner[]>([]);
@@ -63,21 +62,19 @@ export default function NewPropertyPage() {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const sitting: string | number = useDegree ? degree : mountainName;
+  /** 用户可量坐山或向首，统一换算成坐山保存。 */
+  const sitting: string | number = useMemo(
+    () => toSitting(end, useDegree, degree, mountainName),
+    [end, useDegree, degree, mountainName],
+  );
 
   const preview = useMemo(() => {
     try {
-      const m = useDegree ? degreeToMountain(degree) : MOUNTAINS.find((x) => x.name === mountainName)!;
-      return {
-        mountain: m,
-        facing: facingOf(sitting).mountain,
-        jian: analyzeJianXiang(sitting),
-        bz: buildHouseBaZhai(sitting),
-      };
+      return { line: analyzeLine(sitting) };
     } catch {
       return null;
     }
-  }, [sitting, useDegree, degree, mountainName]);
+  }, [sitting]);
 
   function cycleMissing(p: PalaceIndex) {
     setMissing((prev) => {
@@ -325,76 +322,17 @@ export default function NewPropertyPage() {
         {/* ── 第 3 步：坐向 ── */}
         {step === 2 && (
           <div className="space-y-4">
-            <div className="flex gap-2">
-              <button type="button" className={`btn flex-1 ${useDegree ? 'btn-primary' : ''}`} onClick={() => setUseDegree(true)}>
-                知道度数
-              </button>
-              <button type="button" className={`btn flex-1 ${!useDegree ? 'btn-primary' : ''}`} onClick={() => setUseDegree(false)}>
-                只知方位
-              </button>
-            </div>
-
-            {useDegree ? (
-              <div className="card">
-                <label className="label">坐山方位角（房子背靠的方向，正北 0°）</label>
-                <p className="my-2 text-center font-serif text-4xl font-bold tabular-nums text-cinnabar">
-                  {degree.toFixed(1)}°
-                </p>
-                <input
-                  type="range"
-                  min={0}
-                  max={359.5}
-                  step={0.5}
-                  value={degree}
-                  onChange={(e) => setDegree(Number(e.target.value))}
-                  className="h-8 w-full accent-cinnabar"
-                />
-                <div className="mt-2 flex items-center gap-2">
-                  <button type="button" className="btn btn-sm" onClick={() => setDegree((d) => Math.max(0, d - 0.5))}>
-                    −0.5°
-                  </button>
-                  <input
-                    type="number"
-                    inputMode="decimal"
-                    step={0.1}
-                    className="field flex-1 text-center"
-                    value={degree}
-                    onChange={(e) => setDegree(Number(e.target.value))}
-                  />
-                  <button type="button" className="btn btn-sm" onClick={() => setDegree((d) => Math.min(359.5, d + 0.5))}>
-                    +0.5°
-                  </button>
-                </div>
-              </div>
-            ) : (
-              <div className="grid grid-cols-6 gap-1.5">
-                {MOUNTAINS.map((m) => (
-                  <button
-                    key={m.name}
-                    type="button"
-                    onClick={() => setMountainName(m.name)}
-                    className={`min-h-[3rem] rounded-xl border font-serif text-[1.0625rem] transition active:scale-[0.97] ${
-                      mountainName === m.name ? 'border-cinnabar bg-cinnabar text-white' : 'border-rice-line bg-white'
-                    }`}
-                  >
-                    {m.name}
-                  </button>
-                ))}
-              </div>
-            )}
-
-            {preview && (
-              <div className="card">
-                <p className="font-serif text-[1.0625rem]">
-                  坐 <b className="text-cinnabar">{preview.mountain.name}</b> 向{' '}
-                  <b className="text-jade">{preview.facing.name}</b>
-                </p>
-                <p className="mt-1 text-[0.8125rem] leading-relaxed text-ink-soft">{preview.jian.label}</p>
-                <p className="mt-1 text-[0.8125rem] leading-relaxed text-ink-soft">
-                  八宅：{preview.bz.label} · {periodOfYear(moveInYear).label}
-                </p>
-              </div>
-            )}
+            <DirectionPicker
+              end={end}
+              onEndChange={setEnd}
+              degree={degree}
+              onDegreeChange={setDegree}
+              useDegree={useDegree}
+              onUseDegreeChange={setUseDegree}
+              mountainName={mountainName}
+              onMountainChange={setMountainName}
+              moveInYear={moveInYear}
+            />
 
             <button
               type="button"

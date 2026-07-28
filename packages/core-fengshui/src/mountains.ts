@@ -184,6 +184,142 @@ export interface JianXiangInfo {
  * 传统说法不一：常见为「兼过三度用替卦」，亦有取每山中九度为下卦者（即 ±4.5°）。
  * 本实现默认阈值 3°，可由 threshold 覆盖，并在结论中透明标注所用阈值。
  */
+/** 立向线的品级。 */
+export type LineGrade = '下卦' | '兼向' | '小空亡' | '大空亡';
+
+export interface LineAnalysis {
+  readonly grade: LineGrade;
+  /** 偏离本山中线的度数（有符号，正为顺时针偏）。 */
+  readonly offset: number;
+  readonly mountain: Mountain;
+  /** 兼向所偏之邻山；下卦时为 null。 */
+  readonly towards: string | null;
+  /** 是否须起替卦。 */
+  readonly useTiXing: boolean;
+  /** 空亡时，骑的是哪两山（或两卦）之缝。 */
+  readonly straddling: readonly string[] | null;
+  readonly label: string;
+  readonly advice: string;
+}
+
+/** 八卦分界角度（每卦 45°，坎宫居 337.5°–22.5°）。 */
+const GUA_BOUNDARIES = [22.5, 67.5, 112.5, 157.5, 202.5, 247.5, 292.5, 337.5];
+
+/** 空亡带半宽（度）。骑缝 ±1.5° 内即论空亡。 */
+export const VOID_HALF_WIDTH = 1.5;
+
+/** 到最近的某组角度的距离。 */
+function distToNearest(deg: number, angles: readonly number[]): { dist: number; at: number } {
+  let best = { dist: Infinity, at: angles[0]! };
+  for (const a of angles) {
+    const d = Math.abs(((norm360(deg) - a + 540) % 360) - 180);
+    if (d < best.dist) best = { dist: d, at: a };
+  }
+  return best;
+}
+
+/**
+ * 立向线全面判定 —— 下卦 / 兼向 / 空亡。
+ *
+ * 《天玉经》「一线定坐向」：罗盘所量者为一条线，非一个笼统方位。
+ * 线之品级直接决定用哪张盘：
+ *   - 下卦（正向）：偏中线 ≤3°，用下卦盘
+ *   - 兼向：偏 3°–7.5°，须起替卦（二十四山起星诀）
+ *   - 小空亡：骑两山之缝 ±1.5°，气杂而不纯
+ *   - 大空亡（出卦）：骑两卦之缝 ±1.5°，古称「差错空亡」，主怪异退败
+ *
+ * 空亡的判定**优先于**兼向 —— 落在骑缝线上，纵起替卦亦不足恃。
+ */
+export function analyzeLine(input: MountainInput, threshold = 3): LineAnalysis {
+  const r = resolveMountain(input);
+  const off = r.offset;
+  const m = r.mountain;
+
+  // 未给精确度数者，一律按下卦正向处理（并在 label 中说明）
+  if (!r.hasDegree) {
+    return {
+      grade: '下卦',
+      offset: 0,
+      mountain: m,
+      towards: null,
+      useTiXing: false,
+      straddling: null,
+      label: `坐${m.name}山（仅给山名，按下卦正向处理）`,
+      advice: '未量精确度数，无法判断兼向与空亡。若能用罗盘量出度数，理气准确度会明显提高。',
+    };
+  }
+
+  // ── 空亡优先判定 ──
+  const guaHit = distToNearest(r.degree, GUA_BOUNDARIES);
+  if (guaHit.dist <= VOID_HALF_WIDTH) {
+    const a = degreeToMountain(guaHit.at - 3);
+    const b = degreeToMountain(guaHit.at + 3);
+    return {
+      grade: '大空亡',
+      offset: off,
+      mountain: m,
+      towards: null,
+      useTiXing: false,
+      straddling: [a.name, b.name],
+      label: `${r.degree.toFixed(1)}° 落大空亡（出卦）——骑${a.gua}${b.gua}两卦之缝`,
+      advice:
+        '此线骑两卦交界，谓之「出卦空亡」。《沈氏玄空学》以差错空亡为大忌，主宅气驳杂、怪异之事、人丁不安，' +
+        '纵有旺星亦难聚气。首选改门改向：把大门或主气口移出骑缝线，偏向任一卦内 5° 以上即可。' +
+        '若结构无法改动，则以玄关转折气路，另择吉方开次气口纳气。',
+    };
+  }
+
+  const mountainBoundaries = MOUNTAINS.map((x) => norm360(x.center + 7.5));
+  const shanHit = distToNearest(r.degree, mountainBoundaries);
+  if (shanHit.dist <= VOID_HALF_WIDTH) {
+    const a = degreeToMountain(shanHit.at - 3);
+    const b = degreeToMountain(shanHit.at + 3);
+    return {
+      grade: '小空亡',
+      offset: off,
+      mountain: m,
+      towards: null,
+      useTiXing: false,
+      straddling: [a.name, b.name],
+      label: `${r.degree.toFixed(1)}° 落小空亡（差错）——骑${a.name}${b.name}两山之缝`,
+      advice:
+        '此线骑两山交界，谓之「差错空亡」。虽不及出卦之烈，然两山之气相杂，理气难以取定，' +
+        '主事情反复、家宅欠安。宜将气口略移，令其明确落入某一山之内（偏 3° 以上即可），' +
+        '取定一盘再论布局。',
+    };
+  }
+
+  // ── 下卦 / 兼向 ──
+  if (Math.abs(off) <= threshold) {
+    return {
+      grade: '下卦',
+      offset: off,
+      mountain: m,
+      towards: null,
+      useTiXing: false,
+      straddling: null,
+      label: `坐${m.name}山（下卦正向，偏${off.toFixed(1)}°，未过${threshold}°）`,
+      advice: '立向端正，用下卦盘即可，气纯而专，是最理想的一种。',
+    };
+  }
+
+  const neighbour = degreeToMountain(m.center + (off > 0 ? 15 : -15));
+  return {
+    grade: '兼向',
+    offset: off,
+    mountain: m,
+    towards: neighbour.name,
+    useTiXing: true,
+    straddling: null,
+    label: `坐${m.name}兼${neighbour.name} ${Math.abs(off).toFixed(1)}°（过${threshold}°，起替卦）`,
+    advice:
+      `偏出中线 ${Math.abs(off).toFixed(1)}°，已属兼向，须起替卦（替星）另排一盘。` +
+      (Math.abs(off) > 6
+        ? '且已逼近山界，气渐杂，若能将气口稍稍收正，回到中线 3° 以内，则可用下卦，气更纯。'
+        : '兼线尚在可用之内，依替卦盘论断即可。'),
+  };
+}
+
 export function analyzeJianXiang(input: MountainInput, threshold = 3): JianXiangInfo {
   const r = resolveMountain(input);
   const off = r.offset;
