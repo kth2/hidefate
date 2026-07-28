@@ -203,32 +203,127 @@ function cornerCures(p: PalaceIndex): string[] {
   return base[p];
 }
 
-/** 房间用途。优先级严格按：大门 > 主卧 > 厨房 > 儿童房 > 客厅。 */
+/**
+ * 房间用途。
+ *
+ * 覆盖华人住宅与商铺的实际空间，尤其补上了几个在传统风水里分量极重、
+ * 但一般 App 都漏掉的：神位、灶位（与厨房分开）、后门、楼梯、电箱。
+ */
 export type RoomKind =
-  | '大门' | '主卧' | '厨房' | '儿童房' | '客厅'
-  | '次卧' | '书房' | '卫浴' | '阳台' | '餐厅' | '玄关'
-  | '储藏' | '楼梯' | '办公位' | '收银台' | '会议室' | '其他';
+  // ── 气口 ──
+  | '大门' | '后门' | '侧门' | '玄关' | '车库'
+  // ── 卧房 ──
+  | '主卧' | '次卧' | '儿童房' | '老人房' | '客房' | '佣人房'
+  // ── 生活 ──
+  | '客厅' | '餐厅' | '书房' | '家庭厅' | '阳台' | '天井' | '庭院花园'
+  // ── 厨卫 ──
+  | '厨房' | '灶位' | '卫浴' | '厕所' | '洗衣房'
+  // ── 特殊 ──
+  | '神位' | '祖先牌位' | '财位保险箱' | '鱼缸水景' | '楼梯' | '电箱' | '储藏' | '泳池'
+  // ── 商用 ──
+  | '办公位' | '老板位' | '收银台' | '会议室' | '前台接待' | '仓储区' | '机台区' | '诊疗室' | '讲台' | '教室座区'
+  | '其他';
+
+/** 房间分类，供 UI 分组选择。 */
+export type RoomCategory = '气口' | '卧房' | '生活' | '厨卫' | '特殊' | '商用';
+
+/**
+ * 房间的「宜忌取向」—— 本模型最关键的一条修正。
+ *
+ *   宜吉 —— 应当落在吉方。落在凶方即为问题（大门、主卧、灶位、神位…）。
+ *   宜凶 —— **应当落在凶方**。这是古法的「以凶制凶／压凶」：
+ *           厕所、储藏、楼梯这类污秽或不常驻之处压住凶星，反是正解；
+ *           它们若占了吉方（财位、文昌），才是真正的败笔。
+ *   中性 —— 吉凶影响有限。
+ *
+ * 早期版本把所有房间一视同仁，只按权重加权，会把「厕所压绝命方」
+ * 这种正确布局误判为高风险，与实务完全相反。
+ */
+export type RoomNature = '宜吉' | '宜凶' | '中性';
+
+export interface RoomMeta {
+  readonly kind: RoomKind;
+  readonly category: RoomCategory;
+  /** 权重：同一颗凶星落在何处，后果差多少。 */
+  readonly priority: number;
+  readonly nature: RoomNature;
+  /** 一句话说明，供 UI 提示。 */
+  readonly note: string;
+}
+
+export const ROOM_META: Record<RoomKind, RoomMeta> = {
+  // ── 气口 ──
+  大门:   { kind: '大门', category: '气口', priority: 1.0, nature: '宜吉', note: '全宅第一气口，吉凶影响最大，务必落在吉方。' },
+  后门:   { kind: '后门', category: '气口', priority: 0.65, nature: '宜吉', note: '第二气口。与大门成一直线即为穿堂煞，气不聚。' },
+  侧门:   { kind: '侧门', category: '气口', priority: 0.5, nature: '中性', note: '次要气口，日常使用频繁者按大门减半计。' },
+  玄关:   { kind: '玄关', category: '气口', priority: 0.5, nature: '宜吉', note: '缓冲与藏气之处，宜明亮整洁。' },
+  车库:   { kind: '车库', category: '气口', priority: 0.3, nature: '中性', note: '动而不居，压凶尚可，忌设于财位。' },
+
+  // ── 卧房 ──
+  主卧:   { kind: '主卧', category: '卧房', priority: 0.9, nature: '宜吉', note: '一天三分之一在此，直接关乎健康与夫妻感情。' },
+  次卧:   { kind: '次卧', category: '卧房', priority: 0.5, nature: '宜吉', note: '按实际居住者的命卦另行交叉。' },
+  儿童房: { kind: '儿童房', category: '卧房', priority: 0.7, nature: '宜吉', note: '小儿气弱，最忌五鬼、五黄与三碧。' },
+  老人房: { kind: '老人房', category: '卧房', priority: 0.6, nature: '宜吉', note: '长者体虚，尤忌二黑病符与五黄。' },
+  客房:   { kind: '客房', category: '卧房', priority: 0.3, nature: '中性', note: '久空则气滞，偶住者影响有限。' },
+  佣人房: { kind: '佣人房', category: '卧房', priority: 0.25, nature: '中性', note: '影响限于使用者本人。' },
+
+  // ── 生活 ──
+  客厅:     { kind: '客厅', category: '生活', priority: 0.6, nature: '宜吉', note: '全家共用与待客之处，主家运与人际。' },
+  餐厅:     { kind: '餐厅', category: '生活', priority: 0.4, nature: '宜吉', note: '主食禄，宜在天医方。' },
+  书房:     { kind: '书房', category: '生活', priority: 0.5, nature: '宜吉', note: '宜在四绿文昌或一四同宫之方。' },
+  家庭厅:   { kind: '家庭厅', category: '生活', priority: 0.45, nature: '宜吉', note: '家人聚集之处，宜吉方聚气。' },
+  阳台:     { kind: '阳台', category: '生活', priority: 0.2, nature: '中性', note: '纳气之口，不宜堆杂物阻气。' },
+  天井:     { kind: '天井', category: '生活', priority: 0.35, nature: '中性', note: '中宫天井须留意，中空则家运不聚。' },
+  庭院花园: { kind: '庭院花园', category: '生活', priority: 0.3, nature: '中性', note: '外明堂，宜开阔平整。' },
+
+  // ── 厨卫 ──
+  厨房:   { kind: '厨房', category: '厨卫', priority: 0.8, nature: '宜凶', note: '古法「灶压凶方」：厨房镇在凶方反吉，但灶口须朝吉方。' },
+  灶位:   { kind: '灶位', category: '厨卫', priority: 0.85, nature: '宜凶', note: '灶座宜压凶方、灶口宜朝吉方，主一家饮食健康。' },
+  卫浴:   { kind: '卫浴', category: '厨卫', priority: 0.4, nature: '宜凶', note: '污秽之处宜压凶方；若占财位或文昌，反主破财失学。' },
+  厕所:   { kind: '厕所', category: '厨卫', priority: 0.45, nature: '宜凶', note: '同上，且忌设于中宫（污秽压心）。' },
+  洗衣房: { kind: '洗衣房', category: '厨卫', priority: 0.25, nature: '宜凶', note: '水汽杂气之处，压凶方无妨。' },
+
+  // ── 特殊 ──
+  神位:       { kind: '神位', category: '特殊', priority: 0.78, nature: '宜吉', note: '神位须坐吉向吉、背后有实墙；忌对厕、对灶、置于梁下。' },
+  祖先牌位:   { kind: '祖先牌位', category: '特殊', priority: 0.7, nature: '宜吉', note: '宜安于静方，忌与神位争位、忌当风口。' },
+  财位保险箱: { kind: '财位保险箱', category: '特殊', priority: 0.5, nature: '宜吉', note: '宜藏于向星当旺之方，忌明露、忌当门。' },
+  鱼缸水景:   { kind: '鱼缸水景', category: '特殊', priority: 0.45, nature: '中性', note: '水宜就向星旺方；放错方位反主破财，须依盘而定。' },
+  楼梯:       { kind: '楼梯', category: '特殊', priority: 0.58, nature: '宜凶', note: '楼梯动而泄气，压凶方为宜；最忌落于中宫，谓之穿心。' },
+  电箱:       { kind: '电箱', category: '特殊', priority: 0.4, nature: '中性', note: '属火，忌与五黄二黑同宫（火生土助凶），并留意火险。' },
+  储藏:       { kind: '储藏', category: '特殊', priority: 0.15, nature: '宜凶', note: '最理想的压凶用途 —— 把最凶之方封起来堆物即可。' },
+  泳池:       { kind: '泳池', category: '特殊', priority: 0.4, nature: '中性', note: '大水须依向星定方位，误置主退财。' },
+
+  // ── 商用 ──
+  办公位:   { kind: '办公位', category: '商用', priority: 0.75, nature: '宜吉', note: '以坐位所处宫位与朝向合参。' },
+  老板位:   { kind: '老板位', category: '商用', priority: 0.8, nature: '宜吉', note: '决策者座位，宜坐旺山、背后有靠。' },
+  收银台:   { kind: '收银台', category: '商用', priority: 0.8, nature: '宜吉', note: '零售第一要位，须落在向星当旺之方。' },
+  会议室:   { kind: '会议室', category: '商用', priority: 0.4, nature: '宜吉', note: '忌在斗牛煞方，易起争执。' },
+  前台接待: { kind: '前台接待', category: '商用', priority: 0.45, nature: '宜吉', note: '门面与第一印象，宜明亮开阔。' },
+  仓储区:   { kind: '仓储区', category: '商用', priority: 0.2, nature: '宜凶', note: '堆货压凶正合古法，忌占财位空置。' },
+  机台区:   { kind: '机台区', category: '商用', priority: 0.6, nature: '宜吉', note: '重机械忌遇五鬼、五黄、七赤，工伤风险显著上升。' },
+  诊疗室:   { kind: '诊疗室', category: '商用', priority: 0.6, nature: '宜吉', note: '忌五黄叠临；二黑虽为病符，医疗场所可借其象。' },
+  讲台:     { kind: '讲台', category: '商用', priority: 0.6, nature: '宜吉', note: '宜坐旺山面向学生，合文昌更佳。' },
+  教室座区: { kind: '教室座区', category: '商用', priority: 0.5, nature: '宜吉', note: '以四绿文昌与一白为重。' },
+
+  其他:     { kind: '其他', category: '特殊', priority: 0.3, nature: '中性', note: '未分类空间，按中性论。' },
+};
 
 /** 房间权重：概率预测中「同一颗凶星，落在何处后果差多少」。 */
-export const ROOM_PRIORITY: Record<RoomKind, number> = {
-  大门: 1.0,
-  主卧: 0.9,
-  厨房: 0.8,
-  儿童房: 0.7,
-  客厅: 0.6,
-  办公位: 0.75,
-  收银台: 0.8,
-  次卧: 0.5,
-  书房: 0.45,
-  餐厅: 0.4,
-  会议室: 0.4,
-  玄关: 0.5,
-  卫浴: 0.25,
-  阳台: 0.2,
-  储藏: 0.15,
-  楼梯: 0.3,
-  其他: 0.3,
-};
+export const ROOM_PRIORITY: Record<RoomKind, number> = Object.fromEntries(
+  (Object.keys(ROOM_META) as RoomKind[]).map((k) => [k, ROOM_META[k].priority]),
+) as Record<RoomKind, number>;
+
+/** 房间宜忌取向。 */
+export function roomNature(kind: RoomKind): RoomNature {
+  return ROOM_META[kind].nature;
+}
+
+/** 按分类取房间种类，供 UI 分组。 */
+export function roomKindsByCategory(category: RoomCategory): RoomKind[] {
+  return (Object.keys(ROOM_META) as RoomKind[]).filter((k) => ROOM_META[k].category === category);
+}
+
+export const ROOM_CATEGORIES: readonly RoomCategory[] = ['气口', '卧房', '生活', '厨卫', '特殊', '商用'] as const;
 
 /** 严格房间优先序（用于「最优先处理哪一处」的排序）。 */
 export const ROOM_ORDER: readonly RoomKind[] = [
@@ -246,14 +341,30 @@ export interface RoomPlacement {
   readonly primaryPalace: PalaceIndex;
   /** 指派给哪些成员使用（成员 id）。 */
   readonly occupants?: readonly string[];
+  /**
+   * 所在楼层（多层住宅用）。1 = 地面层，2 = 二楼，-1 = 地下室。
+   * 单层住宅或高层单位可省略（视为该单位所在层）。
+   */
+  readonly floorLevel?: number;
 }
 
 export interface PropertyProfile {
   readonly id: string;
   readonly name: string;
   readonly buildingType: BuildingType;
-  /** 楼层；非高层类别可省。 */
+  /**
+   * 楼层。两种含义按建筑类别区分：
+   *   - 高层单位（公寓 / 办公室等）：这个单位位于第几层
+   *   - 有地住宅：主要生活层（通常为 1），仅用于楼层五行
+   */
   readonly floor?: number;
+  /**
+   * 总层数（有地住宅用）。双层排屋填 2，三层半独立式填 3。
+   * 影响：每层各有一套九宫房间布局，但坐向与飞星盘全楼共用。
+   */
+  readonly storeys?: number;
+  /** 是否含地下室（地库）。 */
+  readonly hasBasement?: boolean;
   /** 坐山（山名或度数）。 */
   readonly sitting: string | number;
   /** 向首；默认取坐山之冲。 */
@@ -271,9 +382,48 @@ export interface PropertyProfile {
   readonly note?: string;
 }
 
-/** 取某宫内的所有房间。 */
+/** 取某宫内的所有房间（跨全部楼层）。 */
 export function roomsInPalace(profile: PropertyProfile, p: PalaceIndex): RoomPlacement[] {
   return profile.rooms.filter((r) => r.palaces.includes(p));
+}
+
+/** 需要填「总层数」的类别 —— 有地住宅可以是两层、三层。 */
+export const MULTI_STOREY_TYPES: readonly BuildingType[] = [
+  '独立屋', '排屋', '半独立式', '洋房别墅', '店铺零售', '餐饮', '工厂车间', '仓库', '其他',
+] as const;
+
+export function requiresStoreys(t: BuildingType): boolean {
+  return MULTI_STOREY_TYPES.includes(t);
+}
+
+/**
+ * 楼层清单。
+ *
+ * 飞星盘与八宅盘由坐向决定，**全楼共用同一张盘**；变的是每层的房间布局。
+ * 故这里只列出层号与名称，盘本身不按层重排。
+ */
+export function floorLevelsOf(profile: PropertyProfile): { level: number; label: string }[] {
+  const out: { level: number; label: string }[] = [];
+  if (profile.hasBasement) out.push({ level: -1, label: '地下室' });
+  const total = requiresStoreys(profile.buildingType) ? Math.max(1, profile.storeys ?? 1) : 1;
+  for (let i = 1; i <= total; i++) {
+    out.push({ level: i, label: i === 1 ? '地面层' : `${i} 楼` });
+  }
+  return out;
+}
+
+/** 取某一层的房间。未标层的房间视为地面层。 */
+export function roomsOnFloor(profile: PropertyProfile, level: number): RoomPlacement[] {
+  return profile.rooms.filter((r) => (r.floorLevel ?? 1) === level);
+}
+
+/** 某层某宫的房间。 */
+export function roomsInPalaceOnFloor(
+  profile: PropertyProfile,
+  p: PalaceIndex,
+  level: number,
+): RoomPlacement[] {
+  return profile.rooms.filter((r) => r.palaces.includes(p) && (r.floorLevel ?? 1) === level);
 }
 
 /** 取某宫的缺角信息（无则 null）。 */

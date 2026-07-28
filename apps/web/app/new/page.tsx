@@ -24,20 +24,18 @@ import {
   facingOf,
   periodOfYear,
   requiresFloor,
+  requiresStoreys,
   type BuildingType,
   type MissingCorner,
   type PalaceIndex,
-  type RoomKind,
   type RoomPlacement,
 } from '@hidefate/core-fengshui';
 import { AppBar } from '../../components/mobile/ui';
+import { RoomEditor } from '../../components/mobile/RoomEditor';
 import { db, newId, type StoredProperty } from '../../lib/db';
 import { useProperty } from '../../lib/PropertyContext';
 
 type EntryMode = '九宫格' | '户型图' | '罗盘实测';
-
-/** 只让用户在向导里标这几间 —— 其余可日后补，不该拖慢建档。 */
-const WIZARD_ROOMS: RoomKind[] = ['大门', '主卧', '厨房', '儿童房', '客厅'];
 
 const STEPS = ['方式', '基本', '坐向', '房间', '缺角'] as const;
 
@@ -50,6 +48,8 @@ export default function NewPropertyPage() {
   const [name, setName] = useState('');
   const [buildingType, setBuildingType] = useState<BuildingType>('公寓');
   const [floor, setFloor] = useState<number | ''>('');
+  const [storeys, setStoreys] = useState<number>(1);
+  const [hasBasement, setHasBasement] = useState(false);
   const [moveInYear, setMoveInYear] = useState<number>(new Date().getFullYear());
   const [enableQiMen, setEnableQiMen] = useState(false);
 
@@ -78,14 +78,6 @@ export default function NewPropertyPage() {
       return null;
     }
   }, [sitting, useDegree, degree, mountainName]);
-
-  function setRoomPalace(kind: RoomKind, palace: PalaceIndex | null) {
-    setRooms((prev) => {
-      const without = prev.filter((r) => r.kind !== kind);
-      if (palace == null) return without;
-      return [...without, { id: newId('r'), kind, primaryPalace: palace, palaces: [palace], occupants: [] }];
-    });
-  }
 
   function cycleMissing(p: PalaceIndex) {
     setMissing((prev) => {
@@ -121,6 +113,8 @@ export default function NewPropertyPage() {
         name: name.trim(),
         buildingType,
         floor: floor === '' ? undefined : Number(floor),
+        storeys: requiresStoreys(buildingType) ? storeys : undefined,
+        hasBasement: requiresStoreys(buildingType) ? hasBasement : undefined,
         sitting,
         moveInYear,
         missingCorners: missing,
@@ -279,7 +273,7 @@ export default function NewPropertyPage() {
 
             {requiresFloor(buildingType) && (
               <div>
-                <label className="label">楼层（必填）</label>
+                <label className="label">所在楼层（必填）</label>
                 <input
                   type="number"
                   inputMode="numeric"
@@ -289,7 +283,39 @@ export default function NewPropertyPage() {
                   placeholder="12"
                 />
                 <p className="mt-1.5 text-[0.8125rem] leading-relaxed text-ink-mute">
-                  楼层影响楼层五行，并调节山星（人丁）与向星（财禄）的力度。
+                  这个单位在第几层。楼层影响楼层五行，并调节山星（人丁）与向星（财禄）的力度。
+                </p>
+              </div>
+            )}
+
+            {requiresStoreys(buildingType) && (
+              <div>
+                <label className="label">这栋房子共几层？</label>
+                <div className="grid grid-cols-5 gap-1.5">
+                  {[1, 2, 3, 4, 5].map((n) => (
+                    <button
+                      key={n}
+                      type="button"
+                      onClick={() => setStoreys(n)}
+                      className={`min-h-[3rem] rounded-xl border font-serif text-[1.125rem] transition active:scale-[0.97] ${
+                        storeys === n ? 'border-cinnabar bg-cinnabar text-white' : 'border-rice-line bg-white'
+                      }`}
+                    >
+                      {n}
+                    </button>
+                  ))}
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setHasBasement((v) => !v)}
+                  className={`btn btn-block mt-2 ${hasBasement ? 'btn-primary' : ''}`}
+                >
+                  {hasBasement ? '✓ 含地下室' : '含地下室？'}
+                </button>
+                <p className="mt-1.5 text-[0.8125rem] leading-relaxed text-ink-mute">
+                  双层排屋填 2、三层半独立式填 3。
+                  <b className="text-ink-soft">坐向与飞星盘全楼共用</b>，但每层各有一套房间布局 ——
+                  下一步可逐层标注。
                 </p>
               </div>
             )}
@@ -392,37 +418,19 @@ export default function NewPropertyPage() {
         {step === 3 && (
           <div className="space-y-4">
             <p className="card-sub px-1">
-              至少标 <b>大门</b>。预测的房间权重严格按「大门 &gt; 主卧 &gt; 厨房 &gt; 儿童房 &gt; 客厅」计算，标得越全越准。
+              至少标 <b>大门</b>。标得越全预测越准，但现在标不完也没关系 ——
+              建好后随时可在「我的 → 房间管理」里补。
             </p>
             {photo && (
               // eslint-disable-next-line @next/next/no-img-element
               <img src={photo} alt="户型图" className="w-full rounded-xl border border-rice-line" />
             )}
-            {WIZARD_ROOMS.map((kind) => {
-              const cur = rooms.find((r) => r.kind === kind)?.primaryPalace ?? null;
-              return (
-                <div key={kind}>
-                  <p className="label">
-                    {kind}
-                    {cur != null && <span className="ml-1 text-cinnabar">· {PALACE_DIRECTION[cur]}</span>}
-                  </p>
-                  <div className="grid grid-cols-3 gap-1.5">
-                    {GRID_LAYOUT.map((p) => (
-                      <button
-                        key={p}
-                        type="button"
-                        onClick={() => setRoomPalace(kind, cur === p ? null : p)}
-                        className={`min-h-[2.75rem] rounded-lg border text-[0.8125rem] transition active:scale-[0.97] ${
-                          cur === p ? 'border-cinnabar bg-cinnabar text-white' : 'border-rice-line bg-white'
-                        }`}
-                      >
-                        {PALACE_DIRECTION[p]}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              );
-            })}
+            <RoomEditor
+              profile={{ buildingType, storeys, hasBasement }}
+              rooms={rooms}
+              onChange={setRooms}
+              newId={newId}
+            />
           </div>
         )}
 

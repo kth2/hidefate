@@ -22,22 +22,13 @@ export default function manifest(): MetadataRoute.Manifest {
     background_color: '#f7f3ec',
     theme_color: '#a8352a',
     orientation: 'portrait',
-    // 只声明 SVG：Chrome / Android 自 v93 起接受 SVG 图标并据此判定可安装性。
-    // iOS 的主屏图标另需 PNG 版 apple-touch-icon，暂缺，故 iOS 上会退化为页面截图
-    // —— 纯外观问题，不影响安装与离线使用。补一张 180×180 PNG 即可解决。
+    // SVG 供支持矢量图标的浏览器；192／512 PNG 供 Android 安装横幅与
+    // iOS 的 apple-touch-icon（iOS 不认 SVG，缺 PNG 会退化成页面截图）。
     icons: [
-      {
-        src: `${basePath}/icon.svg`,
-        sizes: 'any',
-        type: 'image/svg+xml',
-        purpose: 'any',
-      },
-      {
-        src: `${basePath}/icon.svg`,
-        sizes: 'any',
-        type: 'image/svg+xml',
-        purpose: 'maskable',
-      },
+      { src: `${basePath}/icon.svg`, sizes: 'any', type: 'image/svg+xml', purpose: 'any' },
+      { src: `${basePath}/icon-192.png`, sizes: '192x192', type: 'image/png', purpose: 'any' },
+      { src: `${basePath}/icon-512.png`, sizes: '512x512', type: 'image/png', purpose: 'any' },
+      { src: `${basePath}/icon-512.png`, sizes: '512x512', type: 'image/png', purpose: 'maskable' },
     ],
   };
 }

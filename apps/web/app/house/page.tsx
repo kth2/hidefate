@@ -3,14 +3,28 @@
 /** 房屋 —— 大九宫格 + 底部弹层看单宫详情 + 预测与化解。 */
 
 import Link from 'next/link';
-import { useState } from 'react';
-import { PALACE_DIRECTION, STAR_META, STAR_NAME, YOU_NIAN_META, type PalaceIndex } from '@hidefate/core-fengshui';
-import { RISK_COLOR } from '@hidefate/core-synthesis';
+import { useMemo, useState } from 'react';
+import {
+  PALACE_DIRECTION,
+  ROOM_META,
+  STAR_META,
+  STAR_NAME,
+  YOU_NIAN_META,
+  floorLevelsOf,
+  type PalaceIndex,
+} from '@hidefate/core-fengshui';
+import { RISK_COLOR, checkLayout, judgeRoomPlacement, layoutSummary } from '@hidefate/core-synthesis';
 import { BigNineGrid, type LayerToggles } from '../../components/mobile/BigNineGrid';
 import { AppBar, Empty, Expandable, Sheet, Skeleton } from '../../components/mobile/ui';
 import { useProperty } from '../../lib/PropertyContext';
 
-type View = '九宫' | '预测' | '化解';
+type View = '九宫' | '布局' | '预测' | '化解';
+
+const SEV_TONE: Record<string, string> = {
+  严重: 'border-risk-crit/40 bg-risk-crit/10 text-risk-crit',
+  中等: 'border-risk-warn/40 bg-risk-warn/10 text-risk-warn',
+  轻微: 'border-rice-line text-ink-mute',
+};
 
 const CONF_TONE: Record<string, string> = {
   高: 'border-jade/40 bg-jade/10 text-jade',
@@ -32,6 +46,26 @@ export default function HousePage() {
   const [view, setView] = useState<View>('九宫');
   const [selected, setSelected] = useState<PalaceIndex | null>(null);
   const [layers, setLayers] = useState<LayerToggles>({ feixing: true, bazhai: true, qimen: false });
+  const [activeFloor, setActiveFloor] = useState(1);
+
+  const floors = property ? floorLevelsOf(property) : [];
+  const layoutIssues = useMemo(() => (result ? checkLayout(result) : []), [result]);
+
+  /**
+   * 多层住宅时，九宫上只显示当前楼层的房间。
+   * 飞星盘与八宅盘全楼共用（由坐向决定），变的只是房间归属。
+   */
+  const viewResult = useMemo(() => {
+    if (!result || floors.length <= 1) return result;
+    const palaces = { ...result.palaces };
+    for (const key of Object.keys(palaces).map(Number) as PalaceIndex[]) {
+      palaces[key] = {
+        ...palaces[key],
+        rooms: palaces[key].rooms.filter((r) => (r.floorLevel ?? 1) === activeFloor),
+      };
+    }
+    return { ...result, palaces };
+  }, [result, floors.length, activeFloor]);
 
   if (loading) {
     return (
@@ -79,9 +113,12 @@ export default function HousePage() {
 
       <div className="space-y-4 px-4 py-4">
         <div className="seg-row">
-          {(['九宫', '预测', '化解'] as View[]).map((v) => (
+          {(['九宫', '布局', '预测', '化解'] as View[]).map((v) => (
             <button key={v} type="button" className={`seg ${view === v ? 'seg-on' : ''}`} onClick={() => setView(v)}>
               {v}
+              {v === '布局' && layoutIssues.length > 0 && (
+                <span className="ml-1 text-[0.6875rem] opacity-75">{layoutIssues.length}</span>
+              )}
               {v === '预测' && result.predictions.length > 0 && (
                 <span className="ml-1 text-[0.6875rem] opacity-75">{result.predictions.length}</span>
               )}
@@ -91,6 +128,22 @@ export default function HousePage() {
             </button>
           ))}
         </div>
+
+        {/* 楼层切换：多层住宅时，九宫上显示的房间按层过滤 */}
+        {floors.length > 1 && view === '九宫' && (
+          <div className="seg-row">
+            {floors.map((f) => (
+              <button
+                key={f.level}
+                type="button"
+                className={`seg ${activeFloor === f.level ? 'seg-on' : ''}`}
+                onClick={() => setActiveFloor(f.level)}
+              >
+                {f.label}
+              </button>
+            ))}
+          </div>
+        )}
 
         {view === '九宫' && (
           <>
@@ -136,7 +189,7 @@ export default function HousePage() {
               </div>
             )}
 
-            <BigNineGrid result={result} layers={layers} onSelect={setSelected} />
+            <BigNineGrid result={viewResult ?? result} layers={layers} onSelect={setSelected} />
 
             <Expandable title="本屋总述">
               <p className="text-[0.9375rem] leading-relaxed">{result.summary}</p>
@@ -159,6 +212,64 @@ export default function HousePage() {
               </ol>
             </Expandable>
           </>
+        )}
+
+        {view === '布局' && (
+          <div className="space-y-3">
+            <p className="card card-sub">{layoutSummary(layoutIssues)}</p>
+
+            {layoutIssues.length === 0 ? (
+              <Empty
+                title="未见明显布局硬伤"
+                desc="没有穿堂煞、污秽压吉、中宫受污或灶压煞方。若房间尚未标全，建议先到「我的 → 房间管理」补齐再看。"
+                action={
+                  <Link href="/rooms" className="btn btn-block">
+                    去补标房间
+                  </Link>
+                }
+              />
+            ) : (
+              layoutIssues.map((issue) => (
+                <Expandable
+                  key={issue.id}
+                  title={<span className="text-[0.9375rem] leading-snug">{issue.title}</span>}
+                  badge={<span className={`tag shrink-0 ${SEV_TONE[issue.severity]}`}>{issue.severity}</span>}
+                  defaultOpen={issue.severity === '严重'}
+                >
+                  <p className="text-[0.9375rem] leading-relaxed">{issue.finding.statement}</p>
+                  <p className="mt-2 border-l-2 border-rice-line pl-2.5 text-[0.8125rem] leading-relaxed text-ink-mute">
+                    依据：{issue.finding.principle}
+                  </p>
+                  <div className="mt-3 space-y-2">
+                    {issue.cures.map((c, i) => (
+                      <div key={i} className="rounded-xl border border-rice-line bg-rice-deep/30 p-3">
+                        <p className="text-[0.9375rem] leading-relaxed">{c.action}</p>
+                        <p className="mt-1 text-[0.8125rem] leading-relaxed text-ink-mute">理据：{c.rationale}</p>
+                        {c.avoid.length > 0 && (
+                          <p className="mt-1 text-[0.8125rem] leading-relaxed text-cinnabar">切忌：{c.avoid.join('、')}</p>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                  <div className="mt-2 flex flex-wrap gap-1.5">
+                    {issue.palaces.map((p) => (
+                      <button
+                        key={p}
+                        type="button"
+                        className="tag border-cinnabar/40 bg-cinnabar/10 text-cinnabar"
+                        onClick={() => {
+                          setSelected(p);
+                          setView('九宫');
+                        }}
+                      >
+                        看 {PALACE_DIRECTION[p]}
+                      </button>
+                    ))}
+                  </div>
+                </Expandable>
+              ))
+            )}
+          </div>
         )}
 
         {view === '预测' && (
@@ -312,6 +423,25 @@ export default function HousePage() {
                 <b className="text-risk-high">缺角</b>：{a.missing.summary}
               </div>
             )}
+
+            {/* 房间宜忌 —— 判据与「布局体检」共用 judgeRoomPlacement，两处结论必然一致 */}
+            {a.rooms.map((r) => {
+              const meta = ROOM_META[r.kind];
+              const j = judgeRoomPlacement(result, a.palace, r.kind);
+              const good = j.verdict === '得当' || j.verdict === '平常';
+              return (
+                <div
+                  key={r.id}
+                  className={`rounded-xl border p-3 text-[0.875rem] leading-relaxed ${
+                    good ? 'border-jade/30 bg-jade/[0.05]' : 'border-gold/40 bg-gold/[0.05]'
+                  }`}
+                >
+                  <b>{r.label ?? r.kind}</b>（{meta.nature}）
+                  {j.text && <span className={good ? 'text-jade' : 'text-gold'}> — {j.text}</span>}
+                  <span className="mt-1 block text-[0.8125rem] text-ink-mute">{meta.note}</span>
+                </div>
+              );
+            })}
 
             {/* 本宫预测 */}
             {result.predictions

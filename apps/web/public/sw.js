@@ -31,6 +31,8 @@ const PRECACHE = [
   p('new/'),
   p('manifest.webmanifest'),
   p('icon.svg'),
+  p('icon-192.png'),
+  p('icon-512.png'),
   p('vendor/qimen-engine.js'),
   p('vendor/shanxiang.js'),
 ];

@@ -22,6 +22,7 @@ import {
   YOU_NIAN_META,
   crossPersonHouse,
   organRisksOf,
+  roomNature,
   starScore,
   type PalaceIndex,
   type RiskDomain,
@@ -47,6 +48,8 @@ export const PROB_CEIL = 0.92;
 function logistic(x: number): number {
   return 1 / (1 + Math.exp(-x));
 }
+
+const label = (r: { label?: string; kind: string }) => r.label ?? r.kind;
 
 function squash(logit: number): number {
   return Math.max(PROB_FLOOR, Math.min(PROB_CEIL, logistic(logit)));
@@ -144,13 +147,37 @@ function buildPrediction(
   const roomKinds = assessment.rooms.map((r) => r.kind);
   const roomWeight = roomKinds.length ? Math.max(...roomKinds.map((k) => ROOM_PRIORITY[k])) : 0.3;
   const topRoom = assessment.rooms.slice().sort((a, b) => ROOM_PRIORITY[b.kind] - ROOM_PRIORITY[a.kind])[0] ?? null;
-  breakdown.push({
-    factor: '房间权重',
-    contribution: (roomWeight - 0.5) * 1.6,
-    note: topRoom
-      ? `此宫为「${topRoom.label ?? topRoom.kind}」，房间权重 ${roomWeight.toFixed(2)}（严格序：大门 > 主卧 > 厨房 > 儿童房 > 客厅）。`
-      : '此宫未标注房间，按低权重计；补标房间后预测会显著更准。',
-  });
+
+  /**
+   * 房间的宜忌取向必须参与加权，否则会得出与实务相反的结论。
+   *
+   * 古法「吉方宜开、凶方宜压」：厕所、储藏、楼梯这类空间落在凶方，是**正解**而非问题
+   * —— 它们把凶星压住了。早期版本只按权重加权，会把「厕所压绝命方」判成高风险，
+   * 完全说反。故此处按 nature 分三种算法。
+   */
+  const nature = topRoom ? roomNature(topRoom.kind) : '中性';
+  const palaceIsBad = assessment.score < 0;
+  let roomContribution: number;
+  let roomNote: string;
+
+  if (!topRoom) {
+    roomContribution = (0.3 - 0.5) * 1.6;
+    roomNote = '此宫未标注房间，按低权重计；补标房间后预测会显著更准。';
+  } else if (nature === '宜凶') {
+    // 压凶到位则显著减险；占了吉方则是浪费吉气（由布局体检另行指出，不在此重复计负）
+    roomContribution = palaceIsBad ? -roomWeight * 1.5 : -0.2;
+    roomNote = palaceIsBad
+      ? `此宫为「${label(topRoom)}」，属「宜凶」之用途 —— 正好压住本宫凶星，合古法「凶方宜压」，故风险大幅下调。`
+      : `此宫为「${label(topRoom)}」，属「宜凶」之用途，却占了本宫吉气（详见布局体检），此处不计其为风险。`;
+  } else if (nature === '中性') {
+    roomContribution = (roomWeight - 0.5) * 0.8;
+    roomNote = `此宫为「${label(topRoom)}」（中性用途），房间权重 ${roomWeight.toFixed(2)}，影响减半计。`;
+  } else {
+    roomContribution = (roomWeight - 0.5) * 1.6;
+    roomNote = `此宫为「${label(topRoom)}」（宜吉之用途），房间权重 ${roomWeight.toFixed(2)}（严格序：大门 > 主卧 > 厨房 > 儿童房 > 客厅）。`;
+  }
+
+  breakdown.push({ factor: '房间权重与宜忌', contribution: roomContribution, note: roomNote });
 
   // 3. 建筑类别维度权重
   const bw = (buildingWeight as Record<string, number>)[domain] ?? 1;

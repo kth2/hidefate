@@ -11,6 +11,14 @@ export const metadata: Metadata = {
   manifest: '/manifest.json',
   applicationName: '藏聚',
   appleWebApp: { capable: true, statusBarStyle: 'default', title: '藏聚' },
+  // iOS 主屏图标只认 PNG，必须单独声明，否则装到主屏是一张页面截图
+  icons: {
+    icon: [
+      { url: `${process.env.NEXT_PUBLIC_BASE_PATH ?? ''}/icon.svg`, type: 'image/svg+xml' },
+      { url: `${process.env.NEXT_PUBLIC_BASE_PATH ?? ''}/icon-192.png`, sizes: '192x192', type: 'image/png' },
+    ],
+    apple: [{ url: `${process.env.NEXT_PUBLIC_BASE_PATH ?? ''}/icon-192.png`, sizes: '180x180', type: 'image/png' }],
+  },
   formatDetection: { telephone: false, date: false, address: false, email: false },
 };
 

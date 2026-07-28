@@ -110,6 +110,15 @@ export default function MePage() {
           <section>
             <h2 className="section-title">更多</h2>
             <div className="overflow-hidden rounded-2xl border border-rice-line bg-white">
+              <Link href="/rooms" className="row">
+                <span className="flex-1">
+                  房间管理
+                  <span className="block text-[0.75rem] text-ink-mute">
+                    增删改房间与楼层，{property.rooms.length} 个已标注
+                  </span>
+                </span>
+                <Chevron />
+              </Link>
               <Link href="/analysis/timeline" className="row">
                 <span className="flex-1">宅运时间轴</span>
                 <Chevron />
