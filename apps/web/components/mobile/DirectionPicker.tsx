@@ -11,7 +11,10 @@
  *      落空亡线者，纵有旺星亦不聚气，用户须在建档时就知道，而不是事后被埋怨。
  */
 
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
+import { CompassReader, EightDirectionPicker } from './CompassAssist';
+import { directionCosts } from '../../lib/confidence';
+import { nearestEightDirection } from '../../lib/compass';
 import {
   MOUNTAINS,
   analyzeLine,
@@ -31,6 +34,14 @@ const GRADE_TONE: Record<LineGrade, string> = {
 };
 
 export type MeasureEnd = '坐山' | '向首';
+
+/**
+ * 坐向的取得方式。
+ *
+ * 手打度数曾是唯一的路，这对「手上没有罗盘」的绝大多数人并不友好。
+ * 现在三条并列，各自的置信度代价明码标在按钮上，由用户自己权衡。
+ */
+export type DirectionInput = '度数' | '二十四山' | '八方';
 
 export function DirectionPicker({
   end,
@@ -54,6 +65,11 @@ export function DirectionPicker({
   onMountainChange: (n: string) => void;
   moveInYear: number;
 }) {
+  const costs = useMemo(() => directionCosts(), []);
+  const [inputMode, setInputMode] = useState<DirectionInput>(useDegree ? '度数' : '二十四山');
+  // 八方近似选中的那一方；由当前山名反推，好让「改回来」时选中态不丢
+  const [eightId, setEightId] = useState<string | null>(null);
+
   /** 无论用户量哪一端，一律换算成坐山，因为整套理气以坐山起。 */
   const sittingInput: string | number = useMemo(() => {
     if (useDegree) return end === '坐山' ? degree : norm360(degree + 180);
@@ -88,16 +104,66 @@ export function DirectionPicker({
         </p>
       </div>
 
-      <div className="flex gap-2">
-        <button type="button" className={`btn flex-1 ${useDegree ? 'btn-primary' : ''}`} onClick={() => onUseDegreeChange(true)}>
-          知道度数
-        </button>
-        <button type="button" className={`btn flex-1 ${!useDegree ? 'btn-primary' : ''}`} onClick={() => onUseDegreeChange(false)}>
-          只知方位
-        </button>
+      {/* 三条路并列，各自的置信度代价直接标在按钮上 */}
+      <div>
+        <p className="label">怎么确定这条线？</p>
+        <div className="grid gap-1.5">
+          {(
+            [
+              ['度数', '有度数（罗盘 / 手机 / 已知资料）', 'compass'],
+              ['二十四山', '只知是哪一山（子、午、艮…）', 'eight-way'],
+              ['八方', '只知大概朝哪边（东南、正北…）', 'eight-way'],
+            ] as const
+          ).map(([mode, desc, costKey]) => {
+            const cost = costs.find((c) => c.method === costKey)!;
+            const free = mode === '度数';
+            return (
+              <button
+                key={mode}
+                type="button"
+                onClick={() => {
+                  setInputMode(mode);
+                  // 从度数切到八方时，预选离当前度数最近的那一方，免得选择被清空
+                  if (mode === '八方' && eightId == null) setEightId(nearestEightDirection(degree).id);
+                }}
+                className={`flex items-center gap-2 rounded-xl border p-3 text-left transition active:scale-[0.99] ${
+                  inputMode === mode ? 'border-cinnabar bg-cinnabar/[0.06]' : 'border-rice-line bg-white'
+                }`}
+              >
+                <span className="min-w-0 flex-1">
+                  <span className="block text-[0.9375rem] font-medium leading-snug">{desc}</span>
+                  <span className="mt-0.5 block text-[0.75rem] leading-relaxed text-ink-mute">
+                    {free ? '置信度无损失 —— 有度数才判得出兼向与空亡。' : cost.note}
+                  </span>
+                </span>
+                <span
+                  className={`shrink-0 rounded-lg border px-2 py-0.5 text-[0.75rem] tabular-nums ${
+                    free ? 'border-jade/45 bg-jade/[0.08] text-jade' : 'border-risk-warn/45 bg-risk-warn/[0.07] text-risk-warn'
+                  }`}
+                >
+                  {free ? '±0' : `−${Math.round(cost.lostPercent * 100)}%`}
+                </span>
+              </button>
+            );
+          })}
+        </div>
       </div>
 
-      {useDegree ? (
+      {inputMode === '八方' && (
+        <EightDirectionPicker
+          value={eightId}
+          label={`${end}朝哪个方向？`}
+          onPick={(d) => {
+            setEightId(d.id);
+            onUseDegreeChange(false);
+            onMountainChange(d.mountain);
+          }}
+        />
+      )}
+
+      {inputMode === '度数' && <CompassReader onUse={(deg) => { onUseDegreeChange(true); onDegreeChange(Number(deg.toFixed(1))); }} />}
+
+      {inputMode === '度数' && (
         <div className="card">
           <label className="label">{end}方位角（正北 0°，顺时针）</label>
           <p className="my-2 text-center font-serif text-4xl font-bold tabular-nums text-cinnabar">
@@ -132,7 +198,9 @@ export function DirectionPicker({
             </button>
           </div>
         </div>
-      ) : (
+      )}
+
+      {inputMode === '二十四山' && (
         <div className="grid grid-cols-6 gap-1.5">
           {MOUNTAINS.map((m) => (
             <button
@@ -147,6 +215,13 @@ export function DirectionPicker({
             </button>
           ))}
         </div>
+      )}
+
+      {inputMode === '八方' && preview && (
+        <p className="rounded-xl border border-rice-line bg-rice-deep/40 p-3 text-[0.8125rem] leading-relaxed text-ink-soft">
+          八方近似取该卦正中一山（{preview.line.mountain.name}）代表整卦。
+          往后若量到确切度数，可在「房屋设置」里随时改回 —— 置信度会跟着补上来。
+        </p>
       )}
 
       {/* 立向线品级反馈 */}

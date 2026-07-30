@@ -228,6 +228,72 @@ export function confidenceLadder(
   return rows.sort((a, b) => Number(b.levelsUp) - Number(a.levelsUp) || b.gain - a.gain);
 }
 
+/** 坐向的几种取得方式。 */
+export type DirectionMethod = 'compass' | 'degrees' | 'plan' | 'eight-way';
+
+export interface DirectionCost {
+  readonly method: DirectionMethod;
+  readonly label: string;
+  /** 相对最佳方式（现场实测度数）损失几分。0 = 无损失。 */
+  readonly lostPoints: number;
+  readonly lostPercent: number;
+  /** 一句话说明代价从何而来。 */
+  readonly note: string;
+}
+
+/** 供代价试算用的骨架档案 —— 除坐向外一切拉满，好让差额只反映坐向本身。 */
+function probeProfile(sitting: string | number, entryMode: PropertyProfile['entryMode']): PropertyProfile {
+  return {
+    id: 'probe',
+    name: 'probe',
+    buildingType: '独立屋',
+    sitting,
+    moveInYear: 2024,
+    missingCorners: [],
+    rooms: [
+      { id: 'a', kind: '大门', primaryPalace: 9, palaces: [9], occupants: [] },
+      { id: 'b', kind: '主卧', primaryPalace: 2, palaces: [2], occupants: [] },
+      { id: 'c', kind: '厨房', primaryPalace: 3, palaces: [3], occupants: [] },
+      { id: 'd', kind: '客厅', primaryPalace: 1, palaces: [1], occupants: [] },
+      { id: 'e', kind: '卫浴', primaryPalace: 8, palaces: [8], occupants: [] },
+    ],
+    entryMode,
+    enableQiMen: true,
+  };
+}
+
+/**
+ * 各种坐向取得方式的置信度代价。
+ *
+ * **代价是算出来的，不是写死的**：拿同一份骨架档案，只把坐向那一项换掉，
+ * 再跑一次 assessConfidence 取差额。所以「只知方位」为什么比「实测度数」
+ * 少两分半，答案在 assess.ts 与 profileCompleteness 里，不在这里。
+ *
+ * 顺带暴露一个容易被忽略的连带损失：坐山只给山名（不给度数）时，
+ * profileCompleteness 会把它记进 missing，于是「关键房间」那一分**永远拿不到**，
+ * 哪怕房间全标齐了也一样。这一条必须让用户在选之前就看到。
+ */
+export function directionCosts(): DirectionCost[] {
+  const best = assessConfidence(probeProfile(180, '罗盘实测'), []).score;
+  const mk = (
+    method: DirectionMethod,
+    label: string,
+    sitting: string | number,
+    entryMode: PropertyProfile['entryMode'],
+    note: string,
+  ): DirectionCost => {
+    const lost = best - assessConfidence(probeProfile(sitting, entryMode), []).score;
+    return { method, label, lostPoints: lost, lostPercent: lost / CONFIDENCE_MAX, note };
+  };
+
+  return [
+    mk('compass', '用手机罗盘读度数', 180, '罗盘实测', '与现场罗盘同级：有度数即可判兼向与替卦。手机读的是磁北，落在山界附近时会提示复核。'),
+    mk('degrees', '手输已知度数', 180, '罗盘实测', '若度数确为现场量得，与实测同级；抄自房产资料的朝向则未必可靠。'),
+    mk('plan', '照户型图估度数', 180, '户型图', '宫位划分较可靠，但坐向准确度取决于图纸与你的比对，故只记一半。'),
+    mk('eight-way', '只选八方之一', '子', '九宫格', '八方各跨 45°，而一山只有 15° —— 无法判断兼向与空亡；且坐山未给度数会连带使「关键房间」那一分拿不到。'),
+  ];
+}
+
 /** 置信度戳记的配色档位。 */
 export function confidenceTone(level: ConfidenceLevel): string {
   return level === '高'

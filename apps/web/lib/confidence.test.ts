@@ -7,8 +7,16 @@ import {
   LADDER_THRESHOLD,
   assessConfidence,
   confidenceLadder,
+  directionCosts,
   levelOfScore,
 } from './confidence';
+import {
+  EIGHT_DIRECTIONS,
+  headingFrom,
+  nearMountainBoundary,
+  nearestEightDirection,
+  palaceOfEight,
+} from './compass';
 
 function run(profile: PropertyProfile, members: Member[]) {
   const input: AnalysisInput = { profile, members, year: 2026, appliedCures: [], qiMen: null };
@@ -165,5 +173,86 @@ describe('阶梯：只要还有可选输入没补就非空', () => {
     const s = assessConfidence(full, [makeMember('m', '甲', '男', 1982, { month: 7, day: 12, hour: 9 })]);
     expect(confidenceLadder(full, [makeMember('m', '甲', '男', 1982, { month: 7, day: 12, hour: 9 })])).toEqual([]);
     expect(s.percent).toBeGreaterThanOrEqual(LADDER_THRESHOLD);
+  });
+});
+
+/**
+ * 坐向取得方式的代价。
+ *
+ * 代价必须是**算出来的**（同一份骨架档案换掉坐向再跑一次记分），
+ * 不是文案里写死的数 —— 否则 assess.ts 改了权重，界面上的「−42%」就成了谎话。
+ */
+describe('各种坐向取得方式的置信度代价', () => {
+  const costs = directionCosts();
+  const by = (m: string) => costs.find((c) => c.method === m)!;
+
+  it('实测度数无损失，八方近似损失最大', () => {
+    expect(by('compass').lostPoints).toBe(0);
+    expect(by('degrees').lostPoints).toBe(0);
+    expect(by('plan').lostPoints).toBeGreaterThan(0);
+    expect(by('eight-way').lostPoints).toBeGreaterThan(by('plan').lostPoints);
+  });
+
+  it('八方近似的代价包含「关键房间那一分也拿不到」的连带损失', () => {
+    // 房间在骨架档案里是标齐的，因此这一分只可能是被「坐山无度数」连累掉的
+    const eight = by('eight-way');
+    const plan = by('plan');
+    expect(eight.lostPoints - plan.lostPoints).toBeGreaterThanOrEqual(1);
+    expect(eight.note).toContain('关键房间');
+  });
+
+  it('百分比与分数同源', () => {
+    for (const c of costs) expect(c.lostPercent).toBeCloseTo(c.lostPoints / CONFIDENCE_MAX);
+  });
+});
+
+describe('八方近似与手机罗盘的换算', () => {
+  it('八方各自落在正确的宫位', () => {
+    const expected: Record<string, number> = { n: 1, ne: 8, e: 3, se: 4, s: 9, sw: 2, w: 7, nw: 6 };
+    for (const d of EIGHT_DIRECTIONS) {
+      expect(d.palace).toBe(expected[d.id]);
+      expect(palaceOfEight(d)).toBe(d.palace); // 与引擎的 azimuthToPalace 一致
+    }
+  });
+
+  it('就近取方 —— 含跨 0° 的回绕', () => {
+    expect(nearestEightDirection(5).id).toBe('n');
+    expect(nearestEightDirection(355).id).toBe('n');
+    expect(nearestEightDirection(179).id).toBe('s');
+    expect(nearestEightDirection(226).id).toBe('sw');
+  });
+
+  it('iOS 的 webkitCompassHeading 直接可用', () => {
+    const r = headingFrom({ webkitCompassHeading: 123.4, webkitCompassAccuracy: 10 })!;
+    expect(r.heading).toBeCloseTo(123.4);
+    expect(r.trustworthy).toBe(true);
+  });
+
+  it('精度为负或过大时标为不可信，并说出原因', () => {
+    expect(headingFrom({ webkitCompassHeading: 10, webkitCompassAccuracy: -1 })!.trustworthy).toBe(false);
+    const bad = headingFrom({ webkitCompassHeading: 10, webkitCompassAccuracy: 40 })!;
+    expect(bad.trustworthy).toBe(false);
+    expect(bad.note).toContain('精度');
+  });
+
+  it('alpha 需换成顺时针方位角；非 absolute 一律不可信', () => {
+    const abs = headingFrom({ alpha: 90, absolute: true })!;
+    expect(abs.heading).toBeCloseTo(270);
+    expect(abs.trustworthy).toBe(true);
+    const rel = headingFrom({ alpha: 90 })!;
+    expect(rel.trustworthy).toBe(false);
+    expect(rel.note).toContain('相对');
+  });
+
+  it('拿不到任何角度时返回 null，由界面走降级路径', () => {
+    expect(headingFrom({})).toBeNull();
+    expect(headingFrom({ alpha: null })).toBeNull();
+  });
+
+  it('贴近山界时提示复核（每山 15°，界在 7.5° 处）', () => {
+    expect(nearMountainBoundary(7.5)).toBe(true);
+    expect(nearMountainBoundary(22.4)).toBe(true);
+    expect(nearMountainBoundary(15)).toBe(false);
+    expect(nearMountainBoundary(0)).toBe(false);
   });
 });
