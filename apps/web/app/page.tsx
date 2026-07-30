@@ -86,9 +86,15 @@ export default function HomePage() {
             title="还没有建立房屋"
             desc="没有户型图、人不在现场也可以 —— 只要知道大门朝向，就能得到完整分析。"
             action={
-              <Link href="/new" className="btn btn-primary btn-block">
-                建立第一处房屋
-              </Link>
+              <div className="space-y-2">
+                {/* 分诊在前、建档在后：第一次来的人先看到东西，再决定要不要走完 6 步 */}
+                <Link href="/start" className="btn btn-primary btn-block">
+                  先看个大概（三个问题）
+                </Link>
+                <Link href="/new" className="btn btn-block">
+                  直接建立房屋
+                </Link>
+              </div>
             }
           />
         )}

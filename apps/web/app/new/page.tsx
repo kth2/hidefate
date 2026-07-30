@@ -8,6 +8,7 @@
  * 户型图走「相机优先」：直接调后置摄像头拍，而不是先让人去找文件。
  */
 
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useMemo, useState } from 'react';
 import {
@@ -176,6 +177,9 @@ export default function NewPropertyPage() {
         {step === 0 && (
           <div className="space-y-3">
             <p className="card-sub px-1">三条路径分析能力完全相同，差别只反映在置信度上。</p>
+            <Link href="/start" className="btn btn-block">
+              还没想好？先花一分钟看个大概 →
+            </Link>
             {(
               [
                 ['九宫格', '不用户型图', '最常用。只要知道大门朝向就能开始 —— 人不在现场也可以。'],
