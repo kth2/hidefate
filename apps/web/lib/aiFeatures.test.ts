@@ -3,6 +3,10 @@ import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 import { AI_OPTIONAL_NOTICE, AI_OPTIONAL_NOTICE_ONE_LINE } from './aiNotice';
 import { classifyProbe } from './aiTest';
+import { analyse, synthesise } from '@hidefate/core-synthesis';
+import { sampleInput } from '../../../packages/core-synthesis/src/fixtures';
+import { findingRefs, refsForDomains } from './findings';
+import { SUGGESTION_CATEGORIES, suggestQuestions } from './suggestedQuestions';
 
 const src = (rel: string) => readFileSync(fileURLToPath(new URL(rel, import.meta.url)), 'utf8');
 
@@ -116,5 +120,57 @@ describe('测试连接：把结果说成人话', () => {
       expect(v.message.length).toBeGreaterThan(6);
       expect(v.nextStep.length).toBeGreaterThan(6);
     }
+  });
+});
+
+/**
+ * 空白对话框的建议问题。
+ *
+ * 核心断言只有一条，但它是这一功能存在的全部理由：
+ * **只要盘上还有断语，用户就不该面对一个空白输入框**。
+ */
+describe('建议问题由 Finding 现算', () => {
+  const result = analyse(sampleInput(2026), synthesise(sampleInput(2026)));
+  const refs = findingRefs(result);
+
+  it('示范盘本身就能摊出断语（否则下面的断言都是空转）', () => {
+    expect(refs.length).toBeGreaterThan(0);
+  });
+
+  it('Finding 非空时建议问题必非空', () => {
+    expect(suggestQuestions(refs).length).toBeGreaterThan(0);
+  });
+
+  it('数量落在 4–6 条之间', () => {
+    const qs = suggestQuestions(refs);
+    expect(qs.length).toBeGreaterThanOrEqual(4);
+    expect(qs.length).toBeLessThanOrEqual(6);
+  });
+
+  it('盘上出现的每个类别（健康／感情／财运／事业）至少各有一问', () => {
+    const present = SUGGESTION_CATEGORIES.filter(
+      (c) => refsForDomains(refs, [c.domain]).length > 0,
+    ).map((c) => c.domain);
+    expect(present.length).toBeGreaterThan(0);
+
+    const covered = new Set(suggestQuestions(refs, 6).map((s) => s.domain));
+    for (const d of present.slice(0, 6)) expect(covered.has(d)).toBe(true);
+  });
+
+  it('每一问都扣着实际盘面（带方位或断语原文），不是空泛套话', () => {
+    for (const s of suggestQuestions(refs)) {
+      expect(s.question.length).toBeGreaterThan(8);
+      expect(s.refId).toBeTruthy();
+    }
+  });
+
+  it('断语为空时返回空数组，由调用方决定退回什么', () => {
+    expect(suggestQuestions([])).toEqual([]);
+  });
+
+  it('只有一条断语时也补足到 4 条，且补位问题仍指向该断语', () => {
+    const qs = suggestQuestions([refs[0]!]);
+    expect(qs.length).toBeGreaterThanOrEqual(4);
+    expect(qs.every((q) => q.refId === refs[0]!.id)).toBe(true);
   });
 });

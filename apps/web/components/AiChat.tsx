@@ -14,6 +14,8 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type { AnswerContextOptions, Member, SynthesisResult } from '@hidefate/core-synthesis';
 import { buildAnswerContext, faqHighlights } from '@hidefate/core-synthesis';
 import { scenarioOf } from '@hidefate/core-fengshui';
+import { findingRefs } from '../lib/findings';
+import { suggestQuestions } from '../lib/suggestedQuestions';
 import { chatStream, type AiConfig, type ChatMessage } from '../lib/ai';
 import { loadSettings, type AppSettings } from '../lib/db';
 import { AiOptionalNotice } from './AiOptionalNotice';
@@ -86,10 +88,19 @@ export function AiChat({
     [result, members, simulation, extraContext, pendingFaq],
   );
 
+  const refs = useMemo(() => findingRefs(result), [result]);
+
+  /**
+   * 建议问题优先由本盘的断语现算 —— 一间房真正的症结在哪，引擎已经知道了，
+   * 没道理还让用户面对一个空白输入框自己猜该问什么。
+   * 只有在完全没有断语（极干净的盘）时才退回 FAQ 库与兜底文案。
+   */
   const suggestions = useMemo(() => {
+    const fromFindings = suggestQuestions(refs);
+    if (fromFindings.length) return fromFindings.map((s) => s.question);
     const s = faqHighlights(scenarioOf(result.buildingType));
     return s.length ? s.map((f) => f.question) : FALLBACK_SUGGESTIONS;
-  }, [result.buildingType]);
+  }, [refs, result.buildingType]);
 
   const configured = Boolean(settings?.aiBaseUrl && settings?.aiModel);
   const consented = Boolean(settings?.aiConsent);
@@ -215,11 +226,18 @@ export function AiChat({
 
       <div ref={scrollRef} className="max-h-[28rem] space-y-3 overflow-y-auto rounded-xl border border-rice-line bg-white/60 p-3">
         {turns.length === 0 && (
-          <div className="py-4 text-center">
-            <p className="mb-3 text-sm text-ink-mute">问点什么吧。模型已经拿到这间房子的全部推算结果。</p>
-            <div className="flex flex-wrap justify-center gap-1.5">
+          <div className="py-2">
+            <p className="mb-2 px-1 text-sm text-ink-mute">
+              以下问题由这间房<b className="text-ink-soft">当前的断语现算</b>，点一条即问。
+            </p>
+            <div className="space-y-1.5">
               {suggestions.map((s) => (
-                <button key={s} type="button" className="btn text-xs" onClick={() => void send(s)}>
+                <button
+                  key={s}
+                  type="button"
+                  className="w-full rounded-xl border border-rice-line bg-white px-3 py-2.5 text-left text-[0.8125rem] leading-relaxed transition active:bg-rice-deep/40"
+                  onClick={() => void send(s)}
+                >
                   {s}
                 </button>
               ))}
