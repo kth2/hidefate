@@ -193,12 +193,14 @@ describe('各种坐向取得方式的置信度代价', () => {
     expect(by('eight-way').lostPoints).toBeGreaterThan(by('plan').lostPoints);
   });
 
-  it('八方近似的代价包含「关键房间那一分也拿不到」的连带损失', () => {
+  it('只给山名的两种方式代价相同 —— 记分只认「有没有度数」', () => {
+    expect(by('eight-way').lostPoints).toBe(by('mountain').lostPoints);
+  });
+
+  it('无度数的代价包含「关键房间那一分也拿不到」的连带损失', () => {
     // 房间在骨架档案里是标齐的，因此这一分只可能是被「坐山无度数」连累掉的
-    const eight = by('eight-way');
-    const plan = by('plan');
-    expect(eight.lostPoints - plan.lostPoints).toBeGreaterThanOrEqual(1);
-    expect(eight.note).toContain('关键房间');
+    expect(by('mountain').lostPoints - by('plan').lostPoints).toBeGreaterThanOrEqual(1);
+    expect(by('mountain').note).toContain('关键房间');
   });
 
   it('百分比与分数同源', () => {

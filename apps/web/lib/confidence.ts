@@ -229,7 +229,7 @@ export function confidenceLadder(
 }
 
 /** 坐向的几种取得方式。 */
-export type DirectionMethod = 'compass' | 'degrees' | 'plan' | 'eight-way';
+export type DirectionMethod = 'compass' | 'degrees' | 'plan' | 'mountain' | 'eight-way';
 
 export interface DirectionCost {
   readonly method: DirectionMethod;
@@ -290,8 +290,28 @@ export function directionCosts(): DirectionCost[] {
     mk('compass', '用手机罗盘读度数', 180, '罗盘实测', '与现场罗盘同级：有度数即可判兼向与替卦。手机读的是磁北，落在山界附近时会提示复核。'),
     mk('degrees', '手输已知度数', 180, '罗盘实测', '若度数确为现场量得，与实测同级；抄自房产资料的朝向则未必可靠。'),
     mk('plan', '照户型图估度数', 180, '户型图', '宫位划分较可靠，但坐向准确度取决于图纸与你的比对，故只记一半。'),
-    mk('eight-way', '只选八方之一', '子', '九宫格', '八方各跨 45°，而一山只有 15° —— 无法判断兼向与空亡；且坐山未给度数会连带使「关键房间」那一分拿不到。'),
+    mk(
+      'mountain',
+      '只知是哪一山',
+      '子',
+      '九宫格',
+      '已定位到 15° 宽的一山，起盘足够；但没有度数就判不出兼向与空亡，' +
+        '且坐山未给度数会连带使「关键房间」那一分拿不到。',
+    ),
+    mk(
+      'eight-way',
+      '只选八方之一',
+      '子',
+      '九宫格',
+      '八方各跨 45°，而一山只有 15° —— 选中的那一方要按正中一山起盘，' +
+        '骑线时可能整卦判错；连带损失与上一项相同。',
+    ),
   ];
+}
+
+/** 供界面按方式取用。 */
+export function directionCostOf(method: DirectionMethod): DirectionCost {
+  return directionCosts().find((c) => c.method === method)!;
 }
 
 /** 置信度戳记的配色档位。 */

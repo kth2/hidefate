@@ -190,7 +190,8 @@ export function provisionalOutcome(input: TriageInput): ProvisionalOutcome {
     }
   } else {
     caveats.push(
-      '没有填大门朝向，因此**没有起九宫盘** —— 以下只是你个人的八宅吉凶方位，' +
+      // 这些文案是直接当纯文本渲染的，别写 markdown 记号
+      '没有填大门朝向，因此没有起九宫盘 —— 以下只是你个人的八宅吉凶方位，' +
         '与具体哪一间房子无关。补上朝向才谈得上「这间房对你如何」。',
     );
   }

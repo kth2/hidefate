@@ -66,9 +66,24 @@ export function DirectionPicker({
   moveInYear: number;
 }) {
   const costs = useMemo(() => directionCosts(), []);
-  const [inputMode, setInputMode] = useState<DirectionInput>(useDegree ? '度数' : '二十四山');
+  /**
+   * 输入方式默认跟着已存的坐向走（存的是山名就开在「二十四山」），
+   * 一旦用户自己选过就以他的选择为准。
+   *
+   * 不能只用 useState 的初值：房屋设置页是异步读出档案再回填 useDegree 的，
+   * 初值那一刻它还是默认的 true，结果山名建档的房子会错误地开在度数模式。
+   */
+  const [modeOverride, setModeOverride] = useState<DirectionInput | null>(null);
+  const inputMode: DirectionInput = modeOverride ?? (useDegree ? '度数' : '二十四山');
   // 八方近似选中的那一方；由当前山名反推，好让「改回来」时选中态不丢
   const [eightId, setEightId] = useState<string | null>(null);
+
+  const pickInputMode = (m: DirectionInput) => {
+    setModeOverride(m);
+    // 方式与「坐向值是度数还是山名」必须同步，否则显示的和存下的会是两回事
+    onUseDegreeChange(m === '度数');
+    if (m === '八方' && eightId == null) setEightId(nearestEightDirection(degree).id);
+  };
 
   /** 无论用户量哪一端，一律换算成坐山，因为整套理气以坐山起。 */
   const sittingInput: string | number = useMemo(() => {
@@ -111,7 +126,7 @@ export function DirectionPicker({
           {(
             [
               ['度数', '有度数（罗盘 / 手机 / 已知资料）', 'compass'],
-              ['二十四山', '只知是哪一山（子、午、艮…）', 'eight-way'],
+              ['二十四山', '只知是哪一山（子、午、艮…）', 'mountain'],
               ['八方', '只知大概朝哪边（东南、正北…）', 'eight-way'],
             ] as const
           ).map(([mode, desc, costKey]) => {
@@ -121,11 +136,7 @@ export function DirectionPicker({
               <button
                 key={mode}
                 type="button"
-                onClick={() => {
-                  setInputMode(mode);
-                  // 从度数切到八方时，预选离当前度数最近的那一方，免得选择被清空
-                  if (mode === '八方' && eightId == null) setEightId(nearestEightDirection(degree).id);
-                }}
+                onClick={() => pickInputMode(mode)}
                 className={`flex items-center gap-2 rounded-xl border p-3 text-left transition active:scale-[0.99] ${
                   inputMode === mode ? 'border-cinnabar bg-cinnabar/[0.06]' : 'border-rice-line bg-white'
                 }`}
@@ -155,13 +166,12 @@ export function DirectionPicker({
           label={`${end}朝哪个方向？`}
           onPick={(d) => {
             setEightId(d.id);
-            onUseDegreeChange(false);
             onMountainChange(d.mountain);
           }}
         />
       )}
 
-      {inputMode === '度数' && <CompassReader onUse={(deg) => { onUseDegreeChange(true); onDegreeChange(Number(deg.toFixed(1))); }} />}
+      {inputMode === '度数' && <CompassReader onUse={(deg) => onDegreeChange(Number(deg.toFixed(1)))} />}
 
       {inputMode === '度数' && (
         <div className="card">
