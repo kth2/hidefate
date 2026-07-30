@@ -8,6 +8,7 @@ import { RISK_COLOR, buildAlerts, yearGlance } from '@hidefate/core-synthesis';
 import { useMemo } from 'react';
 import { AppBar, Empty, Expandable, Meter, Skeleton } from '../components/mobile/ui';
 import { useProperty } from '../lib/PropertyContext';
+import { SYMPTOM_CATEGORIES } from '../lib/symptoms';
 
 export default function HomePage() {
   const { property, result, members, cures, year, monthIndex, loading, properties } = useProperty();
@@ -28,6 +29,45 @@ export default function HomePage() {
       <AppBar title="藏聚" subtitle={`${year} 年 · ${periodOfYear(year).label}`} />
 
       <div className="space-y-4 px-4 py-4">
+        {/*
+          症状入口放在最上面，先于「今年速览」与房屋概况。
+          真正让人打开这种 App 的从来不是「我想看看飞星」，而是「最近老生病」——
+          让用户用自己的话进来，比让他先学会看九宫盘要紧得多。
+        */}
+        <section className="rounded-2xl border-2 border-cinnabar/25 bg-white p-4">
+          <h2 className="font-serif text-[1.0625rem] font-semibold">最近哪方面不顺？</h2>
+          <p className="mt-1 text-[0.8125rem] leading-relaxed text-ink-mute">
+            挑一项，直接看这间房里与它相关的几处，以及今天就能做的一件事。
+          </p>
+          <div className="mt-3 grid gap-2">
+            {SYMPTOM_CATEGORIES.map((c) => (
+              <Link
+                key={c.id}
+                href={`/symptom/${c.id}`}
+                className="flex min-h-[3.25rem] items-center gap-3 rounded-xl border border-rice-line px-3.5 py-2.5 active:bg-rice-deep/40"
+              >
+                <span className="min-w-0 flex-1">
+                  <span className="block text-[0.9375rem] font-medium leading-snug">{c.label}</span>
+                  <span className="block truncate text-[0.75rem] text-ink-mute">{c.hint}</span>
+                </span>
+                <svg
+                  width="18"
+                  height="18"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="#b3aaa2"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  className="shrink-0"
+                >
+                  <path d="M9 6l6 6-6 6" />
+                </svg>
+              </Link>
+            ))}
+          </div>
+        </section>
+
         {/* 今年速览 */}
         <section className="rounded-2xl border border-cinnabar/20 bg-gradient-to-br from-cinnabar/[0.06] to-transparent p-4">
           <p className="text-[0.8125rem] text-ink-mute">{year} 年流年星</p>

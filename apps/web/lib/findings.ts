@@ -13,7 +13,7 @@
  * `SynthesisResult.predictions` 里已经算好的数，取不到就是 null，绝不自己造。
  */
 
-import type { PalaceIndex, RiskDomain } from '@hidefate/core-fengshui';
+import type { PalaceIndex, RiskDomain, RoomKind } from '@hidefate/core-fengshui';
 import type { Cure, Finding, Prediction, SynthesisResult } from '@hidefate/core-synthesis';
 
 export interface FindingRef {
@@ -24,6 +24,8 @@ export interface FindingRef {
   readonly direction: string | null;
   /** 该宫已标注的房间名。 */
   readonly rooms: readonly string[];
+  /** 该宫房间的种类 —— 「睡不好」这类症状只该看卧房。 */
+  readonly roomKinds: readonly RoomKind[];
   /** 该宫的山向组合名，如「二五交加」。 */
   readonly combinationName: string | null;
   /**
@@ -80,6 +82,7 @@ export function findingRefs(s: SynthesisResult): FindingRef[] {
       palace,
       direction: a.direction,
       rooms: a.rooms.map((r) => r.label ?? r.kind),
+      roomKinds: a.rooms.map((r) => r.kind),
       combinationName: a.combinationName,
       probability: pred?.probability ?? null,
       prediction: pred,
