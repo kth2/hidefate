@@ -6,6 +6,7 @@ import { useMemo } from 'react';
 import { buildFamilyFusionReport } from '@hidefate/core-synthesis';
 import { AppBar, Empty, Expandable, Skeleton } from '../../../components/mobile/ui';
 import { useProperty } from '../../../lib/PropertyContext';
+import { PropertyConfidenceGate } from '../../../components/PropertyConfidenceGate';
 
 export default function FusionPage() {
   const { property, members, year, loading } = useProperty();
@@ -48,6 +49,8 @@ export default function FusionPage() {
       <AppBar title="家庭融合报告" subtitle={property.name} back="/me" />
 
       <div className="space-y-4 px-4 py-4">
+        <PropertyConfidenceGate />
+
         <section className="card text-center">
           <p className="text-[0.8125rem] text-ink-mute">全家与本宅契合度</p>
           <p className="mt-1 font-serif text-4xl font-bold text-cinnabar">

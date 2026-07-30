@@ -18,6 +18,7 @@ import { AppBar, Empty, Expandable, Skeleton } from '../../../components/mobile/
 import { FaqPicker } from '../../../components/FaqPicker';
 import { AiChat } from '../../../components/AiChat';
 import { useProperty } from '../../../lib/PropertyContext';
+import { PropertyConfidenceGate } from '../../../components/PropertyConfidenceGate';
 
 type Mode = '常见问题' | 'AI 对话' | '离线作答';
 
@@ -93,6 +94,8 @@ export default function AskPage() {
       <AppBar title="问答" subtitle={`${property.name} · ${scenario}`} back="/me" />
 
       <div className="space-y-4 px-4 py-4">
+        <PropertyConfidenceGate />
+
         <div className="seg-row">
           {(['常见问题', 'AI 对话', '离线作答'] as Mode[]).map((m) => (
             <button key={m} type="button" className={`seg ${mode === m ? 'seg-on' : ''}`} onClick={() => setMode(m)}>

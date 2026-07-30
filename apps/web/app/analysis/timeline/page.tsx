@@ -6,6 +6,7 @@ import { useMemo, useState } from 'react';
 import { RISK_COLOR, buildTimeline, compareYears } from '@hidefate/core-synthesis';
 import { AppBar, Empty, Expandable, SegRow, Skeleton } from '../../../components/mobile/ui';
 import { useProperty } from '../../../lib/PropertyContext';
+import { PropertyConfidenceGate } from '../../../components/PropertyConfidenceGate';
 
 export default function TimelinePage() {
   const { property, members, cures, year, loading } = useProperty();
@@ -38,6 +39,8 @@ export default function TimelinePage() {
       <AppBar title="宅运时间轴" subtitle={`${timeline.startYear}–${timeline.endYear}`} back="/me" />
 
       <div className="space-y-4 px-4 py-4">
+        <PropertyConfidenceGate />
+
         <SegRow
           label="跨度"
           value={span}

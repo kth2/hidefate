@@ -13,6 +13,7 @@ import type { RiskDomain } from '@hidefate/core-fengshui';
 import { MATRIX_DOMAINS, buildRoomMemberMatrix, type MatrixCell } from '@hidefate/core-synthesis';
 import { AppBar, Empty, SegRow, Sheet, Skeleton } from '../../../components/mobile/ui';
 import { useProperty } from '../../../lib/PropertyContext';
+import { PropertyConfidenceGate } from '../../../components/PropertyConfidenceGate';
 
 export default function MatrixPage() {
   const { result, members, loading } = useProperty();
@@ -63,6 +64,8 @@ export default function MatrixPage() {
       />
 
       <div className="space-y-4 px-4 py-4">
+        <PropertyConfidenceGate />
+
         <SegRow
           label="风险类型"
           value={domain}

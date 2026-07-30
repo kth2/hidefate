@@ -6,6 +6,7 @@ import { useState } from 'react';
 import { MATERIAL_BY_WUXING, OUTER_PALACES, PALACE_DIRECTION, type PalaceIndex } from '@hidefate/core-fengshui';
 import { AppBar, Empty, Sheet, Skeleton } from '../../../components/mobile/ui';
 import { useProperty } from '../../../lib/PropertyContext';
+import { PropertyConfidenceGate } from '../../../components/PropertyConfidenceGate';
 import { db, newId, type StoredCure } from '../../../lib/db';
 
 type WuXing = '木' | '火' | '土' | '金' | '水';
@@ -79,6 +80,8 @@ export default function CuresPage() {
       />
 
       <div className="space-y-4 px-4 py-4">
+        <PropertyConfidenceGate />
+
         {pending.length > 0 && (
           <section className="card border-gold/40 bg-gold/[0.05]">
             <h2 className="card-title text-gold">待回访（{pending.length}）</h2>

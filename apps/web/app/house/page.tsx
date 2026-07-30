@@ -33,6 +33,7 @@ import { computeComposite } from '@hidefate/core-synthesis';
 import { BigNineGrid, type LayerToggles } from '../../components/mobile/BigNineGrid';
 import { AppBar, Empty, Expandable, Sheet, Skeleton } from '../../components/mobile/ui';
 import { useProperty } from '../../lib/PropertyContext';
+import { PropertyConfidenceGate } from '../../components/PropertyConfidenceGate';
 
 type View = '九宫' | '峦头' | '吉方' | '布局' | '预测' | '化解';
 
@@ -170,6 +171,8 @@ export default function HousePage() {
       />
 
       <div className="space-y-4 px-4 py-4">
+        <PropertyConfidenceGate />
+
         <div className="seg-row">
           {(['九宫', '峦头', '吉方', '布局', '预测', '化解'] as View[]).map((v) => (
             <button key={v} type="button" className={`seg ${view === v ? 'seg-on' : ''}`} onClick={() => setView(v)}>

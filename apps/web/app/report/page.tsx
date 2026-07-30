@@ -30,6 +30,7 @@ import {
 import { computeShanXiang, type ShanXiangResult } from '@hidefate/core-qimen';
 import { currentFengShuiTime } from '../../lib/useAnalysis';
 import { useProperty } from '../../lib/PropertyContext';
+import { PropertyConfidenceGate } from '../../components/PropertyConfidenceGate';
 
 export default function ReportPage() {
   // 取「当前房屋」而非路由参数：静态导出没有服务器，动态段 [id] 无法预渲染，
@@ -97,6 +98,10 @@ export default function ReportPage() {
         <span className="text-xs text-ink-mute">
           在打印对话框中选择「另存为 PDF」，并勾选「背景图形」以保留风险配色。
         </span>
+        {/* 报告是要拿去给人看的，置信度不够时更该在导出前补齐 */}
+        <div className="w-full">
+          <PropertyConfidenceGate />
+        </div>
       </div>
 
       {/* ── 封面 ── */}

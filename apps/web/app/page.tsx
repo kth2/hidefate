@@ -9,6 +9,8 @@ import { useMemo } from 'react';
 import { AppBar, Empty, Expandable, Meter, Skeleton } from '../components/mobile/ui';
 import { useProperty } from '../lib/PropertyContext';
 import { SYMPTOM_CATEGORIES } from '../lib/symptoms';
+import { ConfidenceLadder, ConfidenceStamp } from '../components/ConfidenceLadder';
+import { assessConfidence } from '../lib/confidence';
 
 export default function HomePage() {
   const { property, result, members, cures, year, monthIndex, loading, properties } = useProperty();
@@ -123,7 +125,7 @@ export default function HomePage() {
               <div className="mt-3 flex flex-wrap gap-1.5">
                 <span className="tag border-rice-line text-ink-mute">{result.flyingStar.pattern}</span>
                 <span className="tag border-rice-line text-ink-mute">{result.baZhai.label}</span>
-                <span className="tag border-rice-line text-ink-mute">置信度 {result.confidence.level}</span>
+                <ConfidenceStamp {...assessConfidence(property, members)} />
                 {result.qiMenEnabled && <span className="tag border-gold/40 bg-gold/10 text-gold">三派合参</span>}
               </div>
 
@@ -131,6 +133,9 @@ export default function HomePage() {
                 查看九宫盘
               </Link>
             </section>
+
+            {/* 置信度阶梯：首页常驻，让「还差什么」始终摆在明面上 */}
+            <ConfidenceLadder profile={property} members={members} />
 
             {/* 最该先做的事 */}
             {result.prioritisedCures.length > 0 && (
