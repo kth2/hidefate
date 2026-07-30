@@ -3,6 +3,13 @@ import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 import { AI_OPTIONAL_NOTICE, AI_OPTIONAL_NOTICE_ONE_LINE } from './aiNotice';
 import { classifyProbe } from './aiTest';
+import { PROVIDERS, type ModelInfo } from './ai';
+import {
+  RECOMMENDED_MODELS,
+  isRecommended,
+  pickDefaultModel,
+  splitByRecommendation,
+} from './recommendedModels';
 import { analyse, synthesise } from '@hidefate/core-synthesis';
 import { sampleInput } from '../../../packages/core-synthesis/src/fixtures';
 import { findingRefs, refsForDomains } from './findings';
@@ -207,5 +214,59 @@ describe('追问由回答实际引用到的宫位与断语生成', () => {
     const anchored = ups.filter((u) => u.refId !== null);
     expect(anchored.length).toBeGreaterThan(0);
     expect(anchored[0]!.question).toContain(withDir.direction!);
+  });
+});
+
+/**
+ * 模型推荐。
+ *
+ * 关键在于「推荐是标注，不是清单」：名单只能在 API 实时返回的结果里
+ * 挑出几个打标，绝不能凭空多出一个 API 没给的模型。
+ */
+describe('模型推荐名单只做标注，不做清单', () => {
+  const live: ModelInfo[] = [
+    { id: 'deepseek-chat', name: 'DeepSeek Chat', contextLength: 64000, free: false, ownedBy: null, description: null },
+    { id: 'deepseek-reasoner', name: 'DeepSeek R1', contextLength: 64000, free: false, ownedBy: null, description: null },
+    { id: 'some-experimental-model', name: 'x', contextLength: null, free: true, ownedBy: null, description: null },
+  ];
+
+  it('只有 API 实际返回的模型才会出现在两组之中', () => {
+    const { recommended, rest } = splitByRecommendation(live, 'deepseek');
+    const ids = [...recommended, ...rest].map((m) => m.id).sort();
+    expect(ids).toEqual(live.map((m) => m.id).sort());
+  });
+
+  it('名单里有、但 API 没返回的模型不会被凭空造出来', () => {
+    const { recommended } = splitByRecommendation([live[2]!], 'deepseek');
+    expect(recommended).toEqual([]);
+  });
+
+  it('推荐组按名单顺序排，其余归入 rest', () => {
+    const { recommended, rest } = splitByRecommendation([...live].reverse(), 'deepseek');
+    expect(recommended.map((m) => m.id)).toEqual(['deepseek-chat', 'deepseek-reasoner']);
+    expect(rest.map((m) => m.id)).toEqual(['some-experimental-model']);
+  });
+
+  it('id 带前后缀时仍能认出（各家写法不一）', () => {
+    expect(isRecommended('gemini', 'models/gemini-2.5-flash')).toBe(true);
+    expect(isRecommended('ollama', 'qwen2.5:7b')).toBe(true);
+    expect(isRecommended('siliconflow', 'deepseek-ai/DeepSeek-V3')).toBe(true);
+  });
+
+  it('自定义端点不做推荐（无从预知跑的是什么）', () => {
+    expect(splitByRecommendation(live, 'custom').recommended).toEqual([]);
+  });
+
+  it('自动默认：推荐优先 → 免费 → 首项', () => {
+    expect(pickDefaultModel(live, 'deepseek')).toBe('deepseek-chat');
+    expect(pickDefaultModel(live, 'custom')).toBe('some-experimental-model'); // 唯一免费的
+    expect(pickDefaultModel([], 'deepseek')).toBeNull();
+  });
+
+  it('每家（自定义除外）都至少备了一个推荐，否则自动选中会退化', () => {
+    for (const p of PROVIDERS) {
+      if (p.id === 'custom') continue;
+      expect(RECOMMENDED_MODELS[p.id].length).toBeGreaterThan(0);
+    }
   });
 });

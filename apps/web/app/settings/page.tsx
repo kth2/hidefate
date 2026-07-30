@@ -19,6 +19,7 @@ import {
   type ProviderId,
 } from '../../lib/ai';
 import { testConnection, type ConnectionVerdict } from '../../lib/aiTest';
+import { RECOMMEND_REASON, pickDefaultModel, splitByRecommendation } from '../../lib/recommendedModels';
 import { loadSettings, saveSettings, type AppSettings } from '../../lib/db';
 import { AppBar } from '../../components/mobile/ui';
 import { AiOptionalNotice } from '../../components/AiOptionalNotice';
@@ -41,6 +42,7 @@ export default function SettingsPage() {
   const [filter, setFilter] = useState('');
   const [freeOnly, setFreeOnly] = useState(false);
   const [showKey, setShowKey] = useState(false);
+  const [showAll, setShowAll] = useState(false);
 
   useEffect(() => {
     void (async () => {
@@ -53,13 +55,14 @@ export default function SettingsPage() {
       setDirect(Boolean(s.aiDirect));
       setConsent(Boolean(s.aiConsent));
       if (s.aiModelCache?.length) {
-        setModels(
-          s.aiModelCache.map((m) => ({
-            ...m,
-            ownedBy: null,
-            description: null,
-          })),
-        );
+        const cached: ModelInfo[] = s.aiModelCache.map((m) => ({
+          ...m,
+          ownedBy: null,
+          description: null,
+        }));
+        setModels(cached);
+        // 首次进来（还没选过模型）时替用户选好推荐的那个，省掉一次翻长列表
+        if (!s.aiModel) setModel(pickDefaultModel(cached, s.aiProvider ?? 'deepseek') ?? '');
       }
     })();
   }, []);
@@ -74,6 +77,7 @@ export default function SettingsPage() {
     setModel('');
     setError(null);
     setOk(null);
+    setShowAll(false);
   }
 
   const fetchModels = useCallback(async () => {
@@ -84,8 +88,8 @@ export default function SettingsPage() {
       const list = await listModels({ baseUrl, apiKey, direct });
       setModels(list);
       setOk(`成功拉取 ${list.length} 个模型${list.some((m) => m.free) ? `，其中 ${list.filter((m) => m.free).length} 个标注为免费` : ''}。`);
-      // 自动选一个合理的默认：优先免费，其次列表首项
-      if (!model) setModel((list.find((m) => m.free) ?? list[0])!.id);
+      // 自动选一个合理的默认：推荐名单里最靠前的 → 任一免费 → 列表首项
+      if (!model) setModel(pickDefaultModel(list, provider) ?? '');
       await saveSettings({
         aiProvider: provider,
         aiBaseUrl: baseUrl,
@@ -140,6 +144,18 @@ export default function SettingsPage() {
       (m) => (!freeOnly || m.free) && (!q || m.id.toLowerCase().includes(q) || m.name.toLowerCase().includes(q)),
     );
   }, [models, filter, freeOnly]);
+
+  /**
+   * 分成「推荐」与「其余」两段。
+   * 长列表（OpenRouter 有数百个）一次铺开对用户毫无帮助 ——
+   * 先给三五个已知好用的，其余收进「显示全部」。
+   */
+  const { recommended, rest } = useMemo(
+    () => splitByRecommendation(visible, provider),
+    [visible, provider],
+  );
+  // 搜索或勾了「只看免费」时，用户已在主动找东西，不该再把结果藏起来
+  const forceShowAll = Boolean(filter.trim()) || freeOnly || recommended.length === 0;
 
   if (!settings) {
     return (
@@ -276,6 +292,7 @@ export default function SettingsPage() {
             <p className="mt-1 text-[0.8125rem] text-ink-soft">{verdict.nextStep}</p>
           </div>
         )}
+      </section>
 
       <section className="card">
         <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
@@ -304,29 +321,45 @@ export default function SettingsPage() {
               <span className="text-xs text-ink-mute">显示 {visible.length} / {models.length}</span>
             </div>
 
-            <ul className="max-h-96 space-y-1 overflow-y-auto pr-1">
-              {visible.map((m) => (
-                <li key={m.id}>
-                  <button
-                    type="button"
-                    onClick={() => setModel(m.id)}
-                    className={`w-full rounded-lg border p-2.5 text-left transition ${
-                      model === m.id ? 'border-cinnabar bg-cinnabar/5' : 'border-rice-line hover:border-cinnabar/50'
-                    }`}
-                  >
-                    <div className="flex flex-wrap items-center gap-1.5">
-                      <span className="font-mono text-xs">{m.id}</span>
-                      {m.free && <span className="tag border-jade/40 bg-jade/10 text-jade">免费</span>}
-                      {m.contextLength != null && (
-                        <span className="tag border-rice-line text-ink-mute">{(m.contextLength / 1000).toFixed(0)}K 上下文</span>
-                      )}
-                      {model === m.id && <span className="tag border-cinnabar/40 bg-cinnabar/10 text-cinnabar">已选</span>}
-                    </div>
-                    {m.name !== m.id && <p className="mt-0.5 text-xs text-ink-soft">{m.name}</p>}
+            {recommended.length > 0 && !forceShowAll && !showAll && (
+              <>
+                <ul className="space-y-1">
+                  {recommended.map((m) => (
+                    <li key={m.id}>
+                      <ModelRow m={m} selected={model === m.id} recommended onPick={setModel} />
+                    </li>
+                  ))}
+                </ul>
+                <p className="mt-2 text-[0.75rem] leading-relaxed text-ink-mute">{RECOMMEND_REASON}</p>
+                {rest.length > 0 && (
+                  <button type="button" className="btn btn-sm btn-block mt-2" onClick={() => setShowAll(true)}>
+                    显示全部（{rest.length}）
                   </button>
-                </li>
-              ))}
-            </ul>
+                )}
+              </>
+            )}
+
+            {(forceShowAll || showAll) && (
+              <>
+                {recommended.length > 0 && !forceShowAll && (
+                  <button type="button" className="btn btn-sm btn-block mb-2" onClick={() => setShowAll(false)}>
+                    收起，只看推荐（{recommended.length}）
+                  </button>
+                )}
+                <ul className="max-h-96 space-y-1 overflow-y-auto pr-1">
+                  {[...recommended, ...rest].map((m) => (
+                    <li key={m.id}>
+                      <ModelRow
+                        m={m}
+                        selected={model === m.id}
+                        recommended={recommended.includes(m)}
+                        onPick={setModel}
+                      />
+                    </li>
+                  ))}
+                </ul>
+              </>
+            )}
           </>
         )}
 
@@ -366,5 +399,39 @@ export default function SettingsPage() {
       </p>
       </div>
     </>
+  );
+}
+
+/** 模型条目。推荐与否只影响一个标，其余展示完全一致。 */
+function ModelRow({
+  m,
+  selected,
+  recommended,
+  onPick,
+}: {
+  m: ModelInfo;
+  selected: boolean;
+  recommended: boolean;
+  onPick: (id: string) => void;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={() => onPick(m.id)}
+      className={`w-full rounded-lg border p-2.5 text-left transition ${
+        selected ? 'border-cinnabar bg-cinnabar/5' : 'border-rice-line hover:border-cinnabar/50'
+      }`}
+    >
+      <div className="flex flex-wrap items-center gap-1.5">
+        <span className="font-mono text-xs">{m.id}</span>
+        {recommended && <span className="tag border-gold/50 bg-gold/10 text-gold">推荐</span>}
+        {m.free && <span className="tag border-jade/40 bg-jade/10 text-jade">免费</span>}
+        {m.contextLength != null && (
+          <span className="tag border-rice-line text-ink-mute">{(m.contextLength / 1000).toFixed(0)}K 上下文</span>
+        )}
+        {selected && <span className="tag border-cinnabar/40 bg-cinnabar/10 text-cinnabar">已选</span>}
+      </div>
+      {m.name !== m.id && <p className="mt-0.5 text-xs text-ink-soft">{m.name}</p>}
+    </button>
   );
 }
