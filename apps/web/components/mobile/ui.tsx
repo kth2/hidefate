@@ -11,18 +11,27 @@
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useEffect, useId, useRef, useState, type ReactNode } from 'react';
+import { PropertySwitcher } from './PropertySwitcher';
 
-/** 顶栏。标题居中，左返回右操作，高度 52px。 */
+/**
+ * 顶栏。标题居中，左返回右操作，高度 52px；下方挂一条全局「当前房屋」下拉。
+ *
+ * 房屋切换做在顶栏而不是某一页里，是因为每个 tab 都依赖「当前是哪一处」，
+ * 而它原本藏在「我的」深处。默认开启；建房向导那类还没有房屋概念的页面
+ * 可以传 `propertySwitcher={false}` 关掉。
+ */
 export function AppBar({
   title,
   subtitle,
   back,
   right,
+  propertySwitcher = true,
 }: {
   title: string;
   subtitle?: string;
   back?: boolean | string;
   right?: ReactNode;
+  propertySwitcher?: boolean;
 }) {
   const router = useRouter();
   return (
@@ -54,6 +63,11 @@ export function AppBar({
         </div>
         <div className="flex w-16 justify-end">{right}</div>
       </div>
+      {propertySwitcher && (
+        <div className="mx-auto max-w-lg">
+          <PropertySwitcher />
+        </div>
+      )}
     </header>
   );
 }

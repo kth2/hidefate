@@ -150,6 +150,8 @@ export default function NewPropertyPage() {
         title="建立房屋"
         subtitle={`第 ${step + 1} / ${STEPS.length} 步 · ${STEPS[step]}`}
         back={step === 0 ? '/me' : undefined}
+        // 建房向导里还没有「当前房屋」这个概念，切换入口只会分散注意力
+        propertySwitcher={false}
         right={
           step > 0 ? (
             <button type="button" className="btn btn-sm" onClick={() => setStep((s) => s - 1)}>
