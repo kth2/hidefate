@@ -18,10 +18,23 @@ export default function MatrixPage() {
   const { result, members, loading } = useProperty();
   const [domain, setDomain] = useState<RiskDomain>('健康');
   const [cell, setCell] = useState<MatrixCell | null>(null);
+  /** '' = 全部成员。 */
+  const [memberId, setMemberId] = useState('');
 
   const matrix = useMemo(
     () => (result ? buildRoomMemberMatrix(result, members) : null),
     [result, members],
+  );
+
+  /**
+   * 单看一位成员。
+   *
+   * 一家四五口时，纵向排下来的卡片要滑很久才能对上「小孩那间房到底怎样」。
+   * 家长真正的问题往往是针对某一个人的，这个筛选就是为那种时刻准备的。
+   */
+  const shownMembers = useMemo(
+    () => (matrix ? matrix.members.filter((m) => !memberId || m.id === memberId) : []),
+    [matrix, memberId],
   );
 
   if (loading) return <><AppBar title="风险矩阵" back="/me" /><div className="px-4 py-4"><Skeleton lines={5} /></div></>;
@@ -39,7 +52,15 @@ export default function MatrixPage() {
 
   return (
     <>
-      <AppBar title="风险矩阵" subtitle={`${members.length} 位成员 × ${matrix.columns.length} 个房间`} back="/me" />
+      <AppBar
+        title="风险矩阵"
+        subtitle={
+          memberId
+            ? `${matrix.members.find((m) => m.id === memberId)?.name ?? ''} × ${matrix.columns.length} 个房间`
+            : `${members.length} 位成员 × ${matrix.columns.length} 个房间`
+        }
+        back="/me"
+      />
 
       <div className="space-y-4 px-4 py-4">
         <SegRow
@@ -49,7 +70,17 @@ export default function MatrixPage() {
           options={MATRIX_DOMAINS.map((d) => ({ value: d, label: d }))}
         />
 
-        {matrix.members.map((m) => (
+        <SegRow
+          label="只看某一位"
+          value={memberId}
+          onChange={setMemberId}
+          options={[
+            { value: '', label: `全部（${matrix.members.length}）` },
+            ...matrix.members.map((m) => ({ value: m.id, label: m.name })),
+          ]}
+        />
+
+        {shownMembers.map((m) => (
           <section key={m.id} className="card">
             <h2 className="card-title mb-2">{m.name}</h2>
             <div className="grid grid-cols-3 gap-1.5">
