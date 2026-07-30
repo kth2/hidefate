@@ -33,6 +33,8 @@ import { XingShiPicker } from '../../components/mobile/XingShiPicker';
 import { AppBar } from '../../components/mobile/ui';
 import { RoomEditor } from '../../components/mobile/RoomEditor';
 import { DirectionPicker, toSitting, type MeasureEnd } from '../../components/mobile/DirectionPicker';
+import { FloorplanGrid } from '../../components/mobile/FloorplanGrid';
+import { EMPTY_LAYOUT, type FloorplanLayout } from '../../lib/floorplan';
 import { db, newId, type StoredProperty } from '../../lib/db';
 import { useProperty } from '../../lib/PropertyContext';
 
@@ -63,6 +65,7 @@ export default function NewPropertyPage() {
   const [missing, setMissing] = useState<MissingCorner[]>([]);
   const [xingShi, setXingShi] = useState<XingShiItem[]>([]);
   const [photo, setPhoto] = useState<string | null>(null);
+  const [layout, setLayout] = useState<FloorplanLayout>(EMPTY_LAYOUT);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -123,7 +126,9 @@ export default function NewPropertyPage() {
         xingShi,
         entryMode,
         enableQiMen,
-        note: photo ? '已拍摄户型图' : undefined,
+        // 照片与叠层一并存下 —— 此前建完档照片就丢了，回头想改格子只能重拍
+        floorplanDataUrl: photo ?? undefined,
+        floorplanLayout: photo ? layout : undefined,
         createdAt: now,
         updatedAt: now,
       };
@@ -369,10 +374,17 @@ export default function NewPropertyPage() {
             <p className="card-sub px-1">
               至少标 <b>大门</b>。标得越全预测越准，但现在标不完也没关系 ——
               建好后随时可在「我的 → 房间管理」里补。
+              {photo ? '已有户型图：把下面的九宫格拖到房子上对齐，点格子即可指派房间。' : ''}
             </p>
             {photo && (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img src={photo} alt="户型图" className="w-full rounded-xl border border-rice-line" />
+              <FloorplanGrid
+                image={photo}
+                layout={layout}
+                rooms={rooms}
+                onLayoutChange={setLayout}
+                onRoomsChange={setRooms}
+                newId={newId}
+              />
             )}
             <RoomEditor
               profile={{ buildingType, storeys, hasBasement }}

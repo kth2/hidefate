@@ -11,10 +11,20 @@ import Dexie, { type Table } from 'dexie';
 import type { PropertyProfile } from '@hidefate/core-fengshui';
 import type { AppliedCure } from '@hidefate/core-synthesis';
 import type { BirthInput } from '@hidefate/core-bazi';
+import type { FloorplanLayout } from './floorplan';
 
 export interface StoredProperty extends PropertyProfile {
   readonly createdAt: string;
   readonly updatedAt: string;
+  /**
+   * 户型图（dataURL）。只存在本机，不上传。
+   *
+   * 放在 StoredProperty 而不是 PropertyProfile 里：core-* 是纯函数层，
+   * 不该知道有图片这回事 —— 它只认 rooms 里那份宫位映射。
+   */
+  readonly floorplanDataUrl?: string;
+  /** 九宫格叠层在图上的位置、姿态与格子→房间的对应。 */
+  readonly floorplanLayout?: FloorplanLayout;
 }
 
 export interface StoredMember extends BirthInput {
