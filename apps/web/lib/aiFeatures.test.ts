@@ -6,6 +6,7 @@ import { classifyProbe } from './aiTest';
 import { analyse, synthesise } from '@hidefate/core-synthesis';
 import { sampleInput } from '../../../packages/core-synthesis/src/fixtures';
 import { findingRefs, refsForDomains } from './findings';
+import { deriveFollowUps, referencedRefs } from './followUps';
 import { SUGGESTION_CATEGORIES, suggestQuestions } from './suggestedQuestions';
 
 const src = (rel: string) => readFileSync(fileURLToPath(new URL(rel, import.meta.url)), 'utf8');
@@ -172,5 +173,39 @@ describe('建议问题由 Finding 现算', () => {
     const qs = suggestQuestions([refs[0]!]);
     expect(qs.length).toBeGreaterThanOrEqual(4);
     expect(qs.every((q) => q.refId === refs[0]!.id)).toBe(true);
+  });
+});
+
+/** 回答之后的追问 chip。 */
+describe('追问由回答实际引用到的宫位与断语生成', () => {
+  const result = analyse(sampleInput(2026), synthesise(sampleInput(2026)));
+  const refs = findingRefs(result);
+  const withDir = refs.find((r) => r.direction)!;
+
+  it('能认出回答里提到的方位', () => {
+    const hit = referencedRefs(`${withDir.direction}这一方今年要留意。`, refs);
+    expect(hit.some((r) => r.direction === withDir.direction)).toBe(true);
+  });
+
+  it('回答完全没提到盘面时不硬凑，退到通用追问', () => {
+    const ups = deriveFollowUps('你好，今天天气不错。', refs);
+    expect(ups.length).toBeGreaterThanOrEqual(2);
+    expect(ups.every((u) => u.refId === null)).toBe(true);
+  });
+
+  it('始终给 2–3 条，且互不重复', () => {
+    for (const reply of ['', `${withDir.direction}有二五交加，须留意。`, '正北与西南都要看。']) {
+      const ups = deriveFollowUps(reply, refs);
+      expect(ups.length).toBeGreaterThanOrEqual(2);
+      expect(ups.length).toBeLessThanOrEqual(3);
+      expect(new Set(ups.map((u) => u.question)).size).toBe(ups.length);
+    }
+  });
+
+  it('提到某方位时，追问会扣着该方位并指回原断语', () => {
+    const ups = deriveFollowUps(`${withDir.direction}这一方今年要留意，建议尽早处理。`, refs);
+    const anchored = ups.filter((u) => u.refId !== null);
+    expect(anchored.length).toBeGreaterThan(0);
+    expect(anchored[0]!.question).toContain(withDir.direction!);
   });
 });

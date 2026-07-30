@@ -15,6 +15,7 @@ import type { AnswerContextOptions, Member, SynthesisResult } from '@hidefate/co
 import { buildAnswerContext, faqHighlights } from '@hidefate/core-synthesis';
 import { scenarioOf } from '@hidefate/core-fengshui';
 import { findingRefs } from '../lib/findings';
+import { deriveFollowUps } from '../lib/followUps';
 import { suggestQuestions } from '../lib/suggestedQuestions';
 import { chatStream, type AiConfig, type ChatMessage } from '../lib/ai';
 import { loadSettings, type AppSettings } from '../lib/db';
@@ -259,6 +260,23 @@ export function AiChat({
               ) : null}
               {t.streaming && t.content && <span className="ml-0.5 animate-pulse">▍</span>}
               {t.error && <p className="mt-1.5 border-t border-rice-line pt-1.5 text-xs text-cinnabar">{t.error}</p>}
+
+              {/* 追问 chip：只在回答收尾后出现，且由这条回答实际提到的宫位与断语生成 */}
+              {t.role === 'assistant' && !t.streaming && !t.error && t.content && (
+                <div className="mt-2 flex flex-wrap gap-1.5 border-t border-rice-line pt-2">
+                  {deriveFollowUps(t.content, refs).map((f) => (
+                    <button
+                      key={f.question}
+                      type="button"
+                      disabled={busy}
+                      className="rounded-full border border-cinnabar/30 bg-cinnabar/[0.05] px-2.5 py-1 text-left text-[0.75rem] leading-snug text-cinnabar transition active:opacity-60 disabled:opacity-40"
+                      onClick={() => void send(f.question)}
+                    >
+                      {f.question}
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
         ))}
