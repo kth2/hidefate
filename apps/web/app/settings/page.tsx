@@ -18,6 +18,7 @@ import {
   type ModelInfo,
   type ProviderId,
 } from '../../lib/ai';
+import { testConnection, type ConnectionVerdict } from '../../lib/aiTest';
 import { loadSettings, saveSettings, type AppSettings } from '../../lib/db';
 import { AppBar } from '../../components/mobile/ui';
 import { AiOptionalNotice } from '../../components/AiOptionalNotice';
@@ -35,6 +36,8 @@ export default function SettingsPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [ok, setOk] = useState<string | null>(null);
+  const [testing, setTesting] = useState(false);
+  const [verdict, setVerdict] = useState<ConnectionVerdict | null>(null);
   const [filter, setFilter] = useState('');
   const [freeOnly, setFreeOnly] = useState(false);
   const [showKey, setShowKey] = useState(false);
@@ -102,6 +105,21 @@ export default function SettingsPage() {
       setLoading(false);
     }
   }, [baseUrl, apiKey, direct, model, provider]);
+
+  const runTest = useCallback(async () => {
+    setTesting(true);
+    setVerdict(null);
+    try {
+      setVerdict(await testConnection({ baseUrl, apiKey, model, direct }));
+    } finally {
+      setTesting(false);
+    }
+  }, [baseUrl, apiKey, model, direct]);
+
+  // 换了供应商 / 模型 / Key，上一次的结论就不再作数，留着会误导
+  useEffect(() => {
+    setVerdict(null);
+  }, [baseUrl, apiKey, model, direct]);
 
   async function save() {
     const s = await saveSettings({
@@ -231,11 +249,33 @@ export default function SettingsPage() {
           <button type="button" className="btn btn-primary" onClick={fetchModels} disabled={loading || !baseUrl.trim()}>
             {loading ? '拉取中…' : '拉取可用模型列表'}
           </button>
+          <button
+            type="button"
+            className="btn"
+            onClick={() => void runTest()}
+            disabled={testing || !baseUrl.trim() || !model}
+            title={!model ? '请先选一个模型' : undefined}
+          >
+            {testing ? '测试中…' : '测试连接'}
+          </button>
           <button type="button" className="btn" onClick={save}>
             保存设置
           </button>
         </div>
-      </section>
+
+        {verdict && (
+          <div
+            className={`rounded-xl border p-3 text-[0.875rem] leading-relaxed ${
+              verdict.ok ? 'border-jade/40 bg-jade/[0.06] text-jade' : 'border-cinnabar/40 bg-cinnabar/[0.05] text-cinnabar'
+            }`}
+          >
+            <p className="font-medium">
+              {verdict.ok ? '✓ ' : '✕ '}
+              {verdict.message}
+            </p>
+            <p className="mt-1 text-[0.8125rem] text-ink-soft">{verdict.nextStep}</p>
+          </div>
+        )}
 
       <section className="card">
         <div className="mb-3 flex flex-wrap items-center justify-between gap-2">

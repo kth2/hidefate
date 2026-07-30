@@ -316,6 +316,49 @@ export async function chatStream(
   return full;
 }
 
+/**
+ * 最小的一次真实补全请求，用于「测试连接」。
+ *
+ * 与 chatStream 的区别：**不抛错、不翻译**，原样返回 status 与响应体，
+ * 由 aiTest.ts 决定该把这个结果说成哪一句人话。
+ * 抛出的只有 fetch 本身的失败（断网 / CORS 被拦），那一层同样交给上层判读。
+ *
+ * 刻意选最省的参数：max_tokens 1、非流式、temperature 0 ——
+ * 目的只是确认「这个 Key 配这个模型能不能通」，不是要模型说什么。
+ */
+export async function probeCompletion(
+  cfg: AiConfig,
+  signal?: AbortSignal,
+): Promise<{ status: number; body: string }> {
+  const baseUrl = trimBase(cfg.baseUrl);
+  const body = {
+    model: cfg.model,
+    messages: [{ role: 'user', content: 'ping' }],
+    max_tokens: 1,
+    temperature: 0,
+    stream: false,
+  };
+
+  const res = useDirect(cfg)
+    ? await fetch(`${baseUrl}/chat/completions`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(cfg.apiKey ? { Authorization: `Bearer ${cfg.apiKey}` } : {}),
+        },
+        body: JSON.stringify(body),
+        signal,
+      })
+    : await fetch('/api/ai/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ baseUrl, apiKey: cfg.apiKey, payload: body }),
+        signal,
+      });
+
+  return { status: res.status, body: await res.text() };
+}
+
 /** 把 HTTP 错误翻成用户能据以行动的中文。 */
 function explainHttpError(status: number, body: string): string {
   let detail = body.slice(0, 300);
