@@ -16,3 +16,5 @@ export * from './answer.js';
 export * from './alerts.js';
 export * from './layoutRules.js';
 export * from './opportunities.js';
+export * from './composite.js';
+export * from './faq.js';

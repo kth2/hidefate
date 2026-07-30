@@ -26,7 +26,9 @@ import {
   type MissingCorner,
   type PalaceIndex,
   type RoomPlacement,
+  type XingShiItem,
 } from '@hidefate/core-fengshui';
+import { XingShiPicker } from '../../components/mobile/XingShiPicker';
 import { AppBar } from '../../components/mobile/ui';
 import { RoomEditor } from '../../components/mobile/RoomEditor';
 import { DirectionPicker, toSitting, type MeasureEnd } from '../../components/mobile/DirectionPicker';
@@ -35,7 +37,7 @@ import { useProperty } from '../../lib/PropertyContext';
 
 type EntryMode = '九宫格' | '户型图' | '罗盘实测';
 
-const STEPS = ['方式', '基本', '坐向', '房间', '缺角'] as const;
+const STEPS = ['方式', '基本', '坐向', '房间', '缺角', '外部环境'] as const;
 
 export default function NewPropertyPage() {
   const router = useRouter();
@@ -58,6 +60,7 @@ export default function NewPropertyPage() {
 
   const [rooms, setRooms] = useState<RoomPlacement[]>([]);
   const [missing, setMissing] = useState<MissingCorner[]>([]);
+  const [xingShi, setXingShi] = useState<XingShiItem[]>([]);
   const [photo, setPhoto] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -116,6 +119,7 @@ export default function NewPropertyPage() {
         moveInYear,
         missingCorners: missing,
         rooms,
+        xingShi,
         entryMode,
         enableQiMen,
         note: photo ? '已拍摄户型图' : undefined,
@@ -137,7 +141,8 @@ export default function NewPropertyPage() {
     (step === 1 && name.trim() !== '' && (!requiresFloor(buildingType) || floor !== '')) ||
     step === 2 ||
     step === 3 ||
-    step === 4;
+    step === 4 ||
+    step === 5;
 
   return (
     <>
@@ -401,6 +406,18 @@ export default function NewPropertyPage() {
                 );
               })}
             </div>
+          </div>
+        )}
+
+        {/* ── 第 6 步：外部环境（峦头）── */}
+        {step === 5 && (
+          <div className="space-y-4">
+            <p className="card-sub px-1">
+              <b>「峦头为体，理气为用。」</b>
+              门前有没有路冲、背后有没有靠、前方开不开阔 —— 这些比盘上的星更先决定吉凶。
+              可以跳过，但下面会告诉你跳过的代价。
+            </p>
+            <XingShiPicker items={xingShi} onChange={setXingShi} />
           </div>
         )}
       </div>

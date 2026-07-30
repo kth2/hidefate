@@ -16,6 +16,8 @@ import {
   type PalaceIndex,
   type RiskDomain,
 } from '@hidefate/core-fengshui';
+import { scenarioOf } from '@hidefate/core-fengshui';
+import type { CompositeScore } from './composite.js';
 import type { Cure, Finding, Member, Prediction, SynthesisResult } from './types.js';
 
 /** 标准三段式作答。 */
@@ -239,6 +241,14 @@ function format(a: Omit<StandardAnswer, 'formatted'>): StandardAnswer {
  * 这是「LLM 绝不发明星位与数字」这条铁律的技术落点。
  */
 export interface AnswerContextOptions {
+  /** 峦头（外部环境）与综合分拆解。「峦头为体」，作答时不可只谈理气。 */
+  readonly composite?: CompositeScore | null;
+  /** 布局体检结果。 */
+  readonly layoutIssues?: readonly { title: string; severity: string; statement: string }[];
+  /** 吉方与催旺建议。 */
+  readonly opportunities?: readonly { kind: string; direction: string; headline: string }[];
+  /** 用户所点的常见问题（含「该看盘上何处」的提示）。 */
+  readonly faq?: { question: string; lookAt: readonly string[] } | null;
   /** 成员及其命卦 / 八字摘要 —— 个人化提问必需。 */
   readonly members?: readonly Member[];
   /** 当前 What-If 模拟状态；有则一并交代，让模型知道「现在看的是哪一版」。 */
@@ -348,6 +358,60 @@ export function buildAnswerContext(
     lines.push(`\n# 当前 What-If 模拟状态\n（无。上方九宫与预测均为现况原盘。）`);
   }
 
+  // ---- 峦头与综合分（体用之分，必须在理气之前交代）----
+  if (opts.composite) {
+    const c = opts.composite;
+    lines.push(`\n# 峦头（形势）与综合评分`);
+    lines.push(`场景：${c.scenario}（居家重人丁健康，商业重财禄客流）`);
+    lines.push(
+      `综合分 ${c.score.toFixed(3)} ＝ 峦头 ${c.landform.score.toFixed(3)}×${c.weights.landform.toFixed(2)}` +
+        ` ＋ 理气 ${c.qi.score.toFixed(3)}×${c.weights.qi.toFixed(2)}`,
+    );
+    lines.push(
+      `理气拆解：飞星 ${c.qi.feiXing.toFixed(3)}｜八宅 ${c.qi.baZhai.toFixed(3)}` +
+        (c.qi.qiMen != null ? `｜山向奇门 ${c.qi.qiMen.toFixed(3)}` : '｜山向奇门未启用'),
+    );
+    if (c.landform.assessed) {
+      lines.push(`峦头项目（负值为形煞）：`);
+      for (const x of c.landform.contributions) {
+        lines.push(
+          `- ${x.direction ?? '全局'}「${x.feature}」${x.contribution >= 0 ? '+' : ''}${x.contribution.toFixed(2)}` +
+            `（${x.meta.affects}）`,
+        );
+      }
+    } else {
+      lines.push(`峦头：**用户未填外部环境**，权重已降至 ${c.weights.landform.toFixed(2)}。` +
+        `作答时须主动提醒「外部形势未评估，此判断只有理气一半，建议补填或实地勘察」。`);
+    }
+    if (c.veto.triggered) {
+      lines.push(`\n⚠ **已触发否决机制**：${c.veto.reason}`);
+      lines.push(`作答时必须把「优先化解形煞」放在所有理气建议之前，不可先谈催财布局。`);
+    }
+  }
+
+  // ---- 布局体检 ----
+  if (opts.layoutIssues?.length) {
+    lines.push(`\n# 布局体检（房间彼此关系，与飞星落点无关）`);
+    for (const i of opts.layoutIssues) {
+      lines.push(`- [${i.severity}] ${i.title}：${i.statement}`);
+    }
+  }
+
+  // ---- 吉方 ----
+  if (opts.opportunities?.length) {
+    lines.push(`\n# 可用吉方（旺位宜动，衰位宜静）`);
+    for (const o of opts.opportunities) {
+      lines.push(`- ${o.direction}｜${o.kind}：${o.headline}`);
+    }
+  }
+
+  // ---- 用户所点的常见问题 ----
+  if (opts.faq) {
+    lines.push(`\n# 本次提问`);
+    lines.push(`问题：${opts.faq.question}`);
+    lines.push(`作答时应重点引用盘上以下几处：${opts.faq.lookAt.join('、')}`);
+  }
+
   // ---- 时间轴 ----
   if (opts.timeline) {
     const t = opts.timeline;
@@ -380,6 +444,21 @@ export function buildAnswerContext(
     '   作答须基于该方案，并在开头一句点明「此为方案〈名称〉下的结论」。',
     '10. 闲聊、问候、或与本宅无关的问题，可以自然作答，不必套用三段格式；',
     '    但只要问题涉及吉凶、方位、房间、成员运势，就必须回到三段格式。',
+    '',
+    '【体用之序 —— 最重要的一条】',
+    '11. 「峦头为体，理气为用；峦头差，理气无用。」',
+    '    若事实中已触发否决机制，或峦头有严重形煞（负值 ≤ −0.3），',
+    '    **必须先讲化解形煞，再谈理气布局**。绝不可在路冲、天斩当前时先教人摆鱼缸催财 ——',
+    '    那是本末倒置，也是最容易招人怨的一种建议。',
+    '12. 若用户未填外部环境，作答时须主动说明「外部形势未评估，此判断只有理气一半」，',
+    '    并建议补填或实地勘察。不可假装峦头无碍。',
+    '13. 化解一律「移形易位」优先，摆件次之 —— 能改格局的，强于任何风水物件。',
+    '    不说「必须摆某物才能化解」这类话。',
+    `14. 本宅为「${scenarioOf(s.buildingType)}」场景：` +
+      (scenarioOf(s.buildingType) === '居家'
+        ? '重健康、和睦、感情、子女、人丁；房间轻重为 大门 > 主卧 > 厨房 > 小孩房 > 客厅。'
+        : '重财运、客流、效率、老板运、员工稳定；房间轻重为 大门/入口 > 收银台 > 老板位 > 核心工作区。') +
+      '　作答须切合此场景，勿把居家话术用在商铺上（反之亦然）。',
   ].join('\n');
 
   return { system, facts: lines.join('\n') };

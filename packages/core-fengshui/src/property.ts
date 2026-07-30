@@ -7,6 +7,8 @@
  */
 
 import { OUTER_PALACES, PALACE_DIRECTION, type PalaceIndex, type WuXing } from './constants.js';
+import type { XingShiItem } from './xingShi.js';
+import type { CubicleSetup } from './scenario.js';
 
 /** 建筑类别。分析规则随类别而变。 */
 export type BuildingType =
@@ -375,6 +377,13 @@ export interface PropertyProfile {
   readonly period?: PalaceIndex;
   readonly missingCorners: readonly MissingCorner[];
   readonly rooms: readonly RoomPlacement[];
+  /**
+   * 外部环境（峦头）。「峦头为体，理气为用」——
+   * 未填时综合评分会把峦头权重降到 15% 并下调置信度，而非假装无碍。
+   */
+  readonly xingShi?: readonly XingShiItem[];
+  /** 隔间设置（格子间／共享办公专用）。 */
+  readonly cubicle?: CubicleSetup;
   /** 建档路径，用于置信度标注。 */
   readonly entryMode: '户型图' | '九宫格' | '罗盘实测';
   /** 是否启用山向奇门层。 */

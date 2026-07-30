@@ -23,6 +23,7 @@ import {
   crossPersonHouse,
   organRisksOf,
   roomNature,
+  scenarioProfile,
   starScore,
   type PalaceIndex,
   type RiskDomain,
@@ -351,8 +352,15 @@ export function predict(input: AnalysisInput, synthesis: SynthesisResult): Predi
     }
   }
 
-  // 排序：房间优先级 → 概率 → 风险等级
-  const roomRank = (k: RoomKind | null) => (k ? ROOM_ORDER.indexOf(k) : -1);
+  /**
+   * 排序：房间优先级 → 概率。
+   *
+   * 房间序按场景取 —— 居家用「大门 > 主卧 > 厨房 > 小孩房 > 客厅」，
+   * 商业用「大门 > 收银台 > 老板位 > 办公位 > 前台」。
+   * 此前只有一套居家序，用在店铺上会把主卧排到收银台前面，显然不合。
+   */
+  const order = scenarioProfile(input.profile.buildingType).roomOrder;
+  const roomRank = (k: RoomKind | null) => (k ? order.indexOf(k) : -1);
   return out.sort((x, y) => {
     const rx = roomRank(x.roomKind);
     const ry = roomRank(y.roomKind);

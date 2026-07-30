@@ -12,7 +12,8 @@
 import Link from 'next/link';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type { AnswerContextOptions, Member, SynthesisResult } from '@hidefate/core-synthesis';
-import { buildAnswerContext } from '@hidefate/core-synthesis';
+import { buildAnswerContext, faqHighlights } from '@hidefate/core-synthesis';
+import { scenarioOf } from '@hidefate/core-fengshui';
 import { chatStream, type AiConfig, type ChatMessage } from '../lib/ai';
 import { loadSettings, type AppSettings } from '../lib/db';
 
@@ -24,22 +25,29 @@ interface Turn {
   error?: string;
 }
 
-const SUGGESTIONS = [
-  '这间房子对我们全家来说最大的问题是什么？请按轻重排序。',
-  '今年最该先花钱处理哪一处？预算有限的话只做一件事，做哪件？',
-  '小孩的房间现在这个位置合适吗？如果不合适，换到哪里更好？',
-  '主卧的问题具体会怎么影响夫妻关系？有多大可能？',
-  '未来三年有哪些年份需要特别注意？为什么？',
+/** 兜底建议（无场景信息时用）。实际会按居家／商业从 FAQ 库取。 */
+const FALLBACK_SUGGESTIONS = [
+  '整体来看，我这里最大的问题是什么？请按轻重排序。',
+  '预算有限，只做一件事的话，先做哪一件？',
+  '本宅的财位在哪一方？现在有没有用起来？',
 ];
 
 export function AiChat({
   result,
   members,
   simulation,
+  /** 峦头与综合分拆解、布局体检、吉方 —— 一并送入上下文。 */
+  extraContext,
+  /** 用户从常见问题选单点进来的那一条。 */
+  pendingFaq,
+  onFaqConsumed,
 }: {
   result: SynthesisResult;
   members: readonly Member[];
   simulation?: AnswerContextOptions['simulation'];
+  extraContext?: Pick<AnswerContextOptions, 'composite' | 'layoutIssues' | 'opportunities'>;
+  pendingFaq?: { question: string; lookAt: readonly string[] } | null;
+  onFaqConsumed?: () => void;
 }) {
   const [settings, setSettings] = useState<AppSettings | null>(null);
   const [turns, setTurns] = useState<Turn[]>([]);
@@ -56,10 +64,31 @@ export function AiChat({
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: 'smooth' });
   }, [turns]);
 
+  // 从常见问题选单点进来的问题，自动发出（上下文已带上「该看何处」）
+  useEffect(() => {
+    if (!pendingFaq || busy || !settings) return;
+    void send(pendingFaq.question);
+    onFaqConsumed?.();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pendingFaq, settings]);
+
   const context = useMemo(
-    () => buildAnswerContext(result, { members, simulation: simulation ?? null }),
-    [result, members, simulation],
+    () =>
+      buildAnswerContext(result, {
+        members,
+        simulation: simulation ?? null,
+        composite: extraContext?.composite ?? null,
+        layoutIssues: extraContext?.layoutIssues,
+        opportunities: extraContext?.opportunities,
+        faq: pendingFaq ?? null,
+      }),
+    [result, members, simulation, extraContext, pendingFaq],
   );
+
+  const suggestions = useMemo(() => {
+    const s = faqHighlights(scenarioOf(result.buildingType));
+    return s.length ? s.map((f) => f.question) : FALLBACK_SUGGESTIONS;
+  }, [result.buildingType]);
 
   const configured = Boolean(settings?.aiBaseUrl && settings?.aiModel);
   const consented = Boolean(settings?.aiConsent);
@@ -184,7 +213,7 @@ export function AiChat({
           <div className="py-4 text-center">
             <p className="mb-3 text-sm text-ink-mute">问点什么吧。模型已经拿到这间房子的全部推算结果。</p>
             <div className="flex flex-wrap justify-center gap-1.5">
-              {SUGGESTIONS.map((s) => (
+              {suggestions.map((s) => (
                 <button key={s} type="button" className="btn text-xs" onClick={() => void send(s)}>
                   {s}
                 </button>

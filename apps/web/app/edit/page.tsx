@@ -26,8 +26,10 @@ import {
   type BuildingType,
   type MissingCorner,
   type PalaceIndex,
+  type XingShiItem,
 } from '@hidefate/core-fengshui';
 import { AppBar, Empty, Expandable, Skeleton } from '../../components/mobile/ui';
+import { XingShiPicker } from '../../components/mobile/XingShiPicker';
 import { DirectionPicker, toSitting, type MeasureEnd } from '../../components/mobile/DirectionPicker';
 import { useProperty } from '../../lib/PropertyContext';
 import { db } from '../../lib/db';
@@ -47,6 +49,7 @@ export default function EditPage() {
   const [degree, setDegree] = useState(0);
   const [mountainName, setMountainName] = useState('子');
   const [missing, setMissing] = useState<MissingCorner[]>([]);
+  const [xingShi, setXingShi] = useState<XingShiItem[]>([]);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
 
@@ -60,6 +63,7 @@ export default function EditPage() {
     setHasBasement(Boolean(property.hasBasement));
     setMoveInYear(property.moveInYear);
     setMissing([...property.missingCorners]);
+    setXingShi([...(property.xingShi ?? [])]);
     // 现有坐向一律以「坐山」呈现，用户可自行切到向首再改
     setEnd('坐山');
     try {
@@ -87,9 +91,10 @@ export default function EditPage() {
       Boolean(hasBasement) !== Boolean(property.hasBasement) ||
       moveInYear !== property.moveInYear ||
       String(nextSitting) !== String(property.sitting) ||
-      JSON.stringify(missing) !== JSON.stringify(property.missingCorners)
+      JSON.stringify(missing) !== JSON.stringify(property.missingCorners) ||
+      JSON.stringify(xingShi) !== JSON.stringify(property.xingShi ?? [])
     );
-  }, [property, name, buildingType, floor, storeys, hasBasement, moveInYear, nextSitting, missing]);
+  }, [property, name, buildingType, floor, storeys, hasBasement, moveInYear, nextSitting, missing, xingShi]);
 
   /** 坐向若改动，整盘会重排 —— 必须让用户看到差别再决定。 */
   const shift = useMemo(() => {
@@ -130,6 +135,7 @@ export default function EditPage() {
       moveInYear,
       sitting: nextSitting,
       missingCorners: missing,
+      xingShi,
       updatedAt: new Date().toISOString(),
     });
     reload();
@@ -282,6 +288,15 @@ export default function EditPage() {
             </p>
           </section>
         )}
+
+        <section className="card">
+          <h2 className="card-title">外部环境（峦头）</h2>
+          <p className="card-sub mb-3">
+            「峦头为体，理气为用；峦头差，理气无用。」这一步决定峦头以 45%（居家）／35%（商业）
+            还是仅 15% 的权重参与判断。
+          </p>
+          <XingShiPicker items={xingShi} onChange={setXingShi} />
+        </section>
 
         <Expandable title={`缺角（已标 ${missing.length} 处）`}>
           <p className="mb-3 text-[0.8125rem] leading-relaxed text-ink-mute">

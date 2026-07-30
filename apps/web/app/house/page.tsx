@@ -22,12 +22,19 @@ import {
   layoutSummary,
   opportunitySummary,
 } from '@hidefate/core-synthesis';
-import { dailyStar, monthlyStar, solarMonthIndexOf, STAR_NAME as SN } from '@hidefate/core-fengshui';
+import {
+  dailyStar,
+  monthlyStar,
+  solarMonthIndexOf,
+  xingShiCures,
+  STAR_NAME as SN,
+} from '@hidefate/core-fengshui';
+import { computeComposite } from '@hidefate/core-synthesis';
 import { BigNineGrid, type LayerToggles } from '../../components/mobile/BigNineGrid';
 import { AppBar, Empty, Expandable, Sheet, Skeleton } from '../../components/mobile/ui';
 import { useProperty } from '../../lib/PropertyContext';
 
-type View = '九宫' | '吉方' | '布局' | '预测' | '化解';
+type View = '九宫' | '峦头' | '吉方' | '布局' | '预测' | '化解';
 
 const OPP_TONE: Record<string, string> = {
   正财位: 'border-jade/40 bg-jade/10 text-jade',
@@ -74,6 +81,13 @@ export default function HousePage() {
     () => (result ? findOpportunities(result, members) : []),
     [result, members],
   );
+
+  /** 峦头 × 理气 综合分。峦头未填时权重自动降至 15%。 */
+  const composite = useMemo(
+    () => (result ? computeComposite(result, property?.xingShi ?? []) : null),
+    [result, property?.xingShi],
+  );
+  const shaCures = useMemo(() => (composite ? xingShiCures(composite.landform) : []), [composite]);
 
   /**
    * 年 / 月 / 日 三层紫白。
@@ -157,9 +171,10 @@ export default function HousePage() {
 
       <div className="space-y-4 px-4 py-4">
         <div className="seg-row">
-          {(['九宫', '吉方', '布局', '预测', '化解'] as View[]).map((v) => (
+          {(['九宫', '峦头', '吉方', '布局', '预测', '化解'] as View[]).map((v) => (
             <button key={v} type="button" className={`seg ${view === v ? 'seg-on' : ''}`} onClick={() => setView(v)}>
               {v}
+              {v === '峦头' && composite?.veto.triggered && <span className="ml-1 text-[0.6875rem]">⚠</span>}
               {v === '吉方' && opportunities.length > 0 && (
                 <span className="ml-1 text-[0.6875rem] opacity-75">{opportunities.length}</span>
               )}
@@ -285,6 +300,146 @@ export default function HousePage() {
               </ol>
             </Expandable>
           </>
+        )}
+
+        {view === '峦头' && composite && (
+          <div className="space-y-3">
+            {/* 否决警示置顶 —— 形煞当前，不该先谈催财 */}
+            {composite.veto.triggered && (
+              <div className="rounded-2xl border-2 border-risk-crit bg-risk-crit/[0.07] p-4">
+                <p className="font-serif text-[1.0625rem] font-bold text-risk-crit">
+                  ⚠ 理气虽好，峦头有缺
+                </p>
+                <p className="mt-2 text-[0.9375rem] leading-relaxed">{composite.veto.reason}</p>
+              </div>
+            )}
+
+            {/* 综合分与拆解 */}
+            <section className="card">
+              <h2 className="card-title">综合评分拆解</h2>
+              <p className="mb-1 text-center font-serif text-3xl font-bold tabular-nums text-cinnabar">
+                {composite.score >= 0 ? '+' : ''}
+                {composite.score.toFixed(2)}
+              </p>
+              <p className="mb-3 text-center text-[0.8125rem] text-ink-mute">
+                {composite.scenario}场景 · 置信度 {composite.confidence}
+              </p>
+
+              <div className="space-y-2.5">
+                {composite.breakdown.map((b) => (
+                  <div key={b.label}>
+                    <div className="flex items-baseline justify-between text-[0.875rem]">
+                      <span className="font-medium">{b.label}</span>
+                      <span className="tabular-nums text-ink-mute">
+                        {b.value >= 0 ? '+' : ''}
+                        {b.value.toFixed(2)} × {b.weight.toFixed(2)} ={' '}
+                        <b className={b.contribution >= 0 ? 'text-jade' : 'text-cinnabar'}>
+                          {b.contribution >= 0 ? '+' : ''}
+                          {b.contribution.toFixed(3)}
+                        </b>
+                      </span>
+                    </div>
+                    <div className="mt-1 h-2 overflow-hidden rounded-full bg-rice-deep">
+                      <div
+                        className="h-full rounded-full"
+                        style={{
+                          width: `${Math.min(100, Math.abs(b.contribution) * 200)}%`,
+                          background: b.contribution >= 0 ? '#2f6b52' : '#a8352a',
+                        }}
+                      />
+                    </div>
+                    <p className="mt-1 text-[0.75rem] leading-relaxed text-ink-mute">{b.note}</p>
+                  </div>
+                ))}
+              </div>
+
+              <p className="mt-3 rounded-lg border border-rice-line bg-rice-deep/40 p-2.5 text-[0.8125rem] leading-relaxed text-ink-soft">
+                <b>「峦头为体，理气为用；峦头差，理气无用。」</b>
+                故设否决机制：理气再好，若形煞当前，综合评价强制压低 ——
+                先化形煞，再论布局。
+              </p>
+            </section>
+
+            {/* 置信度理由 */}
+            <Expandable title={`置信度 ${composite.confidence} —— 为什么`}>
+              <ul className="list-disc space-y-1 pl-4 text-[0.8125rem] leading-relaxed text-ink-soft">
+                {composite.confidenceReasons.map((r, i) => (
+                  <li key={i}>{r}</li>
+                ))}
+              </ul>
+            </Expandable>
+
+            {/* 未填提示 */}
+            {!composite.landform.assessed && (
+              <Empty
+                title="尚未填写外部环境"
+                desc="门前有没有路冲、背后有没有靠、前方开不开阔 —— 这些比盘上的星更先决定吉凶。补填后峦头权重会从 15% 升到场景权重。"
+                action={
+                  <Link href="/edit" className="btn btn-primary btn-block">
+                    去填外部环境
+                  </Link>
+                }
+              />
+            )}
+
+            {/* 峦头逐项 */}
+            {composite.landform.assessed && (
+              <section>
+                <h2 className="section-title">峦头逐项</h2>
+                <div className="space-y-2">
+                  {composite.landform.contributions.map((c, i) => (
+                    <Expandable
+                      key={`${c.feature}-${i}`}
+                      title={
+                        <span className="flex items-center gap-2 text-[0.9375rem]">
+                          <span className="min-w-0 flex-1 truncate">
+                            {c.direction ? `${c.direction} · ` : ''}
+                            {c.feature}
+                          </span>
+                        </span>
+                      }
+                      badge={
+                        <span
+                          className={`tag shrink-0 tabular-nums ${
+                            c.contribution >= 0
+                              ? 'border-jade/40 bg-jade/10 text-jade'
+                              : 'border-cinnabar/40 bg-cinnabar/10 text-cinnabar'
+                          }`}
+                        >
+                          {c.contribution >= 0 ? '+' : ''}
+                          {c.contribution.toFixed(2)}
+                        </span>
+                      }
+                      defaultOpen={c.contribution <= -0.3}
+                    >
+                      <p className="text-[0.875rem] leading-relaxed">
+                        <b>应象</b>：{c.meta.affects}
+                      </p>
+                      <p className="mt-2 border-l-2 border-rice-line pl-2.5 text-[0.8125rem] leading-relaxed text-ink-mute">
+                        {c.meta.classical}
+                      </p>
+                      <h4 className="mt-3 text-[0.875rem] font-semibold">
+                        {c.contribution >= 0 ? '怎么借力' : '化解'}
+                      </h4>
+                      <ul className="mt-1 list-disc space-y-1 pl-4 text-[0.875rem] leading-relaxed">
+                        {c.meta.cures.map((x, k) => (
+                          <li key={k}>{x}</li>
+                        ))}
+                      </ul>
+                    </Expandable>
+                  ))}
+                </div>
+              </section>
+            )}
+
+            {shaCures.length > 0 && (
+              <p className="card card-sub">
+                化解形煞以「<b>移形易位</b>」为先，摆件次之 —— 能改格局的，强于任何风水物件。
+                共 {shaCures.length} 项形煞待处理，其中{' '}
+                {shaCures.filter((c) => c.severity === '严重').length} 项属严重。
+              </p>
+            )}
+          </div>
         )}
 
         {view === '吉方' && (
