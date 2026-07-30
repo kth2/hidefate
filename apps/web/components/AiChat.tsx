@@ -16,6 +16,7 @@ import { buildAnswerContext, faqHighlights } from '@hidefate/core-synthesis';
 import { scenarioOf } from '@hidefate/core-fengshui';
 import { chatStream, type AiConfig, type ChatMessage } from '../lib/ai';
 import { loadSettings, type AppSettings } from '../lib/db';
+import { AiOptionalNotice } from './AiOptionalNotice';
 
 interface Turn {
   role: 'user' | 'assistant';
@@ -160,25 +161,26 @@ export function AiChat({
 
   if (!configured) {
     return (
-      <div className="card">
-        <h3 className="card-title">AI 对话尚未配置</h3>
-        <p className="text-sm leading-relaxed text-ink-soft">
-          填入任一 OpenAI 兼容端点的 Base URL 与 API Key，即可从该 API 拉取<b>实际可用的模型列表</b>并选用。
-        </p>
-        <p className="mt-2 text-xs leading-relaxed text-ink-mute">
-          不配置也完全不影响使用 —— 上方的内置作答同样输出「答案 / 理 / 化解建议」三段，
-          且完全离线，只是文字较为格式化。
-        </p>
-        <Link href="/settings" className="btn btn-primary mt-3">
-          前往 AI 设置
-        </Link>
+      <div className="space-y-3">
+        <AiOptionalNotice />
+        <div className="card">
+          <h3 className="card-title">AI 对话尚未配置</h3>
+          <p className="text-sm leading-relaxed text-ink-soft">
+            填入任一 OpenAI 兼容端点的 Base URL 与 API Key，即可从该 API 拉取<b>实际可用的模型列表</b>并选用。
+          </p>
+          <Link href="/settings" className="btn btn-primary mt-3">
+            前往 AI 设置
+          </Link>
+        </div>
       </div>
     );
   }
 
   if (!consented) {
     return (
-      <div className="card border-gold/40 bg-gold/5">
+      <div className="space-y-3">
+        <AiOptionalNotice />
+        <div className="card border-gold/40 bg-gold/5">
         <h3 className="card-title text-gold">需要你的确认</h3>
         <p className="text-sm leading-relaxed text-ink-soft">
           向 AI 提问会把本宅的九宫盘、房间布局，以及成员的姓名与出生资料，
@@ -188,12 +190,15 @@ export function AiChat({
         <Link href="/settings" className="btn btn-primary mt-3">
           到设置中确认
         </Link>
+        </div>
       </div>
     );
   }
 
   return (
     <div className="space-y-3">
+      <AiOptionalNotice compact />
+
       <div className="flex flex-wrap items-center gap-2 text-xs text-ink-mute">
         <span className="tag border-rice-line">
           模型 <b className="font-mono">{settings.aiModel}</b>
@@ -271,10 +276,6 @@ export function AiChat({
         )}
       </form>
 
-      <p className="text-xs leading-relaxed text-ink-mute">
-        模型只负责组织语言。若它给出的星位或数字与上方九宫盘不一致，
-        <b className="text-ink-soft">以九宫盘为准</b> —— 那是确定性引擎算的，模型没有权限改动。
-      </p>
     </div>
   );
 }

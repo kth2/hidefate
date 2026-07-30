@@ -20,6 +20,7 @@ import {
 } from '../../lib/ai';
 import { loadSettings, saveSettings, type AppSettings } from '../../lib/db';
 import { AppBar } from '../../components/mobile/ui';
+import { AiOptionalNotice } from '../../components/AiOptionalNotice';
 
 export default function SettingsPage() {
   const [settings, setSettings] = useState<AppSettings | null>(null);
@@ -135,11 +136,7 @@ export default function SettingsPage() {
     <>
       <AppBar title="AI 设置" back="/me" />
       <div className="space-y-4 px-4 py-4">
-      <p className="card-sub px-1">
-        AI 只负责把已算好的结论写成通顺中文，
-        <b className="text-ink-soft">不参与任何星位、宫位与概率的计算</b>。
-        不配置 AI 也不影响本 App 的一切排盘、预测与化解建议。
-      </p>
+      <AiOptionalNotice />
 
       {error && <p className="rounded-lg border border-cinnabar/40 bg-cinnabar/5 p-3 text-sm leading-relaxed text-cinnabar">{error}</p>}
       {ok && <p className="rounded-lg border border-jade/30 bg-jade/5 p-3 text-sm text-jade">{ok}</p>}
