@@ -14,6 +14,7 @@ import { analyse, synthesise } from '@hidefate/core-synthesis';
 import { sampleInput } from '../../../packages/core-synthesis/src/fixtures';
 import { findingRefs, refsForDomains } from './findings';
 import { deriveFollowUps, referencedRefs } from './followUps';
+import { annotateClaims, citedRefIds } from './provenance';
 import { SUGGESTION_CATEGORIES, suggestQuestions } from './suggestedQuestions';
 
 const src = (rel: string) => readFileSync(fileURLToPath(new URL(rel, import.meta.url)), 'utf8');
@@ -267,6 +268,72 @@ describe('模型推荐名单只做标注，不做清单', () => {
     for (const p of PROVIDERS) {
       if (p.id === 'custom') continue;
       expect(RECOMMENDED_MODELS[p.id].length).toBeGreaterThan(0);
+    }
+  });
+});
+
+/**
+ * 逐条溯源。
+ *
+ * 最要紧的一条断言是「对不上的一律不标」—— 给一句没有依据的话套上
+ * 「有依据」的外观，比不标更糟。
+ */
+describe('回答里的宫位／星组合／概率变成可溯源 chip', () => {
+  const result = analyse(sampleInput(2026), synthesise(sampleInput(2026)));
+  const refs = findingRefs(result);
+  const withDir = refs.find((r) => r.direction)!;
+
+  it('切出的片段拼回去必须与原文完全一致（不吞字、不改字）', () => {
+    const text = `${withDir.direction}这一方今年要留意，建议尽早处理。`;
+    expect(annotateClaims(text, refs).map((s) => s.text).join('')).toBe(text);
+  });
+
+  it('方位被标成宫位 chip，并指向具体某条断语', () => {
+    const segs = annotateClaims(`${withDir.direction}要留意。`, refs);
+    const claim = segs.find((s) => s.kind === 'claim');
+    expect(claim).toBeDefined();
+    expect(claim!.kind === 'claim' && claim!.claimKind).toBe('宫位');
+    expect(refs.some((r) => r.id === (claim as { refId: string }).refId)).toBe(true);
+  });
+
+  it('认得方位的常见别写（北方 / 坎宫 都指正北）', () => {
+    const north = refs.find((r) => r.direction === '正北');
+    if (!north) return; // 该盘正北无断语时跳过，不做假断言
+    for (const alias of ['北方', '坎宫']) {
+      expect(annotateClaims(`${alias}如何？`, refs).some((s) => s.kind === 'claim')).toBe(true);
+    }
+  });
+
+  it('对不上盘面的概率不标 —— 宁可少标，不可假装有依据', () => {
+    const bogus = annotateClaims('这件事有 47% 的可能，另有 3% 的意外。', refs);
+    for (const s of bogus) {
+      if (s.kind !== 'claim') continue;
+      const r = refs.find((x) => x.id === s.refId)!;
+      expect(`${Math.round((r.probability ?? -1) * 100)}%`).toBe(s.text);
+    }
+  });
+
+  it('完全与盘面无关的闲聊一个 chip 都不产生', () => {
+    const segs = annotateClaims('你好，谢谢你的解答。', refs);
+    expect(segs.every((s) => s.kind === 'text')).toBe(true);
+  });
+
+  it('没有断语时原样返回，不炸', () => {
+    expect(annotateClaims('随便什么话', [])).toEqual([{ kind: 'text', text: '随便什么话' }]);
+    expect(annotateClaims('', refs)).toEqual([]);
+  });
+
+  it('citedRefIds 按出现顺序去重', () => {
+    const text = `${withDir.direction}如何？再说一次${withDir.direction}。`;
+    expect(citedRefIds(text, refs)).toEqual([withDir.id]);
+  });
+
+  it('每条被引用的依据都能给出门派、置信度与古法依据', () => {
+    for (const id of citedRefIds(`${withDir.direction}要留意。`, refs)) {
+      const r = refs.find((x) => x.id === id)!;
+      expect(r.finding.schools.length).toBeGreaterThan(0);
+      expect(r.finding.confidence).toBeTruthy();
+      expect(r.finding.principle.length).toBeGreaterThan(0);
     }
   });
 });

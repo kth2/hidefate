@@ -17,6 +17,8 @@ import { scenarioOf } from '@hidefate/core-fengshui';
 import { findingRefs } from '../lib/findings';
 import { deriveFollowUps } from '../lib/followUps';
 import { suggestQuestions } from '../lib/suggestedQuestions';
+import { citedRefIds } from '../lib/provenance';
+import { FindingSources, ProvenanceText, useScrollToSource } from './ProvenanceText';
 import { chatStream, type AiConfig, type ChatMessage } from '../lib/ai';
 import { loadSettings, type AppSettings } from '../lib/db';
 import { AiOptionalNotice } from './AiOptionalNotice';
@@ -90,6 +92,18 @@ export function AiChat({
   );
 
   const refs = useMemo(() => findingRefs(result), [result]);
+  const [activeRef, setActiveRef] = useState<string | null>(null);
+  const scrollToSource = useScrollToSource(setActiveRef);
+
+  /** 至今为止所有回答实际引用到的断语，按首次出现顺序。 */
+  const citedRefs = useMemo(() => {
+    const ids: string[] = [];
+    for (const t of turns) {
+      if (t.role !== 'assistant') continue;
+      for (const id of citedRefIds(t.content, refs)) if (!ids.includes(id)) ids.push(id);
+    }
+    return ids.map((id) => refs.find((r) => r.id === id)!).filter(Boolean);
+  }, [turns, refs]);
 
   /**
    * 建议问题优先由本盘的断语现算 —— 一间房真正的症结在哪，引擎已经知道了，
@@ -254,7 +268,16 @@ export function AiChat({
               }`}
             >
               {t.content ? (
-                <pre className="whitespace-pre-wrap font-sans">{t.content}</pre>
+                t.role === 'assistant' ? (
+                  // 流式进行中不做溯源：半句话切出来的 chip 会不断跳动
+                  t.streaming ? (
+                    <pre className="whitespace-pre-wrap font-sans">{t.content}</pre>
+                  ) : (
+                    <ProvenanceText text={t.content} refs={refs} onCite={scrollToSource} />
+                  )
+                ) : (
+                  <pre className="whitespace-pre-wrap font-sans">{t.content}</pre>
+                )
               ) : t.streaming ? (
                 <span className="text-ink-mute">思考中…</span>
               ) : null}
@@ -311,6 +334,19 @@ export function AiChat({
           </button>
         )}
       </form>
+
+      {citedRefs.length > 0 && (
+        <>
+          <p className="px-1 text-[0.75rem] leading-relaxed text-ink-mute">
+            回答里带底色的
+            <span className="mx-1 rounded border border-cinnabar/35 bg-cinnabar/[0.07] px-1 text-cinnabar">宫位</span>
+            <span className="mx-1 rounded border border-gold/50 bg-gold/[0.10] px-1 text-gold">星组合</span>
+            <span className="mx-1 rounded border border-jade/40 bg-jade/[0.08] px-1 text-jade">概率</span>
+            都可以点 —— 点了会跳到它下面这条依据。对不上盘面的说法不会被标记。
+          </p>
+          <FindingSources refs={citedRefs} activeId={activeRef} />
+        </>
+      )}
 
     </div>
   );
