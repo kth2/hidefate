@@ -53,6 +53,16 @@ export interface AppSettings {
   aiDirect?: boolean;
   /** 用户是否已知悉「提问会把宅盘与成员命理送往第三方」。 */
   aiConsent?: boolean;
+  /**
+   * 首次出网确认的时间戳。空 = 还没确认过，任何外发请求都要先弹出网确认。
+   * 与 aiConsent 的分工：aiConsent 是设置页上的一次勾选，这一项是真正拦在
+   * 第一次发送之前的闸 —— 用户在那一刻看到的是**将要发出的原文**。
+   */
+  aiEgressConsentAt?: string;
+  /** 出网时剔除成员八字（只留命卦）。 */
+  aiExcludeMemberBazi?: boolean;
+  /** 出网时剔除健康类断语与预测。 */
+  aiExcludeHealthFindings?: boolean;
   /** 上次成功拉取的模型列表（离线时仍可选，避免每次进设置都要联网）。 */
   aiModelCache?: { id: string; name: string; free: boolean; contextLength: number | null }[];
   aiModelCacheAt?: string;

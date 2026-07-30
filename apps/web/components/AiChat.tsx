@@ -20,8 +20,10 @@ import { suggestQuestions } from '../lib/suggestedQuestions';
 import { citedRefIds } from '../lib/provenance';
 import { FindingSources, ProvenanceText, useScrollToSource } from './ProvenanceText';
 import { chatStream, type AiConfig, type ChatMessage } from '../lib/ai';
-import { loadSettings, type AppSettings } from '../lib/db';
+import { loadSettings, saveSettings, type AppSettings } from '../lib/db';
+import { exclusionsOf, needsEgressConsent, redactFacts } from '../lib/egress';
 import { AiOptionalNotice } from './AiOptionalNotice';
+import { EgressConsentSheet } from './EgressConsentSheet';
 
 interface Turn {
   role: 'user' | 'assistant';
@@ -59,6 +61,8 @@ export function AiChat({
   const [turns, setTurns] = useState<Turn[]>([]);
   const [input, setInput] = useState('');
   const [busy, setBusy] = useState(false);
+  /** 等待出网确认的那个问题；非 null 时弹层打开。 */
+  const [pendingEgress, setPendingEgress] = useState<string | null>(null);
   const abortRef = useRef<AbortController | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
 
@@ -120,14 +124,20 @@ export function AiChat({
   const configured = Boolean(settings?.aiBaseUrl && settings?.aiModel);
   const consented = Boolean(settings?.aiConsent);
 
-  const send = useCallback(
-    async (text: string) => {
-      if (!text.trim() || busy || !settings) return;
+  /**
+   * 真正发请求的那一段。
+   *
+   * 刻意把 settings 作为显式参数传进来：出网确认之后要立刻用**刚保存的**
+   * 设置补发，而 React 的 state 更新是异步的，读闭包里的 settings 会读到旧值。
+   */
+  const sendWith = useCallback(
+    async (cur: AppSettings, text: string) => {
       const question = text.trim();
-      setInput('');
+      if (!question) return;
+      const facts = redactFacts(context.facts, exclusionsOf(cur));
 
       const history: ChatMessage[] = [
-        { role: 'system', content: `${context.system}\n\n===== 事实（由确定性引擎算出，不可修改） =====\n${context.facts}` },
+        { role: 'system', content: `${context.system}\n\n===== 事实（由确定性引擎算出，不可修改） =====\n${facts}` },
         // 只带最近 8 轮，避免上下文无限膨胀；事实区块每轮都会重新附上，故不会丢失盘面。
         ...turns.slice(-8).map((t) => ({ role: t.role, content: t.content }) as ChatMessage),
         { role: 'user', content: question },
@@ -139,10 +149,10 @@ export function AiChat({
       const ctrl = new AbortController();
       abortRef.current = ctrl;
       const cfg: AiConfig = {
-        baseUrl: settings.aiBaseUrl ?? '',
-        apiKey: settings.aiApiKey ?? '',
-        model: settings.aiModel,
-        direct: settings.aiDirect,
+        baseUrl: cur.aiBaseUrl ?? '',
+        apiKey: cur.aiApiKey ?? '',
+        model: cur.aiModel,
+        direct: cur.aiDirect,
       };
 
       try {
@@ -180,7 +190,27 @@ export function AiChat({
         abortRef.current = null;
       }
     },
-    [busy, settings, context, turns],
+    [context, turns],
+  );
+
+  /**
+   * 对外的发送入口 —— 出网闸门就在这里。
+   *
+   * 第一次把数据发出本机之前，必须让用户看过将要发出的原文并点头。
+   * 此处只挂起问题、不发任何请求；确认之后由弹层回调补发。
+   */
+  const send = useCallback(
+    async (text: string) => {
+      if (!text.trim() || busy || !settings) return;
+      const question = text.trim();
+      setInput('');
+      if (needsEgressConsent(settings)) {
+        setPendingEgress(question);
+        return;
+      }
+      await sendWith(settings, question);
+    },
+    [busy, settings, sendWith],
   );
 
   if (!settings) return <p className="text-sm text-ink-mute">读取设置中…</p>;
@@ -334,6 +364,31 @@ export function AiChat({
           </button>
         )}
       </form>
+
+      <EgressConsentSheet
+        open={pendingEgress != null}
+        question={pendingEgress ?? ''}
+        baseUrl={settings.aiBaseUrl ?? ''}
+        model={settings.aiModel ?? ''}
+        system={context.system}
+        facts={context.facts}
+        initial={exclusionsOf(settings)}
+        onCancel={() => setPendingEgress(null)}
+        onAccept={(ex) => {
+          const q = pendingEgress;
+          setPendingEgress(null);
+          void (async () => {
+            const next = await saveSettings({
+              aiEgressConsentAt: new Date().toISOString(),
+              aiExcludeMemberBazi: ex.memberBazi,
+              aiExcludeHealthFindings: ex.healthFindings,
+            });
+            setSettings(next);
+            // 闸门已开，把挂起的那个问题原样补发
+            if (q) void sendWith(next, q);
+          })();
+        }}
+      />
 
       {citedRefs.length > 0 && (
         <>

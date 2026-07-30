@@ -388,6 +388,40 @@ export default function SettingsPage() {
             保存设置
           </button>
         </div>
+
+        {/* 出网确认状态。首次提问时会弹层展示将要发出的原文，这里只做查看与撤回。 */}
+        <div className="mt-4 border-t border-rice-line pt-3">
+          <p className="text-[0.8125rem] leading-relaxed text-ink-soft">
+            首次出网确认：
+            {settings.aiEgressConsentAt ? (
+              <b className="text-jade"> 已于 {new Date(settings.aiEgressConsentAt).toLocaleString('zh-CN')} 确认</b>
+            ) : (
+              <b className="text-ink-mute"> 尚未确认 —— 第一次提问时会先弹出，让你看过将要发出的原文再决定</b>
+            )}
+          </p>
+          {settings.aiEgressConsentAt && (
+            <>
+              <p className="mt-1 text-[0.75rem] text-ink-mute">
+                当前剔除：
+                {settings.aiExcludeMemberBazi || settings.aiExcludeHealthFindings
+                  ? [settings.aiExcludeMemberBazi && '成员八字', settings.aiExcludeHealthFindings && '健康类断语']
+                      .filter(Boolean)
+                      .join('、')
+                  : '无（完整上下文）'}
+              </p>
+              <button
+                type="button"
+                className="btn btn-sm mt-2"
+                onClick={async () => {
+                  setSettings(await saveSettings({ aiEgressConsentAt: undefined }));
+                  setOk('已撤回出网确认。下次提问会重新弹出确认。');
+                }}
+              >
+                撤回出网确认
+              </button>
+            </>
+          )}
+        </div>
       </section>
 
       <p className="px-1 text-[0.8125rem] leading-relaxed text-ink-mute">

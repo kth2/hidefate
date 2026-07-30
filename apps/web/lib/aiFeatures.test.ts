@@ -10,11 +10,20 @@ import {
   pickDefaultModel,
   splitByRecommendation,
 } from './recommendedModels';
-import { analyse, synthesise } from '@hidefate/core-synthesis';
-import { sampleInput } from '../../../packages/core-synthesis/src/fixtures';
+import { analyse, buildAnswerContext, synthesise } from '@hidefate/core-synthesis';
+import { SAMPLE_MEMBERS, sampleInput } from '../../../packages/core-synthesis/src/fixtures';
 import { findingRefs, refsForDomains } from './findings';
 import { deriveFollowUps, referencedRefs } from './followUps';
 import { annotateClaims, citedRefIds } from './provenance';
+import {
+  DEFAULT_EXCLUSIONS,
+  guardEgress,
+  hostOf,
+  isLocalHost,
+  needsEgressConsent,
+  redactFacts,
+  serialiseEgressPayload,
+} from './egress';
 import { SUGGESTION_CATEGORIES, suggestQuestions } from './suggestedQuestions';
 
 const src = (rel: string) => readFileSync(fileURLToPath(new URL(rel, import.meta.url)), 'utf8');
@@ -335,5 +344,84 @@ describe('回答里的宫位／星组合／概率变成可溯源 chip', () => {
       expect(r.finding.confidence).toBeTruthy();
       expect(r.finding.principle.length).toBeGreaterThan(0);
     }
+  });
+});
+
+/**
+ * 出网闸门。
+ *
+ * 这一组断言守着本 App 最要紧的一条承诺：**数据不会在用户点头之前离开本机**。
+ */
+describe('首次出网必须先经确认', () => {
+  const result = analyse(sampleInput(2026), synthesise(sampleInput(2026)));
+  const ctx = buildAnswerContext(result, { members: SAMPLE_MEMBERS });
+
+  it('全新设置下闸门是关的', () => {
+    expect(guardEgress({})).toBe('blocked');
+    expect(guardEgress(null)).toBe('blocked');
+    expect(needsEgressConsent({})).toBe(true);
+  });
+
+  it('确认过之后才放行，撤回后重新关上', () => {
+    const accepted = { aiEgressConsentAt: new Date(0).toISOString() };
+    expect(guardEgress(accepted)).toBe('allowed');
+    expect(needsEgressConsent(accepted)).toBe(false);
+    expect(guardEgress({ aiEgressConsentAt: undefined })).toBe('blocked');
+  });
+
+  it('勾选「已知悉」（aiConsent）并不等于出网确认 —— 两道闸各管各的', () => {
+    expect(guardEgress({ aiConsent: true } as never)).toBe('blocked');
+  });
+
+  it('AI 对话组件在发请求之前先过闸门', () => {
+    const chat = src('../components/AiChat.tsx');
+    // send 里必须先 needsEgressConsent 再谈发送
+    const gateAt = chat.indexOf('needsEgressConsent');
+    const streamAt = chat.indexOf('await chatStream');
+    expect(gateAt).toBeGreaterThan(-1);
+    expect(streamAt).toBeGreaterThan(-1);
+    expect(chat).toContain('setPendingEgress(question)');
+    expect(chat).toContain('<EgressConsentSheet');
+  });
+
+  it('预览就是真正要发出的请求体（同一个函数产出）', () => {
+    const payload = serialiseEgressPayload({
+      model: 'm',
+      system: ctx.system,
+      facts: ctx.facts,
+      question: '这间房今年如何？',
+      exclusions: DEFAULT_EXCLUSIONS,
+    });
+    const parsed = JSON.parse(payload) as { model: string; messages: { role: string; content: string }[] };
+    expect(parsed.model).toBe('m');
+    expect(parsed.messages[0]!.content).toContain(ctx.facts);
+    expect(parsed.messages[1]!.content).toBe('这间房今年如何？');
+    // API Key 走请求头，绝不该出现在正文里
+    expect(payload).not.toContain('apiKey');
+  });
+
+  it('目的地主机名如实取自 Base URL，本机地址会被认出来', () => {
+    expect(hostOf('https://api.deepseek.com/v1')).toBe('api.deepseek.com');
+    expect(isLocalHost('http://localhost:11434/v1')).toBe(true);
+    expect(isLocalHost('https://api.groq.com/openai/v1')).toBe(false);
+  });
+
+  it('剔除八字：四柱与日主真的从 payload 里消失，只留命卦', () => {
+    const kept = redactFacts(ctx.facts, { memberBazi: false, healthFindings: false });
+    const cut = redactFacts(ctx.facts, { memberBazi: true, healthFindings: false });
+    expect(kept).toContain('八字精度');
+    expect(cut).not.toContain('八字精度');
+    expect(cut).not.toContain('已知柱');
+    expect(cut).toContain('命卦'); // 命卦只需生年性别，保留
+    expect(cut).toContain('已剔除'); // 并且明写「剔掉了什么、因此不可作答什么」
+  });
+
+  it('剔除健康：健康类预测行整条消失', () => {
+    const cut = redactFacts(ctx.facts, { memberBazi: false, healthFindings: true });
+    expect(cut.split('\n').some((l) => l.startsWith('- [健康]'))).toBe(false);
+  });
+
+  it('两个开关都不勾时事实区块逐字不变', () => {
+    expect(redactFacts(ctx.facts, DEFAULT_EXCLUSIONS)).toBe(ctx.facts);
   });
 });
