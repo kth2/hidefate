@@ -227,6 +227,58 @@ describe('用户举的三个例子都能出得来', () => {
   });
 });
 
+/**
+ * 双星断事 —— 玄空的断事在**配对**上：二五交加 ≠ 二黑 + 五黄。
+ * 早先事件层把山星与向星拆成两个独立 token，配对信息整个丢掉。
+ */
+describe('双星组合与应期', () => {
+  it('原局组合属风水层、流年临宫组合属运层', () => {
+    expect(maxReachableLayers(['合:交剑煞'])).toBe(1);
+    expect(maxReachableLayers(['合:交剑煞', '临:交剑煞'])).toBe(2);
+  });
+
+  it('原局有交剑煞、流年又临交剑煞 —— 年星临门，血光之象成立', () => {
+    const e = predictEvents({
+      year: 2027,
+      tokens: [t('合:交剑煞', '风水'), t('临:交剑煞', '运')],
+    });
+    const x = e.find((v) => v.templateId === 'combo.crossSword')!;
+    expect(x).toBeDefined();
+    expect(x.title).toContain('血光');
+    expect(x.resonance).toBe(2);
+  });
+
+  it('只有原局组合、流年未临 —— 不出报（没有触发就没有时点）', () => {
+    const e = predictEvents({ year: 2027, tokens: [t('合:交剑煞', '风水')] });
+    expect(e.find((v) => v.templateId === 'combo.crossSword')).toBeUndefined();
+  });
+
+  it('二五交加逢天医则整条不成立 —— 有制不作凶论', () => {
+    const withCure = predictEvents({
+      year: 2027,
+      tokens: [t('合:二五交加', '风水'), t('临:二五交加', '运'), t('天医', '风水')],
+    });
+    expect(withCure.find((v) => v.templateId === 'combo.twoFive')).toBeUndefined();
+  });
+
+  it('文昌局主考试得中，属吉事', () => {
+    const e = predictEvents({
+      year: 2027,
+      tokens: [t('合:文昌局', '风水'), t('临:文昌局', '运')],
+    });
+    const x = e.find((v) => v.templateId === 'combo.wenChang')!;
+    expect(x.valence).toBe('吉');
+    expect(x.advice).toContain('书桌');
+  });
+
+  it('组合 token 全部登记在词表里 —— 拼错就是死规则', () => {
+    for (const tk of ['合:交剑煞', '临:二五交加', '合:文昌局', '临:斗牛煞']) {
+      expect(isKnownToken(tk)).toBe(true);
+    }
+    expect(isKnownToken('合:根本没有这个组合')).toBe(false);
+  });
+});
+
 describe('全年汇总', () => {
   it('同一模板在多个月成立时只留概率最高的那个月', () => {
     const yearTokens = [t('偏财', '命')];

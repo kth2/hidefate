@@ -28,8 +28,11 @@ import {
   STAR_NAME,
   annualStar,
   buildFlyingStarChart,
+  deriveCombination,
+  dongQiOf,
   monthlyStar,
   periodOfYear,
+  type PalaceIndex,
   type PropertyProfile,
 } from '@hidefate/core-fengshui';
 import {
@@ -102,6 +105,8 @@ export interface YearOutlook {
   readonly resonance: readonly Resonance[];
   /** 具体事件 —— 这才是用户要看的东西，象意退居解释位。 */
   readonly events: readonly PredictedEvent[];
+  /** 该年的九宫双星与动气 —— 「五黄飞到你大门所在的坎宫」这句话的来源。 */
+  readonly palaces: readonly PalaceSnapshot[];
   readonly drafts: readonly PredictionDraft[];
   /** 该年是否值得重点留意（有断点或有三层共振）。 */
   readonly notable: boolean;
@@ -225,11 +230,52 @@ function monthTokensOf(
   return out;
 }
 
-/** 风水层：该年所居之宅的山向星。 */
-function fengShuiTokensOf(timeline: LifeTimeline, year: number): TaggedToken[] {
+/** 该年生效之宅的双星与动气详情，供事件层与界面共用。 */
+export interface PalaceSnapshot {
+  readonly palace: PalaceIndex;
+  readonly direction: string;
+  readonly shan: number;
+  readonly xiang: number;
+  /** 双星组合名，如「二五交加」。 */
+  readonly comboName: string;
+  readonly comboKey: string;
+  readonly comboNature: '吉' | '凶' | '中';
+  readonly comboMeaning: string;
+  /** 动气强度 0–1 与分档。 */
+  readonly dongQi: number;
+  readonly dongQiLevel: string;
+  readonly dongQiNote: string;
+  /** 该年流年星飞入本宫。 */
+  readonly annual: number;
+  /** 流年星与原山星／向星形成的新组合名。 */
+  readonly annualCombo: string;
+}
+
+const PALACE_DIRECTION_CN: Record<number, string> = {
+  1: '正北', 2: '西南', 3: '正东', 4: '东南', 5: '中宫',
+  6: '西北', 7: '正西', 8: '东北', 9: '正南',
+};
+
+/** 流年星飞入某宫 —— 洛书轨迹，与 annualStar 入中同源。 */
+function annualStarAt(year: number, palace: PalaceIndex): number {
+  const center = annualStar(year);
+  // 入中之星按洛书顺飞：宫位 p 上的星 = ((center - 1) + (p - 5) + 9) % 9 + 1
+  return (((center - 1 + (palace - 5)) % 9) + 9) % 9 + 1;
+}
+
+/**
+ * 该年的九宫快照：双星组合 + 动气 + 流年触发。
+ *
+ * 这是「双星断事 + 应期」的落点 —— 早先事件层把山星与向星拆成两个独立 token，
+ * 配对信息整个丢掉，等于守着 53 条经典组合表不用。
+ */
+export function palaceSnapshots(
+  timeline: LifeTimeline,
+  year: number,
+): PalaceSnapshot[] {
   const y = timeline.years.find((x) => x.year === year);
   if (!y || !y.fengShui.evidenceUsable) return [];
-  const out: TaggedToken[] = [];
+
   for (const r of y.fengShui.residences) {
     if (!r.profile || !r.capability.flyingStar) continue;
     try {
@@ -238,13 +284,60 @@ function fengShuiTokensOf(timeline: LifeTimeline, year: number): TaggedToken[] {
         ...(r.profile.facing != null ? { facing: r.profile.facing } : {}),
         moveInYear: r.profile.moveInYear,
       });
-      for (const p of [1, 2, 3, 4, 5, 6, 7, 8, 9] as const) {
-        out.push({ token: STAR_NAME[chart.palaces[p].shan], layer: '风水' });
-        out.push({ token: STAR_NAME[chart.palaces[p].xiang], layer: '风水' });
-      }
+      const period = chart.period.period;
+      return ([1, 2, 3, 4, 5, 6, 7, 8, 9] as const).map((p) => {
+        const cell = chart.palaces[p];
+        const combo = deriveCombination(cell.shan, cell.xiang, period);
+        const dq = dongQiOf(p, r.profile!.rooms);
+        const annual = annualStarAt(year, p);
+        // 流年星与原盘山向各成一组，取凶性较著者示人
+        const withShan = deriveCombination(cell.shan, annual as PalaceIndex, period);
+        const withXiang = deriveCombination(annual as PalaceIndex, cell.xiang, period);
+        const pick = withShan.nature === '凶' ? withShan : withXiang;
+        return {
+          palace: p,
+          direction: PALACE_DIRECTION_CN[p] ?? '',
+          shan: cell.shan,
+          xiang: cell.xiang,
+          comboName: combo.name,
+          comboKey: combo.key,
+          comboNature: combo.nature,
+          comboMeaning: combo.meaning,
+          dongQi: dq.strength,
+          dongQiLevel: dq.level,
+          dongQiNote: dq.note,
+          annual,
+          annualCombo: pick.name,
+        };
+      });
     } catch {
       // 坐向无法解析 —— coverage 已报出资料不足
     }
+  }
+  return [];
+}
+
+/**
+ * 风水层 token。
+ *
+ * 两处与早先不同，都是「双星断事 + 应期」带来的：
+ *
+ * 1. **发组合，不发拆开的单星。** 早先 push 的是「二黑」「五黄」两个独立 token，
+ *    配对信息整个丢掉 —— 而玄空的断事恰恰在配对上（二五交加 ≠ 二黑 + 五黄）。
+ *    现在既发单星（保持既有模板可用），也发 `合:二五交加` 这样的组合 token。
+ * 2. **只发有动气的宫。** 五黄飞到天天进出的大门，和飞到一年不开一次的储藏室，
+ *    是两回事。无动气之宫的星象照算不误（宅盘分析里仍会报），
+ *    但它不该成为「今年会出事」的触发依据 —— 古法「不动不应」。
+ */
+function fengShuiTokensOf(timeline: LifeTimeline, year: number): TaggedToken[] {
+  const out: TaggedToken[] = [];
+  for (const s of palaceSnapshots(timeline, year)) {
+    if (s.dongQi <= 0) continue; // 不动不应
+    out.push({ token: STAR_NAME[s.shan as PalaceIndex], layer: '风水' });
+    out.push({ token: STAR_NAME[s.xiang as PalaceIndex], layer: '风水' });
+    out.push({ token: `合:${s.comboName}`, layer: '风水' });
+    // 流年星临宫所成之新组合 —— 这是应期的触发，属运层
+    out.push({ token: `临:${s.annualCombo}`, layer: '运' });
   }
   return out;
 }
@@ -333,6 +426,7 @@ function outlookFor(
     breakpoints: bps,
     resonance,
     events,
+    palaces: palaceSnapshots(timeline, year),
     drafts,
     /**
      * 「留意」只标**这一年独有**的事：个人断点（换大运、搬家、施做化解）。

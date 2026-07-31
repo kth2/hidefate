@@ -366,4 +366,106 @@ export const EVENT_TEMPLATES: readonly EventTemplate[] = [
     criterion: '{窗口}内是否有人给了你实质性的帮助或关键引荐',
     advice: '贵人是走动出来的 —— 这段主动约人喝茶，比等着强。',
   },
+
+  /* ───────────── 双星断事 ─────────────
+   *
+   * 以下各条以**双星组合**为条件，而非单星。
+   * 玄空的断事在配对上：二五交加 ≠ 二黑 + 五黄 ——
+   * 前者是「病符会正关煞」的具体格局，后者只是两颗星恰好在场。
+   *
+   * `合:` 为宅盘原局组合（风水层，段内常量），
+   * `临:` 为流年星飞入该宫与原山向所成之新组合（运层，应期的触发）。
+   * 两者并见时即古法所谓「年星临门」，是应期最强的一种。
+   *
+   * 动气条件不在此表 —— 它由 lifeStore 在发 token 时就已过滤：
+   * 无动气之宫根本不发风水 token，故这些模板天然只对「有人在动」的宫成立。
+   */
+
+  {
+    id: 'combo.crossSword',
+    title: '血光、刀伤或与人正面冲突（交剑煞应期）',
+    domain: '意外',
+    valence: '凶',
+    anyOf: ['合:交剑煞', '临:交剑煞'],
+    noneOf: ['天医', '延年'],
+    minResonance: 2,
+    granularity: '年',
+    prior: 0.26,
+    classic: '《紫白诀》：「六七同宫，交剑煞。」双金相击，主血光刀伤与争斗',
+    interventionability: '空间可调',
+    criterion: '{窗口}内是否发生外伤流血、需要缝合或手术，或与人爆发正面冲突（含肢体、法律对抗）',
+    advice: '交剑之宫忌摆刀剑利器与金属摆件，以水泄金；此方不宜作谈判与争议处理之所。',
+  },
+  {
+    id: 'combo.twoFive',
+    title: '重病、久病或家中有人健康出大问题（二五交加应期）',
+    domain: '健康',
+    valence: '凶',
+    anyOf: ['合:二五交加', '合:五二交加', '临:二五交加', '临:五二交加'],
+    noneOf: ['天医'],
+    minResonance: 2,
+    granularity: '年',
+    prior: 0.24,
+    classic: '《飞星赋》：「二五交加，罹死亡并生疾病。」玄空第一凶组合',
+    interventionability: '空间可调',
+    criterion: '{窗口}内本人或同住家人是否出现需要长期治疗、住院或手术的健康问题',
+    advice: '此方务求静止：不动土、不装修、不设卧床与炉灶；悬六帝钱或纯铜器泄土，忌红色与三角形。',
+  },
+  {
+    id: 'combo.bullFight',
+    title: '家人反目、婆媳失和或缠上官司（斗牛煞应期）',
+    domain: '官非',
+    valence: '凶',
+    anyOf: ['合:斗牛煞', '临:斗牛煞'],
+    noneOf: ['六合', '天医'],
+    minResonance: 2,
+    granularity: '年',
+    prior: 0.25,
+    classic: '《紫白诀》：「斗牛煞起，惹官刑；蚩尤黑曜，斗争频。」',
+    interventionability: '空间可调',
+    criterion: '{窗口}内是否发生家人长期失和、正式诉讼或需要调解的争议',
+    advice: '以红色系通木土之关（红地毯、暖色灯），忌金属与流水；家庭会议与签约避开此方。',
+  },
+  {
+    id: 'combo.fireHeaven',
+    title: '火险、目疾或长辈头部之疾（火烧天门应期）',
+    domain: '健康',
+    valence: '凶',
+    anyOf: ['合:火烧天门', '临:火烧天门'],
+    minResonance: 2,
+    granularity: '年',
+    prior: 0.2,
+    classic: '《紫白诀》：「七九合辙，常招回禄。」六九火照天门，主长上之灾与头疾',
+    interventionability: '空间可调',
+    criterion: '{窗口}内是否发生火警、电器起火、眼疾就医，或家中长辈头部与心血管方面的问题',
+    advice: '此方忌明火与红色，忌堆放易燃物；用水或金泄之，并检查该方位的电路与炉灶。',
+  },
+  {
+    id: 'combo.wenChang',
+    title: '考试得中、文书顺遂或研究出成果（文昌局应期）',
+    domain: '学业',
+    valence: '吉',
+    anyOf: ['合:文昌局', '临:文昌局'],
+    minResonance: 2,
+    granularity: '年',
+    prior: 0.4,
+    classic: '《紫白诀》：「一四同宫，准发科名之显。」',
+    interventionability: '空间可调',
+    criterion: '{窗口}内是否通过考试、拿到证书、论文或作品获得正式认可',
+    advice: '把书桌与常用工作位挪到此宫；此方宜静宜明，忌堆杂物与摆放金属利器。',
+  },
+  {
+    id: 'combo.wealthStar',
+    title: '进财、置产或事业上一次实质跃升（武曲财局／紫辅同宫应期）',
+    domain: '财运',
+    valence: '吉',
+    anyOf: ['合:武曲财局', '合:紫辅同宫', '临:武曲财局', '临:紫辅同宫', '合:双白财星'],
+    minResonance: 2,
+    granularity: '年',
+    prior: 0.36,
+    classic: '《紫白诀》：「辅弼相辉，田园富盛。」六八武曲财局主武贵与财帛',
+    interventionability: '空间可调',
+    criterion: '{窗口}内是否有一次实质性的进财、置产，或职位与事业规模上的明确跃升',
+    advice: '此宫宜开、宜动、宜亮 —— 财位怕压怕静，可设常用出入口、办公位或收银处。',
+  },
 ];

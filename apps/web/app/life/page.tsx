@@ -19,7 +19,13 @@ import { AppBar, Empty, Expandable, Meter, Skeleton } from '../../components/mob
 import { useProperty } from '../../lib/PropertyContext';
 import { db } from '../../lib/db';
 import type { PredictedEvent } from '@hidefate/core-events';
-import { buildLifeView, freezeOutlook, type LifeView, type YearOutlook } from '../../lib/lifeStore';
+import {
+  buildLifeView,
+  freezeOutlook,
+  type LifeView,
+  type PalaceSnapshot,
+  type YearOutlook,
+} from '../../lib/lifeStore';
 
 const DOMAIN_TONE: Record<string, string> = {
   健康: 'bg-cinnabar/10 text-cinnabar border-cinnabar/30',
@@ -38,6 +44,49 @@ const VALENCE_MARK: Record<string, string> = { 吉: '○', 凶: '⚠', 中: '·'
  * 不是「七杀在事业宫」。取象依据、古法出处、判据全部收进折叠区，
  * 想追问「凭什么」的时候再展开。
  */
+/**
+ * 九宫双星 + 动气。
+ *
+ * 只列**有动气**的宫，并按凶险与动气强度排序 ——
+ * 「五黄飞到你从不进去的储藏室」不值得占版面，
+ * 「二五交加在你天天进出的大门」才是要看的。
+ */
+function PalaceRows({ palaces }: { palaces: readonly PalaceSnapshot[] }) {
+  const active = palaces
+    .filter((p) => p.dongQi > 0)
+    .sort((a, b) => {
+      const rank = (x: PalaceSnapshot) => (x.comboNature === '凶' ? 2 : x.comboNature === '吉' ? 1 : 0);
+      return rank(b) - rank(a) || b.dongQi - a.dongQi;
+    });
+  if (active.length === 0) {
+    return (
+      <p className="text-[0.75rem] leading-relaxed text-ink-mute">
+        这处房子还没标房间，算不出哪一宫有人走动。古法「不动不应」——
+        补上房间位置，才能说清凶星到底飞在你天天进出的地方还是闲置角落。
+      </p>
+    );
+  }
+  return (
+    <div className="space-y-1.5">
+      {active.map((p) => (
+        <div key={p.palace} className="flex items-start gap-2 text-[0.8125rem]">
+          <span className="w-10 shrink-0 text-ink-mute">{p.direction}</span>
+          <span className="min-w-0 flex-1">
+            <span className={p.comboNature === '凶' ? 'text-cinnabar' : p.comboNature === '吉' ? 'text-jade' : ''}>
+              {p.comboName}
+            </span>
+            <span className="text-ink-mute">（{p.shan}-{p.xiang}）</span>
+            <span className="ml-1 text-[0.6875rem] text-ink-mute">
+              流年{p.annual}入 · 动气{p.dongQiLevel}
+            </span>
+            <span className="mt-0.5 block text-[0.6875rem] leading-relaxed text-ink-mute">{p.dongQiNote}</span>
+          </span>
+        </div>
+      ))}
+    </div>
+  );
+}
+
 function EventCard({ e }: { e: PredictedEvent }) {
   return (
     <div className={`rounded-xl border bg-white p-3 ${e.valence === '凶' ? 'border-cinnabar/35' : 'border-rice-line'}`}>
@@ -231,6 +280,19 @@ export default function LifePage() {
           <p key={n} className="rounded-xl border border-gold/40 bg-gold/5 p-3 text-[0.75rem] leading-relaxed">{n}</p>
         ))}
 
+        {/* ── 今年九宫双星与动气 ── */}
+        <section>
+          <h2 className="section-title">今年星落何宫</h2>
+          <div className="card">
+            <PalaceRows palaces={view.present.palaces} />
+            <p className="mt-3 text-[0.6875rem] leading-relaxed text-ink-mute">
+              双星断事看的是配对：二五交加不等于二黑加五黄。
+              只列有人走动的宫 —— 古法「不动不应」，凶星飞到闲置角落，应期会拖后甚至不应；
+              飞到大门、主卧、厨房这类天天用的地方才要紧。
+            </p>
+          </div>
+        </section>
+
         {/* ── 命盘概览 ── */}
         <section>
           <h2 className="section-title">这张盘</h2>
@@ -380,10 +442,10 @@ export default function LifePage() {
         </section>
 
         <p className="text-[0.75rem] leading-relaxed text-ink-mute">
-          每一条都是**具体的事**，不是取象范畴 —— 展开「凭什么这么说」能看到它由哪些
+          每一条都是具体的事，不是取象范畴 —— 展开「凭什么这么说」能看到它由哪些
           盘面元素凑出来、依的哪条古法、到期怎么算数。概率一律收敛在 3%–92%，绝不说「必定」；
           门槛设在两层共振（身体与官非要三层），就是为了不把单层的臆断报给你。
-          这些条目都没有人群基准率，所以它们是**提醒**，不是统计意义上的「准」。
+          这些条目都没有人群基准率，所以它们是提醒，不是统计意义上的「准」。
         </p>
       </div>
     </>

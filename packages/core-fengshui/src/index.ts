@@ -11,5 +11,6 @@ export * from './flyingStar.js';
 export * from './baZhai.js';
 export * from './property.js';
 export * from './starMeta.js';
+export * from './dongQi.js';
 export * from './xingShi.js';
 export * from './scenario.js';
