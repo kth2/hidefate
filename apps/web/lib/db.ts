@@ -62,6 +62,22 @@ export interface StoredPosterior extends XiangPosterior {
   key: string;
 }
 
+/** 占局盘面快照。权威仍是按 castAt 重放，此表只为回看省一次重排。 */
+export interface StoredDivinationRow {
+  id: string;
+  key: string;
+  question: string;
+  category: string;
+  castAt: string;
+  resolveBy: string;
+  juShu: string;
+  status: '待结算' | '已结算' | '窗口过期';
+  outcome?: string;
+  resolution: { criterion: string; judge: '用户自评' | '客观记录'; windowDays: number };
+  predictionId: string;
+  chartJson: string;
+}
+
 export interface AppSettings {
   key: 'settings';
   /** AI 供应商配置（全部可留空，不影响任何离线推算）。 */
@@ -103,6 +119,7 @@ class HideFateDB extends Dexie {
   predictions!: Table<StoredPrediction, string>;
   quiets!: Table<StoredQuiet, string>;
   posteriors!: Table<StoredPosterior, string>;
+  divinations!: Table<StoredDivinationRow, string>;
 
   constructor() {
     super('hidefate');
@@ -119,6 +136,10 @@ class HideFateDB extends Dexie {
       predictions: 'id, personId, status, domain, createdAt',
       quiets: 'id, personId, year, domain',
       posteriors: 'key, personId, xiangId',
+    });
+    // v3：占局盘面。
+    this.version(3).stores({
+      divinations: 'id, key, castAt, status, category',
     });
   }
 }

@@ -203,11 +203,19 @@ export function normaliseQuestion(q: string): string {
     .replace(/[，。！？、；：""''（）()[\]{}.,!?;:'"]/g, '');
 }
 
-/** 由占问意图导出查重键：归一化问题 + 占类 + 求测人年命。 */
-export function divinationKey(req: Pick<DivinationRequest, 'question' | 'category' | 'nianMingGan'>): string {
-  return fnv1a(
-    [normaliseQuestion(req.question), req.category ?? '', req.nianMingGan ?? ''].join(' '),
-  );
+/**
+ * 由占问意图导出查重键：归一化问题 + 求测人年命。
+ *
+ * **占类刻意不进钥匙。** 占类是对这件事的*解读*，不是这件事本身 ——
+ * 把它算进去，用户只要换一个占类就能对同一件事再占一次，
+ * 而那正是查重要防的动作。实跑界面时确认过这个漏洞：
+ * 同一问题先自动判类、再显式指定占类，会得到两把不同的钥匙。
+ *
+ * 年命保留，因为它区分的是**谁在问** —— 同一个问题，我问和替家人问是两件事。
+ * 代价是漏填年命会另开一把钥匙，故界面须把年命固定住，不要随手清空。
+ */
+export function divinationKey(req: Pick<DivinationRequest, 'question' | 'nianMingGan'>): string {
+  return fnv1a([normaliseQuestion(req.question), req.nianMingGan ?? ''].join(' '));
 }
 
 const DAY_MS = 86_400_000;

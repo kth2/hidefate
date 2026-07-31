@@ -126,6 +126,20 @@ export default function MePage() {
                 </span>
                 <Chevron />
               </Link>
+              <Link href="/members" className="row">
+                <span className="flex-1">
+                  成员管理
+                  <span className="block text-[0.75rem] text-ink-mute">生辰、性别、常用房间</span>
+                </span>
+                <Chevron />
+              </Link>
+              <Link href="/simulate" className="row">
+                <span className="flex-1">
+                  What-If 模拟
+                  <span className="block text-[0.75rem] text-ink-mute">改坐向、改房间，看前后对比</span>
+                </span>
+                <Chevron />
+              </Link>
               <Link href="/calibrate" className="row">
                 <span className="flex-1">
                   对轨 · 用真实经历收敛取象

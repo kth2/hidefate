@@ -69,12 +69,26 @@ describe('纪律三：一事一占', () => {
     expect(normaliseQuestion('这次换工作，能成吗？')).toBe(normaliseQuestion('这次换工作 能成吗'));
   });
 
-  it('同一问题同一占类得同一个键；改占类则键不同', () => {
-    const k1 = divinationKey({ question: '这次换工作能成吗', category: '功名', nianMingGan: '丙' });
-    const k2 = divinationKey({ question: '这次换工作能成吗！', category: '功名', nianMingGan: '丙' });
-    const k3 = divinationKey({ question: '这次换工作能成吗', category: '求财', nianMingGan: '丙' });
+  /**
+   * 回归锁：改占类**不得**换出新钥匙。
+   *
+   * 早先占类进了钥匙，于是同一问题「自动判类」与「显式指定占类」会得到两把钥匙，
+   * 换个占类就能对同一件事复占 —— 守卫形同虚设。这是实跑界面时抓到的。
+   */
+  it('同一问题得同一把钥匙，标点与占类都不影响', () => {
+    const k1 = divinationKey({ question: '这次换工作能成吗', nianMingGan: '丙' });
+    const k2 = divinationKey({ question: '这次换工作能成吗！', nianMingGan: '丙' });
     expect(k1).toBe(k2);
-    expect(k1).not.toBe(k3);
+    // 占类根本不在钥匙的参数里 —— 传了也会被忽略
+    expect(
+      divinationKey({ question: '这次换工作能成吗', category: '求财', nianMingGan: '丙' } as never),
+    ).toBe(k1);
+  });
+
+  it('不同的人问同一件事是两件事', () => {
+    expect(divinationKey({ question: '今年能升职吗', nianMingGan: '丙' })).not.toBe(
+      divinationKey({ question: '今年能升职吗', nianMingGan: '壬' }),
+    );
   });
 
   it('窗口内已有未结算之占则拒绝复占', async () => {

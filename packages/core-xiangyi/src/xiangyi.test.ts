@@ -5,6 +5,7 @@ import {
   MATURITY_THRESHOLDS,
   PRIOR_STRENGTH,
   analyseResonance,
+  analyseResonanceTagged,
   buildBaseDictionary,
   buildBaZhaiXiangYi,
   buildFengShuiDictionary,
@@ -328,6 +329,40 @@ describe('三层共振（ROADMAP §4.4 的例子）', () => {
     expect(withoutCondition.find((x) => x.domain === '官非')).toBeUndefined();
     const withCondition = analyseResonance(DICT, ['七杀', '七杀无制', '二黑']);
     expect(withCondition.find((x) => x.domain === '官非')).toBeDefined();
+  });
+
+  it('按 token 出处算共振：流年上的七杀说话的是运层，不是命层', () => {
+    // 同一个「七杀」，只从命层来时是一层
+    const onlyMing = analyseResonanceTagged(DICT, [{ token: '七杀', layer: '命' }]);
+    expect(onlyMing.find((r) => r.domain === '事业')!.resonance).toBe(1);
+
+    // 大运七杀 ＋ 流年七杀 → 命、运两层，健康类的开刀之象因此够格
+    const mingAndYun = analyseResonanceTagged(DICT, [
+      { token: '七杀', layer: '命' },
+      { token: '七杀', layer: '运' },
+    ]);
+    const health = mingAndYun.find((r) => r.domain === '健康')!;
+    expect(health.resonance).toBe(2);
+    expect(new Set(health.layers)).toEqual(new Set(['命', '运']));
+    expect(health.admitted.map((e) => e.id)).toContain('bazi.qisha.health.surgery');
+  });
+
+  it('同一批 token 用旧接口算只有一层 —— 这正是要修的问题', () => {
+    // 旧接口按词条归属层算：七杀是八字十神，永远只算命层
+    const old = analyseResonance(DICT, ['七杀']);
+    expect(old.find((r) => r.domain === '健康')!.resonance).toBe(1);
+    expect(old.find((r) => r.domain === '健康')!.admitted).toHaveLength(0);
+  });
+
+  it('三层齐备时达到三层共振', () => {
+    const r = analyseResonanceTagged(DICT, [
+      { token: '七杀', layer: '命' },
+      { token: '七杀', layer: '运' },
+      { token: '二黑', layer: '风水' },
+    ]);
+    const health = r.find((x) => x.domain === '健康')!;
+    expect(health.resonance).toBe(3);
+    expect(new Set(health.layers)).toEqual(new Set(['命', '运', '风水']));
   });
 
   it('输出按共振层数排序且稳定，保证可重放', () => {

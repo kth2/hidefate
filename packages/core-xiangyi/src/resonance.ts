@@ -84,6 +84,60 @@ export function analyseResonance(
   return resonanceOf(activate(dictionary, new Set(presentTokens)));
 }
 
+/** 带出处的 token —— 同一个「七杀」从大运来还是从流年来，分属不同层。 */
+export interface TaggedToken {
+  readonly token: string;
+  readonly layer: XiangLayer;
+}
+
+/**
+ * 按 token 的**出处**算共振，而不是按词条被归在哪一层。
+ *
+ * 这个区分是实打实的：字典把「七杀」归在命层（它是八字十神），
+ * 但同一个七杀出现在流年上时，说话的是运层。
+ * 用 `analyseResonance()` 算，未来某年的预测永远只有命＋风水两层，
+ * 流年根本参与不进来 —— 三层共振也就永远达不到。
+ *
+ * 一个 token 可同时来自多层（大运七杀 ＋ 流年七杀），此时两层都计。
+ */
+export function analyseResonanceTagged(
+  dictionary: readonly XiangYi[],
+  tagged: readonly TaggedToken[],
+): Resonance[] {
+  const layersOfToken = new Map<string, Set<XiangLayer>>();
+  for (const t of tagged) {
+    const set = layersOfToken.get(t.token) ?? new Set<XiangLayer>();
+    set.add(t.layer);
+    layersOfToken.set(t.token, set);
+  }
+
+  const activated = activate(dictionary, new Set(layersOfToken.keys()));
+
+  const byDomain = new Map<XiangDomain, XiangYi[]>();
+  for (const x of activated) {
+    const list = byDomain.get(x.domain);
+    if (list) list.push(x);
+    else byDomain.set(x.domain, [x]);
+  }
+
+  const out: Resonance[] = [];
+  for (const [domain, entries] of byDomain) {
+    const layers = new Set<XiangLayer>();
+    for (const e of entries) {
+      for (const l of layersOfToken.get(e.source.token) ?? []) layers.add(l);
+    }
+    const resonance = clampResonance(layers.size);
+    out.push({
+      domain,
+      layers: [...layers],
+      resonance,
+      admitted: entries.filter((e) => e.minResonance <= resonance),
+      rejected: entries.filter((e) => e.minResonance > resonance),
+    });
+  }
+  return out.sort((a, b) => b.resonance - a.resonance || a.domain.localeCompare(b.domain));
+}
+
 /**
  * 解释某条象意为何未被放行 —— 供 UI 回答「为什么没提醒我」。
  * 未被拦下时返回 null。
