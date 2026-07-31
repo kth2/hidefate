@@ -104,6 +104,108 @@ export interface ShanXiangOptions {
   purpose?: string;
 }
 
+/**
+ * 飞盘（鸣法·括囊）盘面。
+ *
+ * 与转盘（`QiMenChart`）**结构不同**，不可混用：
+ * 转盘是 `tianPan / jiuXing / baMen / baShen / anGan` 五组；
+ * 飞盘分天／人／地三盘，各带奇仪与暗干支，另有明值使与暗值使两套门。
+ */
+export interface FeiPanChart {
+  readonly basicInfo: Record<string, string>;
+  readonly siZhu: { year: string; month: string; day: string; time: string };
+  readonly juShu: { type: 'yang' | 'yin'; number: string; yuan: string; fullName: string; formatCode: string; jieQiName: string };
+  readonly xunShou: string;
+  readonly xunShouYi: string;
+  /** 值符宫（旬首宫）。 */
+  readonly zhiFuGong: string;
+  readonly zhiFuXing: string;
+  /** 值符落宫（时干落宫）。 */
+  readonly zhiFuLuoGong: string;
+  readonly zhiShiMen: string;
+  readonly zhiShiGong: string;
+  readonly anZhiShiMen: string;
+  readonly anZhiShiGong: string;
+  readonly tianPanXing: GongMap;
+  readonly tianPanShen: GongMap;
+  readonly tianPanYi: GongMap;
+  readonly tianPanAnGan: GongMap;
+  /** 明值使门。中宫为「黄门」，飞盘特有。 */
+  readonly renPanMen: GongMap;
+  readonly renPanAnMen: GongMap;
+  readonly renPanAnGan: GongMap;
+  readonly diPanShen: GongMap;
+  readonly diPan: GongMap;
+  readonly diPanAnGan: GongMap;
+  readonly kongWangZhi: readonly string[];
+  readonly kongWangGong: readonly string[];
+  readonly maStar: { zhi: string; gong: string } | null;
+  readonly jiuGongAnalysis: GongMap<QiMenGongAnalysis>;
+  readonly geju: unknown;
+  readonly analysis: unknown;
+}
+
+/** 用神条目：kind 决定去哪一盘找 name。 */
+export interface YongShenRuleItem {
+  readonly kind: 'men' | 'shen' | 'xing' | 'gan' | 'sanyi';
+  readonly name: string;
+}
+
+export interface YongShenRule {
+  readonly category: string;
+  readonly keywords: readonly string[];
+  readonly yongshen: readonly YongShenRuleItem[];
+  /** 该占类的断法纲要（《鸣法·用神章》）。 */
+  readonly note: string;
+}
+
+/** 上游 feipanPredict 的用神定位结果。 */
+export interface LocatedYongShen {
+  readonly name: string;
+  readonly kind: YongShenRuleItem['kind'];
+  /** 所落宫，"1"–"9"；定位失败为空串。 */
+  readonly gong: string;
+  readonly gongName: string;
+  readonly fangwei: string;
+  readonly place: string;
+  /** 应期近取：用神宫地盘奇仪。 */
+  readonly diPanYi: string;
+  /** 应期远取：用神宫地盘暗干支。 */
+  readonly diPanAnGan: string;
+}
+
+export interface SanYiSiGong {
+  /** 天乙 —— 主事情开始。 */
+  readonly tianYi: string;
+  /** 太乙 —— 主过程。 */
+  readonly taiYi: string;
+  /** 地乙 —— 主结局。 */
+  readonly diYi: string;
+  /** 时干宫 —— 禀盘主宰。 */
+  readonly shiGanGong: string;
+  /** 年命宫；未提供年命或年命干为甲时为空串。 */
+  readonly nianMingGong: string;
+  readonly nianMingGan: string;
+  readonly detail: Record<string, string>;
+}
+
+/** 上游 feipanPredict 模块的公开面。 */
+export interface FeiPanPredictModule {
+  YONG_SHEN_RULES: readonly YongShenRule[];
+  computeSanYiSiGong(pan: FeiPanChart, opts?: { nianMingGan?: string }): SanYiSiGong;
+  classifyQuestion(
+    question: string,
+    category?: string,
+    fallbackCategory?: string,
+  ): { category: string; note: string; yongshen: readonly YongShenRuleItem[]; matched: boolean };
+  selectYongShen(
+    pan: FeiPanChart,
+    question: string,
+    opts?: { category?: string; fallbackCategory?: string; nianMingGan?: string },
+  ): { category: string; note: string; matched: boolean; located: readonly LocatedYongShen[] };
+  serializeChart(pan: FeiPanChart): string;
+}
+
 /** 上游引擎的公开面（只声明本项目实际用到的部分）。 */
 export interface QMEngine {
   qimen: {
@@ -111,6 +213,12 @@ export interface QMEngine {
     calculateJuShu(date: Date, method: string): { type: 'yang' | 'yin'; number: string; yuan: string; jieQiName: string };
     diPanModule: { getDiPan(type: 'yang' | 'yin', n: number): GongMap };
   };
+  /** 飞盘（鸣法·括囊）排盘。 */
+  feipanQimen: {
+    calculate(date: Date, opts?: Record<string, unknown>): FeiPanChart;
+  };
+  /** 飞盘用神选取与序列化（纯确定性，无 LLM 调用）。 */
+  feipanPredict: FeiPanPredictModule;
   JIU_GONG: GongMap<{ name: string; direction: string; element: string; color: string; yinyang: string }>;
   JIU_XING: Record<string, { alias: string; element: string; color: string; feature: string }>;
   BA_MEN: Record<string, { feature: string; type: 'ji' | 'xiong'; element: string; color: string }>;

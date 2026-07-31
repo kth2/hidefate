@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { OUTER_PALACES, PALACE_INDEXES } from '@hidefate/core-fengshui';
+import { OUTER_PALACES, PALACE_INDEXES, type RoomKind } from '@hidefate/core-fengshui';
 import { computeShanXiang } from '@hidefate/core-qimen';
 import { bestPalaces, synthesise, worstPalaces } from './assess.js';
 import { PROB_CEIL, PROB_FLOOR, analyse, predict } from './predict.js';
@@ -112,8 +112,8 @@ describe('概率预测', () => {
   });
 
   it('房间优先级严格：大门 > 主卧 > 厨房 > 儿童房 > 客厅', () => {
-    const order = ['大门', '主卧', '厨房', '儿童房', '客厅'];
-    const seq = s.predictions.map((p) => p.roomKind).filter((k): k is string => order.includes(k ?? ''));
+    const order: RoomKind[] = ['大门', '主卧', '厨房', '儿童房', '客厅'];
+    const seq = s.predictions.map((p) => p.roomKind).filter((k): k is RoomKind => k != null && order.includes(k));
     const idx = seq.map((k) => order.indexOf(k));
     for (let i = 1; i < idx.length; i++) expect(idx[i]!).toBeGreaterThanOrEqual(idx[i - 1]!);
   });

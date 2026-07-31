@@ -9,8 +9,10 @@
 
 import Dexie, { type Table } from 'dexie';
 import type { PropertyProfile } from '@hidefate/core-fengshui';
-import type { AppliedCure } from '@hidefate/core-synthesis';
+import type { AppliedCure, ResidencePeriod } from '@hidefate/core-synthesis';
 import type { BirthInput } from '@hidefate/core-bazi';
+import type { PredictionRecord, QuietRecord } from '@hidefate/core-ledger';
+import type { XiangPosterior } from '@hidefate/core-xiangyi';
 
 export interface StoredProperty extends PropertyProfile {
   readonly createdAt: string;
@@ -40,6 +42,24 @@ export interface StoredScenario {
   changesJson: string;
   note?: string;
   createdAt: string;
+}
+
+/** 居住史。人维度，跨房产，故与 properties／members 分表。 */
+export interface StoredResidence extends ResidencePeriod {}
+
+/**
+ * 预测账本。**只增不改** —— 结算由 core-ledger 产出新对象后整条 put 回来，
+ * 绝不在此处就地改字段。
+ */
+export interface StoredPrediction extends PredictionRecord {}
+
+/** 负样本：「这年这方面平安无事」。只能由用户主动填写。 */
+export interface StoredQuiet extends QuietRecord {}
+
+/** 个人象意后验。可随时由账本重算，故此表是缓存而非事实来源。 */
+export interface StoredPosterior extends XiangPosterior {
+  /** 复合主键 `${personId}|${xiangId}`。 */
+  key: string;
 }
 
 export interface AppSettings {
@@ -79,6 +99,10 @@ class HideFateDB extends Dexie {
   cures!: Table<StoredCure, string>;
   scenarios!: Table<StoredScenario, string>;
   settings!: Table<AppSettings, string>;
+  residences!: Table<StoredResidence, string>;
+  predictions!: Table<StoredPrediction, string>;
+  quiets!: Table<StoredQuiet, string>;
+  posteriors!: Table<StoredPosterior, string>;
 
   constructor() {
     super('hidefate');
@@ -88,6 +112,13 @@ class HideFateDB extends Dexie {
       cures: 'id, propertyId, palace, appliedOn',
       scenarios: 'id, propertyId, createdAt',
       settings: 'key',
+    });
+    // v2：对轨回路的四张表。旧库升级时自动建表，既有资料不动。
+    this.version(2).stores({
+      residences: 'id, personId, propertyId, fromYear',
+      predictions: 'id, personId, status, domain, createdAt',
+      quiets: 'id, personId, year, domain',
+      posteriors: 'key, personId, xiangId',
     });
   }
 }
@@ -114,14 +145,24 @@ export function newId(prefix: string): string {
 /** 导出全部资料为 JSON（用户主动触发）。 */
 export async function exportAll(): Promise<string> {
   const d = db();
-  const [properties, members, cures, scenarios] = await Promise.all([
+  const [properties, members, cures, scenarios, residences, predictions, quiets] = await Promise.all([
     d.properties.toArray(),
     d.members.toArray(),
     d.cures.toArray(),
     d.scenarios.toArray(),
+    d.residences.toArray(),
+    d.predictions.toArray(),
+    d.quiets.toArray(),
   ]);
+  // 后验（posteriors）刻意不导出 —— 它随时可由账本重算，
+  // 导出它只会在导入后与账本不一致，且不一致时没人看得出来。
   return JSON.stringify(
-    { version: 1, exportedAt: new Date().toISOString(), properties, members, cures, scenarios },
+    {
+      version: 2,
+      exportedAt: new Date().toISOString(),
+      properties, members, cures, scenarios,
+      residences, predictions, quiets,
+    },
     null,
     2,
   );
@@ -134,17 +175,33 @@ export interface ExportShape {
   members?: StoredMember[];
   cures?: StoredCure[];
   scenarios?: StoredScenario[];
+  residences?: StoredResidence[];
+  predictions?: StoredPrediction[];
+  quiets?: StoredQuiet[];
 }
 
 /** 导入 JSON（覆盖同 id 记录）。 */
-export async function importAll(json: string): Promise<{ properties: number; members: number }> {
+export async function importAll(
+  json: string,
+): Promise<{ properties: number; members: number; predictions: number }> {
   const data = JSON.parse(json) as ExportShape;
   const d = db();
-  await d.transaction('rw', d.properties, d.members, d.cures, d.scenarios, async () => {
-    if (data.properties?.length) await d.properties.bulkPut(data.properties);
-    if (data.members?.length) await d.members.bulkPut(data.members);
-    if (data.cures?.length) await d.cures.bulkPut(data.cures);
-    if (data.scenarios?.length) await d.scenarios.bulkPut(data.scenarios);
-  });
-  return { properties: data.properties?.length ?? 0, members: data.members?.length ?? 0 };
+  await d.transaction(
+    'rw',
+    [d.properties, d.members, d.cures, d.scenarios, d.residences, d.predictions, d.quiets],
+    async () => {
+      if (data.properties?.length) await d.properties.bulkPut(data.properties);
+      if (data.members?.length) await d.members.bulkPut(data.members);
+      if (data.cures?.length) await d.cures.bulkPut(data.cures);
+      if (data.scenarios?.length) await d.scenarios.bulkPut(data.scenarios);
+      if (data.residences?.length) await d.residences.bulkPut(data.residences);
+      if (data.predictions?.length) await d.predictions.bulkPut(data.predictions);
+      if (data.quiets?.length) await d.quiets.bulkPut(data.quiets);
+    },
+  );
+  return {
+    properties: data.properties?.length ?? 0,
+    members: data.members?.length ?? 0,
+    predictions: data.predictions?.length ?? 0,
+  };
 }

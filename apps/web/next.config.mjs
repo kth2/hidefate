@@ -24,9 +24,29 @@ const nextConfig = {
     '@hidefate/core-bazi',
     '@hidefate/core-fengshui',
     '@hidefate/core-qimen',
+    '@hidefate/core-ziwei',
+    '@hidefate/core-xiangyi',
+    '@hidefate/core-ledger',
     '@hidefate/core-synthesis',
   ],
   eslint: { ignoreDuringBuilds: true },
+
+  /**
+   * AI 转发路由只在有服务器时才存在。
+   *
+   * 它们是 POST 代理，与 `output: export` 天生不兼容（Next 只允许导出无副作用的
+   * GET Route Handler），此前静态构建会直接失败 ——「推荐用 GitHub Pages」那条路
+   * 实际上是断的。
+   *
+   * 解法：把它们命名为 `route.proxy.ts`，只在非静态构建时把 `proxy.ts` 列入
+   * pageExtensions。静态构建下 Next 认不出 `route.proxy` 这个文件名，
+   * 于是整个 /api 目录自然不存在 —— 不需要临时挪文件，也不留半个死路由。
+   *
+   * 静态版本来就走浏览器直连（NEXT_PUBLIC_AI_DIRECT_ONLY=1），不缺这一层。
+   */
+  pageExtensions: isStatic
+    ? ['tsx', 'ts', 'jsx', 'js']
+    : ['proxy.ts', 'tsx', 'ts', 'jsx', 'js'],
 
   ...(isStatic
     ? {

@@ -1,6 +1,6 @@
 'use client';
 
-/** 我的 —— 房屋切换、报告、时间轴、化解追踪、AI 设置、数据与隐私。 */
+/** 我的 —— 房屋切换、对轨、报告、时间轴、化解追踪、AI 设置、数据与隐私。 */
 
 import Link from 'next/link';
 import { useState } from 'react';
@@ -122,6 +122,15 @@ export default function MePage() {
                   房间管理
                   <span className="block text-[0.75rem] text-ink-mute">
                     增删改房间与楼层，{property.rooms.length} 个已标注
+                  </span>
+                </span>
+                <Chevron />
+              </Link>
+              <Link href="/calibrate" className="row">
+                <span className="flex-1">
+                  对轨 · 用真实经历收敛取象
+                  <span className="block text-[0.75rem] text-ink-mute">
+                    先出回溯并锁定，再由你逐条评 —— 系统据此学你这盘走哪条道
                   </span>
                 </span>
                 <Chevron />
