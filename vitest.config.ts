@@ -16,6 +16,7 @@ export default defineConfig({
       '@hidefate/core-ziwei': r('./packages/core-ziwei/src/index.ts'),
       '@hidefate/core-xiangyi': r('./packages/core-xiangyi/src/index.ts'),
       '@hidefate/core-ledger': r('./packages/core-ledger/src/index.ts'),
+      '@hidefate/core-events': r('./packages/core-events/src/index.ts'),
       '@hidefate/core-synthesis': r('./packages/core-synthesis/src/index.ts'),
     },
   },

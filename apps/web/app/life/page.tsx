@@ -18,6 +18,7 @@ import type { PredictionRecord } from '@hidefate/core-ledger';
 import { AppBar, Empty, Expandable, Meter, Skeleton } from '../../components/mobile/ui';
 import { useProperty } from '../../lib/PropertyContext';
 import { db } from '../../lib/db';
+import type { PredictedEvent } from '@hidefate/core-events';
 import { buildLifeView, freezeOutlook, type LifeView, type YearOutlook } from '../../lib/lifeStore';
 
 const DOMAIN_TONE: Record<string, string> = {
@@ -27,6 +28,52 @@ const DOMAIN_TONE: Record<string, string> = {
   感情: 'bg-cinnabar/10 text-cinnabar border-cinnabar/30',
 };
 const tone = (d: string) => DOMAIN_TONE[d] ?? 'bg-rice-deep/50 text-ink-mute border-rice-line';
+
+const VALENCE_MARK: Record<string, string> = { 吉: '○', 凶: '⚠', 中: '·' };
+
+/**
+ * 一件具体的事。
+ *
+ * 排版刻意把**事件名**放在最大最先 —— 用户要的是「八月可能被裁」，
+ * 不是「七杀在事业宫」。取象依据、古法出处、判据全部收进折叠区，
+ * 想追问「凭什么」的时候再展开。
+ */
+function EventCard({ e }: { e: PredictedEvent }) {
+  return (
+    <div className={`rounded-xl border bg-white p-3 ${e.valence === '凶' ? 'border-cinnabar/35' : 'border-rice-line'}`}>
+      <div className="flex items-center gap-2">
+        <span className={`rounded-md border px-1.5 py-0.5 text-[0.6875rem] ${tone(e.domain)}`}>{e.domain}</span>
+        <span className="text-[0.6875rem] text-ink-mute">{e.whenLabel}</span>
+        <span className="ml-auto text-[0.875rem] font-medium tabular-nums">{Math.round(e.probability * 100)}%</span>
+      </div>
+
+      <p className="mt-1.5 text-[0.9375rem] font-medium leading-relaxed">
+        <span className={e.valence === '凶' ? 'text-cinnabar' : 'text-ink-mute'}>{VALENCE_MARK[e.valence]}</span>{' '}
+        {e.title}
+      </p>
+
+      <Meter value={e.probability} color={e.valence === '凶' ? '#a8352a' : '#5b7f6f'} />
+
+      <p className="mt-2 text-[0.8125rem] leading-relaxed text-ink-soft">{e.advice}</p>
+
+      <details className="mt-2 group">
+        <summary className="flex min-h-11 cursor-pointer list-none items-center text-[0.75rem] text-ink-mute">
+          凭什么这么说 · {e.layers.join('＋')}层共振
+        </summary>
+        <div className="space-y-1.5 pb-1 pt-1">
+          <p className="text-[0.75rem] leading-relaxed text-ink-mute">
+            命中：{e.matched.join('、')}
+          </p>
+          <p className="text-[0.75rem] leading-relaxed text-ink-mute">{e.classic}</p>
+          <p className="text-[0.75rem] leading-relaxed text-ink-mute">
+            到期怎么算数：{e.criterion}
+          </p>
+          <p className="text-[0.75rem] text-ink-mute">可干预性：{e.interventionability}</p>
+        </div>
+      </details>
+    </div>
+  );
+}
 
 export default function LifePage() {
   const { memberRows, properties, loading, year } = useProperty();
@@ -158,22 +205,13 @@ export default function LifePage() {
           )}
 
           <div className="mt-3 space-y-2">
-            {view.present.drafts.length === 0 ? (
+            {view.present.events.length === 0 ? (
               <p className="text-[0.8125rem] leading-relaxed text-ink-mute">
-                今年没有达到共振门槛的条目 —— 这是好消息，不是没算出来。
+                今年没有达到门槛的事件 —— 这是好消息，不是没算出来。
+                门槛设在两层共振，就是为了不把单层的臆断报给你。
               </p>
             ) : (
-              view.present.drafts.map((d, i) => (
-                <div key={i} className="rounded-xl border border-rice-line bg-white p-3">
-                  <div className="flex items-center gap-2">
-                    <span className={`rounded-md border px-1.5 py-0.5 text-[0.6875rem] ${tone(d.domain)}`}>{d.domain}</span>
-                    <span className="text-[0.6875rem] text-ink-mute">{d.layers.join('＋')}层</span>
-                    <span className="ml-auto text-[0.8125rem] font-medium tabular-nums">{Math.round(d.probability * 100)}%</span>
-                  </div>
-                  <p className="mt-1.5 text-[0.875rem] leading-relaxed">{d.statement}</p>
-                  <p className="mt-1 text-[0.6875rem] text-ink-mute">{d.interventionability}</p>
-                </div>
-              ))
+              view.present.events.map((e) => <EventCard key={e.templateId} e={e} />)
             )}
           </div>
 
@@ -320,20 +358,10 @@ export default function LifePage() {
                   </p>
                 ))}
                 <div className="mt-2 space-y-2">
-                  {y.drafts.length === 0 ? (
-                    <p className="text-[0.8125rem] text-ink-mute">该年没有达到共振门槛的条目。</p>
+                  {y.events.length === 0 ? (
+                    <p className="text-[0.8125rem] text-ink-mute">该年没有达到门槛的事件。</p>
                   ) : (
-                    y.drafts.map((d, i) => (
-                      <div key={i}>
-                        <div className="flex items-center gap-2">
-                          <span className={`rounded-md border px-1.5 py-0.5 text-[0.6875rem] ${tone(d.domain)}`}>{d.domain}</span>
-                          <span className="text-[0.6875rem] text-ink-mute">{d.layers.join('＋')}层</span>
-                          <span className="ml-auto text-[0.75rem] tabular-nums">{Math.round(d.probability * 100)}%</span>
-                        </div>
-                        <p className="mt-1 text-[0.8125rem] leading-relaxed">{d.statement}</p>
-                        <Meter value={d.probability} color="#a8352a" />
-                      </div>
-                    ))
+                    y.events.map((e) => <EventCard key={e.templateId} e={e} />)
                   )}
                 </div>
                 {y.drafts.length > 0 && (
@@ -352,9 +380,10 @@ export default function LifePage() {
         </section>
 
         <p className="text-[0.75rem] leading-relaxed text-ink-mute">
-          概率一律收敛在 3%–92%，绝不说「必定」。每条都标了是哪几层在说话 ——
-          单层的看看就好，三层共振的才值得当回事。所有条目都没有人群基准率，
-          所以它们能做的是收敛取象，不是证明系统准。
+          每一条都是**具体的事**，不是取象范畴 —— 展开「凭什么这么说」能看到它由哪些
+          盘面元素凑出来、依的哪条古法、到期怎么算数。概率一律收敛在 3%–92%，绝不说「必定」；
+          门槛设在两层共振（身体与官非要三层），就是为了不把单层的臆断报给你。
+          这些条目都没有人群基准率，所以它们是**提醒**，不是统计意义上的「准」。
         </p>
       </div>
     </>

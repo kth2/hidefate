@@ -73,6 +73,7 @@ export async function saveDivination(d: Divination, id: string): Promise<StoredD
   const row: StoredDivination = {
     id,
     key: d.key,
+    sequence: d.sequence,
     question: d.question,
     category: d.category,
     castAt: d.castAt,

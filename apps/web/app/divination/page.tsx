@@ -6,7 +6,8 @@
  * 三条纪律在 core-qimen 的签名里已经写死，界面只负责把它们讲清楚：
  *   1. **占时不可选** —— 起局用的是你按下按钮那一刻，不给挑
  *   2. **判据先于盘面** —— 不写「何为应验」就排不出盘
- *   3. **一事一占** —— 同一件事应期未到不得再占
+ *   3. **复占留档** —— 同一件事可以反复占（换个时辰本就是另一个局），
+ *      但每一次都编号入列、都要各自结算，不许只留下合心意的那一局
  *
  * 这一层是「二运」：命层说这个大运有什么底子、风水层说环境如何，
  * 都不回答「哪天」。占局回答当下这件事。
@@ -109,8 +110,6 @@ export default function DivinationPage() {
       if (raw.includes('未能识别占类')) {
         setErr('认不出这是哪一类占问，所以取不到用神。请在上面选一个占类；或者按「三乙四宫」的通用法起局 —— 那样没有具体用神，记录的对轨价值也低。');
         setOfferGeneral(true);
-      } else if (raw.includes('复占不应')) {
-        setErr(raw.replace(/。$/, '。') + '（这是刻意的：允许复占，人就会问到满意为止。）');
       } else {
         setErr(raw);
       }
@@ -261,7 +260,14 @@ export default function DivinationPage() {
                       {r.outcome && ` · ${r.outcome}`}
                     </span>
                   </div>
-                  <p className="mt-1.5 text-[0.9375rem]">{r.question}</p>
+                  <p className="mt-1.5 text-[0.9375rem]">
+                    {r.sequence > 1 && (
+                      <span className="mr-1.5 rounded bg-rice-deep px-1.5 py-0.5 text-[0.6875rem] text-ink-mute">
+                        第 {r.sequence} 次
+                      </span>
+                    )}
+                    {r.question}
+                  </p>
                   <p className="mt-1 text-[0.6875rem] text-ink-mute">
                     {r.castAt.slice(0, 16).replace('T', ' ')} · {r.juShu} · 应期至 {r.resolveBy.slice(0, 10)}
                   </p>
@@ -289,8 +295,9 @@ export default function DivinationPage() {
         </section>
 
         <p className="text-[0.75rem] leading-relaxed text-ink-mute">
-          一事一占：同一件事应期未到不得再占。这不是规矩讲究 ——
-          允许复占，人就会问到满意为止然后只留下喜欢的那条，记录全废。
+          同一件事可以反复占 —— 换个时辰本就是另一个局，多占几次也确实有助于校准取象。
+          但每一局都会编号留档，<strong className="text-ink">到期请各自结算</strong>：
+          真正会毁掉记录的不是「再问」，是只认最合心意的那一局。
         </p>
       </div>
 
@@ -326,6 +333,11 @@ export default function DivinationPage() {
       <Sheet open={opened != null} onClose={() => setOpened(null)} title={opened?.category ?? '盘'}>
         {opened && (
           <div className="space-y-4 pb-2">
+            {opened.repeatNote && (
+              <p className="rounded-lg border border-gold/40 bg-gold/5 p-2.5 text-[0.75rem] leading-relaxed">
+                {opened.repeatNote}
+              </p>
+            )}
             <div>
               <p className="text-[0.9375rem]">{opened.question}</p>
               <p className="mt-1 text-[0.75rem] text-ink-mute">

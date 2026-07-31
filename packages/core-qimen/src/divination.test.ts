@@ -64,22 +64,20 @@ describe('纪律二：判据先于盘面', () => {
   });
 });
 
-describe('纪律三：一事一占', () => {
+describe('纪律三：复占留档，不许挑答案', () => {
   it('归一化能吃掉空白与标点', () => {
     expect(normaliseQuestion('这次换工作，能成吗？')).toBe(normaliseQuestion('这次换工作 能成吗'));
   });
 
   /**
-   * 回归锁：改占类**不得**换出新钥匙。
-   *
-   * 早先占类进了钥匙，于是同一问题「自动判类」与「显式指定占类」会得到两把钥匙，
-   * 换个占类就能对同一件事复占 —— 守卫形同虚设。这是实跑界面时抓到的。
+   * 回归锁：改占类不得换出新钥匙。
+   * 占类是对这件事的解读，不是这件事本身；早先它进了钥匙，
+   * 换个占类就能把同一件事记成另一件，串不成一列。
    */
   it('同一问题得同一把钥匙，标点与占类都不影响', () => {
     const k1 = divinationKey({ question: '这次换工作能成吗', nianMingGan: '丙' });
     const k2 = divinationKey({ question: '这次换工作能成吗！', nianMingGan: '丙' });
     expect(k1).toBe(k2);
-    // 占类根本不在钥匙的参数里 —— 传了也会被忽略
     expect(
       divinationKey({ question: '这次换工作能成吗', category: '求财', nianMingGan: '丙' } as never),
     ).toBe(k1);
@@ -91,38 +89,56 @@ describe('纪律三：一事一占', () => {
     );
   });
 
-  it('窗口内已有未结算之占则拒绝复占', async () => {
+  /**
+   * 早先这里是硬拦。拦错了地方 —— 要防的是**选择性保留**，
+   * 不是「再问」这个动作。换个时辰本就是另一个局，多占几次有助于校准取象。
+   */
+  it('同一件事可以再占，不再被拒绝', async () => {
     const key = divinationKey(REQ);
     const open: OpenDivination[] = [
       { key, castAt: new Date(Date.now() - 86_400_000).toISOString(), windowDays: 45, status: '待结算' },
     ];
-    await expect(castDivination(REQ, { openDivinations: open })).rejects.toThrow(/复占不应/);
+    const d = await castDivination(REQ, { openDivinations: open });
+    expect(d.sequence).toBe(2);
+    expect(d.repeatNote).toContain('第 2 次');
   });
 
-  it('已结算之占不阻挡新占', () => {
+  it('复占会提醒「每一局各自结算，别只认合心意的那一局」', () => {
     const key = divinationKey(REQ);
     const v = checkRepeat(
-      [{ key, castAt: new Date().toISOString(), windowDays: 45, status: '已结算' }],
+      [{ key, castAt: new Date().toISOString(), windowDays: 45, status: '待结算' }],
       key,
     );
-    expect(v.allowed).toBe(true);
+    expect(v.isRepeat).toBe(true);
+    expect(v.sequence).toBe(2);
+    expect(v.reason).toContain('不要只认最合心意的那一局');
   });
 
-  it('窗口已过之占不阻挡新占', () => {
+  it('首次占不算复占', () => {
+    const v = checkRepeat([], divinationKey(REQ));
+    expect(v.isRepeat).toBe(false);
+    expect(v.sequence).toBe(1);
+  });
+
+  it('已结算的旧占同样计入序号 —— 留档就是全都留', () => {
     const key = divinationKey(REQ);
     const v = checkRepeat(
-      [{ key, castAt: new Date(Date.now() - 60 * 86_400_000).toISOString(), windowDays: 45, status: '待结算' }],
+      [
+        { key, castAt: new Date().toISOString(), windowDays: 45, status: '已结算' },
+        { key, castAt: new Date().toISOString(), windowDays: 45, status: '待结算' },
+      ],
       key,
     );
-    expect(v.allowed).toBe(true);
+    expect(v.sequence).toBe(3);
+    expect(v.previous).toHaveLength(2);
   });
 
-  it('别人的占不阻挡我的占', () => {
+  it('别人的占不计入我的序号', () => {
     const v = checkRepeat(
       [{ key: 'deadbeef', castAt: new Date().toISOString(), windowDays: 45, status: '待结算' }],
       divinationKey(REQ),
     );
-    expect(v.allowed).toBe(true);
+    expect(v.sequence).toBe(1);
   });
 });
 
@@ -268,7 +284,7 @@ describe('重放（供账本比对用）', () => {
     expect(r.castAt).toBe(d.castAt);
   });
 
-  it('重放不受复占限制（它不产生新的占）', async () => {
+  it('重放不产生新的占，序号恒为 1', async () => {
     const d = await castDivination(REQ, empty);
     // 账本里就摆着这一条未结算的占，重放照样可行
     await expect(

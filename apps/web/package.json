@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "@hidefate/core-bazi": "*",
+    "@hidefate/core-events": "*",
     "@hidefate/core-fengshui": "*",
     "@hidefate/core-ledger": "*",
     "@hidefate/core-qimen": "*",

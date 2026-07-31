@@ -10,7 +10,7 @@
   "scripts": {
     "test": "vitest run",
     "test:watch": "vitest",
-    "typecheck": "tsc -b packages/core-bazi packages/core-fengshui packages/core-qimen packages/core-ziwei packages/core-xiangyi packages/core-ledger packages/core-synthesis",
+    "typecheck": "tsc -b packages/core-bazi packages/core-fengshui packages/core-qimen packages/core-ziwei packages/core-xiangyi packages/core-ledger packages/core-events packages/core-synthesis",
     "dev": "npm run dev --workspace=@hidefate/web",
     "build": "npm run build --workspace=@hidefate/web",
     "start": "npm run start --workspace=@hidefate/web",

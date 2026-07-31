@@ -27,6 +27,7 @@ const nextConfig = {
     '@hidefate/core-ziwei',
     '@hidefate/core-xiangyi',
     '@hidefate/core-ledger',
+    '@hidefate/core-events',
     '@hidefate/core-synthesis',
   ],
   eslint: { ignoreDuringBuilds: true },

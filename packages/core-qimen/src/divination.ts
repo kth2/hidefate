@@ -20,9 +20,10 @@
  *    它只接受账本里已记录的时刻，且不产生新的占。
  * 2. **判据先于盘面。** `resolution`（何为应验、谁来判、多长窗口）是必填参数，
  *    不填就排不出盘。「今年财运有起伏」这种不可证伪的占，在类型层就写不出来。
- * 3. **一事一占。** `castDivination()` 必须显式接收当前未结算的占列表用于查重。
- *    传空数组是允许的（首次占），但**必须显式传** —— 让「我没做查重」成为一个
- *    需要主动写下的动作，而不是忘记调用的默认结果。
+ * 3. **复占留档，不许挑答案。** 同一件事可以反复占 —— 换个时辰本就是另一个局，
+ *    多占几次也确实有助于校准取象。真正要防的不是「再问」，而是**只留下喜欢的那条**。
+ *    故 `castDivination()` 不再拒绝复占，改为把每一次都编号入列（`sequence`），
+ *    并要求调用方传入已有的占用于串联。删不掉、藏不住，才是记录该有的样子。
  *
  * 本文件不做任何断语生成。用神取用由上游 `feipanPredict` 的确定性规则完成，
  * 应期只呈现古法材料（用神宫地盘奇仪主近、地盘暗干支主远），**不换算成天数** ——
@@ -85,16 +86,20 @@ export interface OpenDivination {
 
 export interface DivinationContext {
   /**
-   * 当前账本里的占（至少含未结算者）。用于「一事一占」查重。
+   * 账本里已有的占。用于把同一件事的多次占**串成一列**（而非拒绝）。
    * 首次占请显式传 `[]`。
    */
   readonly openDivinations: readonly OpenDivination[];
 }
 
 export interface RepeatVerdict {
-  readonly allowed: boolean;
+  /** 是否为复占。 */
+  readonly isRepeat: boolean;
+  /** 这是同一件事的第几次占，从 1 起。 */
+  readonly sequence: number;
   readonly reason: string;
-  readonly blockedBy?: OpenDivination;
+  /** 同一件事此前那些占。 */
+  readonly previous: readonly OpenDivination[];
 }
 
 /** 应期材料 —— 古法取象，不换算天数。 */
@@ -136,8 +141,12 @@ export interface DivinationPalace {
 }
 
 export interface Divination {
-  /** 查重键，由占问意图归一后哈希得来。 */
+  /** 同一件事的归一化键。同一件事的多次占共用它，用于串成一列。 */
   readonly key: string;
+  /** 这是同一件事的第几次占，从 1 起。 */
+  readonly sequence: number;
+  /** 复占提示；首次占为 null。 */
+  readonly repeatNote: string | null;
   readonly school: DivinationSchool;
   /** 起局时刻（ISO）。写入即锁。 */
   readonly castAt: string;
@@ -221,29 +230,35 @@ export function divinationKey(req: Pick<DivinationRequest, 'question' | 'nianMin
 const DAY_MS = 86_400_000;
 
 /**
- * 一事一占查重。
+ * 复占检查 —— **不拒绝，只编号**。
  *
- * 同一件事若已有未结算的占且仍在窗口内，则不得再占 —— 古法「复占不应」，
- * 工程上的理由更直接：允许复占，用户就会问到满意为止，对轨数据全废。
+ * 早先这里是硬拦：同一件事应期未到不得再占。那个担心是真的
+ * （允许复占，人就会问到满意为止），但拦错了地方 ——
+ * 要防的是**选择性保留**，不是「再问」这个动作本身。
+ *
+ * 换个时辰本来就是另一个局；多占几次、把每一次都留下来，
+ * 反而是校准取象最快的路子。所以现在的做法是：照占，编号，全部留档。
+ * 删不掉、藏不住，就没法只留下喜欢的那条。
  */
 export function checkRepeat(
   open: readonly OpenDivination[],
   key: string,
-  now: Date = new Date(),
+  _now: Date = new Date(),
 ): RepeatVerdict {
-  const blocking = open.find((d) => {
-    if (d.key !== key || d.status !== '待结算') return false;
-    const deadline = new Date(d.castAt).getTime() + d.windowDays * DAY_MS;
-    return now.getTime() < deadline;
-  });
-  if (!blocking) return { allowed: true, reason: '同一事项无未结算之占，可起局。' };
-  const deadline = new Date(new Date(blocking.castAt).getTime() + blocking.windowDays * DAY_MS);
+  const previous = open.filter((d) => d.key === key);
+  const sequence = previous.length + 1;
+  if (previous.length === 0) {
+    return { isRepeat: false, sequence: 1, previous: [], reason: '同一事项的首次起局。' };
+  }
+  const pending = previous.filter((d) => d.status === '待结算').length;
   return {
-    allowed: false,
+    isRepeat: true,
+    sequence,
+    previous,
     reason:
-      `同一事项已于 ${blocking.castAt} 起过一局，应期未到（至 ${deadline.toISOString()}）。` +
-      '一事一占，复占不应 —— 请先结算前一占，或直接查看它。',
-    blockedBy: blocking,
+      `同一事项已占过 ${previous.length} 次（其中 ${pending} 次未结算），本局记为第 ${sequence} 次。` +
+      '每一次都会留档 —— 到期请把每一局各自结算，不要只认最合心意的那一局，' +
+      '否则这批记录对校准就没有价值了。',
   };
 }
 
@@ -378,8 +393,7 @@ export async function castDivination(
 
   const key = divinationKey(req);
   const now = new Date();
-  const verdict = checkRepeat(ctx.openDivinations, key, now);
-  if (!verdict.allowed) throw new Error(verdict.reason);
+  const repeat = checkRepeat(ctx.openDivinations, key, now);
 
   const { engine } = await loadQiMenEngine();
   if (!engine.feipanQimen?.calculate || !engine.feipanPredict?.selectYongShen) {
@@ -407,6 +421,8 @@ export async function castDivination(
 
   return {
     key,
+    sequence: repeat.sequence,
+    repeatNote: repeat.isRepeat ? repeat.reason : null,
     school,
     castAt,
     question: req.question,
@@ -475,6 +491,8 @@ export async function replayDivination(
 
   return {
     key: record.key,
+    sequence: 1,
+    repeatNote: null,
     school,
     castAt: record.castAt,
     question: record.question,

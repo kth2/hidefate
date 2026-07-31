@@ -66,6 +66,8 @@ export interface StoredPosterior extends XiangPosterior {
 export interface StoredDivinationRow {
   id: string;
   key: string;
+  /** 同一件事的第几次占。复占留档，序号是它们的次序。 */
+  sequence: number;
   question: string;
   category: string;
   castAt: string;

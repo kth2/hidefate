@@ -14,11 +14,21 @@
  * 否则「预测」就只是好看的段落。
  */
 
-import { computeBaziChart, liuNianGanZhi, liuNianShiShen, type BirthInput } from '@hidefate/core-bazi';
+import {
+  computeBaziChart,
+  liuNianGanZhi,
+  liuNianShiShen,
+  shenShaHits,
+  shiShen,
+  type BirthInput,
+} from '@hidefate/core-bazi';
+import { Solar } from 'lunar-typescript';
+import { predictYear, type EventToken, type PredictedEvent } from '@hidefate/core-events';
 import {
   STAR_NAME,
   annualStar,
   buildFlyingStarChart,
+  monthlyStar,
   periodOfYear,
   type PropertyProfile,
 } from '@hidefate/core-fengshui';
@@ -90,6 +100,8 @@ export interface YearOutlook {
   readonly residenceName: string | null;
   readonly breakpoints: readonly Breakpoint[];
   readonly resonance: readonly Resonance[];
+  /** 具体事件 —— 这才是用户要看的东西，象意退居解释位。 */
+  readonly events: readonly PredictedEvent[];
   readonly drafts: readonly PredictionDraft[];
   /** 该年是否值得重点留意（有断点或有三层共振）。 */
   readonly notable: boolean;
@@ -146,6 +158,14 @@ function yunTokensOf(chart: ReturnType<typeof computeBaziChart>, zw: ZiWeiChart 
   const ss = liuNianShiShen(chart, year);
   if (ss) out.push({ token: ss, layer: '运' });
   out.push({ token: STAR_NAME[annualStar(year)], layer: '运' });
+
+  // 流年神煞：本命红鸾在卯，则逢卯年为红鸾年。
+  // 少了这一句，「论及婚嫁」这类以红鸾为必要条件的年级事件永远触发不了。
+  const natal = natalYearZhi(chart);
+  if (natal) {
+    for (const sh of shenShaHits(natal, [ZHI_OF_YEAR(year)])) out.push({ token: sh, layer: '运' });
+  }
+
   if (zw) {
     try {
       const h = horoscopeAt(zw, year);
@@ -153,6 +173,54 @@ function yunTokensOf(chart: ReturnType<typeof computeBaziChart>, zw: ZiWeiChart 
     } catch {
       // 运限取不到时静默跳过 —— 命盘本身的 caveats 已经说明了原因
     }
+  }
+  return out;
+}
+
+/**
+ * 本命年支 —— 神煞由它推出。
+ *
+ * 用法是古法的标准用法：本命红鸾在卯，则逢卯年为「红鸾年」。
+ * 所以神煞命中算**运层**（是那一年触发的），不是命层。
+ */
+function natalYearZhi(chart: ReturnType<typeof computeBaziChart>): string | null {
+  return chart.pillars.find((p) => p.position === '年柱')?.zhi ?? null;
+}
+
+/** 立春年 → 年支。 */
+function ZHI_OF_YEAR(year: number): string {
+  return liuNianGanZhi(year).charAt(1);
+}
+
+/** 某节气月的干支（取该月中气前后的一天，避开月界）。 */
+function monthGanZhi(year: number, monthIndex: number): string {
+  // 节气月序 1 = 寅月（约公历 2 月）。取该月 15 号前后一天足够避开交节。
+  const gregorianMonth = ((monthIndex + 1 - 1) % 12) + 1;
+  const y = monthIndex >= 12 ? year + 1 : year;
+  return Solar.fromYmdHms(y, gregorianMonth, 15, 12, 0, 0).getLunar().getMonthInGanZhiExact();
+}
+
+/**
+ * 流月层 token：流月十神 + 流月紫白 + 流月支触发的神煞。
+ *
+ * 这一层是「八月」这种说法的来源 —— 没有它，一切预测只能落到年。
+ */
+function monthTokensOf(
+  chart: ReturnType<typeof computeBaziChart>,
+  year: number,
+  monthIndex: number,
+): EventToken[] {
+  const out: EventToken[] = [];
+  const gz = monthGanZhi(year, monthIndex);
+  if (chart.dayMaster) {
+    const ss = shiShen(chart.dayMaster, gz.charAt(0));
+    if (ss) out.push({ token: ss, layer: '运' });
+  }
+  out.push({ token: STAR_NAME[monthlyStar(year, monthIndex)], layer: '运' });
+
+  const natal = natalYearZhi(chart);
+  if (natal) {
+    for (const s of shenShaHits(natal, [gz.charAt(1)])) out.push({ token: s, layer: '运' });
   }
   return out;
 }
@@ -210,43 +278,32 @@ function outlookFor(
   const resonance = analyseResonanceTagged(DICTIONARY, tagged);
 
   /**
-   * 排序时**优先取该年独有的象**。
+   * 具体事件 —— 这才是用户要看的东西。
    *
-   * 大运十神、紫微本命主星、宅飞星在一整段里都是常量，只按共振与先验排，
-   * 十年会给出十份一模一样的清单 —— 那样的「逐年预测」等于没有。
-   * 故先看这条象是不是由该年的运层 token（流年十神、流年紫白、流年四化）激活的，
-   * 是则排前面；不足三条时再用常量项补位。
+   * 象意（上面那个 resonance）退居解释位：用户追问「凭什么这么说」时才展开。
+   * 早先把象意直接当预测端出去，读起来是「竞争、创业、独当一面承压」，
+   * 那是古法的取象范畴，不是人话，更不是预判。
    */
-  const yunTokens = new Set(
-    [...mingTokensOf(chart, zw, year), ...yunTokensOf(chart, zw, year)]
-      .filter((t) => t.layer === '运')
-      .map((t) => t.token),
-  );
-  const picks = resonance
-    .flatMap((r) => r.admitted.map((e) => ({ entry: e, resonance: r.resonance })))
-    .sort((a, b) => {
-      const ay = yunTokens.has(a.entry.source.token) ? 1 : 0;
-      const by = yunTokens.has(b.entry.source.token) ? 1 : 0;
-      return by - ay || b.resonance - a.resonance || b.entry.prior - a.entry.prior;
-    })
-    .slice(0, MAX_PER_YEAR);
+  const events = predictYear(
+    year,
+    tagged,
+    (m) => monthTokensOf(chart, year, m),
+  ).slice(0, MAX_PER_YEAR);
 
-  const drafts: PredictionDraft[] = picks.map(({ entry, resonance: r }) => ({
+  /** 事件进账本 —— 断语就是事件名，判据就是事件模板写死的那一条。 */
+  const drafts: PredictionDraft[] = events.map((e) => ({
     personId: input.person.id,
     engineVersion: LIFE_ENGINE_VERSION,
     inputHash,
     window: { fromYear: year, toYear: year },
-    domain: entry.domain,
-    statement: entry.statement,
-    candidateXiangIds: [entry.id],
-    layers: resonance.find((x) => x.domain === entry.domain)?.layers ?? [entry.source.layer],
-    probability: outlookProbability(entry, r),
+    domain: e.domain,
+    statement: e.title,
+    candidateXiangIds: [`event.${e.templateId}`],
+    layers: e.layers,
+    probability: e.probability,
     baseRate: null,
-    resolution: {
-      criterion: `${year} 年内，是否确实发生过：${entry.statement}`,
-      judge: '用户自评',
-    },
-    interventionability: entry.interventionability,
+    resolution: { criterion: e.criterion, judge: '用户自评' },
+    interventionability: e.interventionability,
   }));
 
   const yearRow = timeline.years.find((x) => x.year === year);
@@ -275,13 +332,18 @@ function outlookFor(
       (yearRow && yearRow.fengShui.residences.length > 0 ? '（未建档）' : null),
     breakpoints: bps,
     resonance,
+    events,
     drafts,
     /**
      * 「留意」只标**这一年独有**的事：个人断点（换大运、搬家、施做化解）。
      * 早先还把「三层共振」算进来，结果每年都三层共振，标记因此毫无分辨力 ——
      * 满屏都是重点等于没有重点。
      */
-    notable: bps.some((b) => b.personal),
+    /**
+     * 「留意」= 这一年有个人断点（换大运、搬家、化解），或有凶事件出报。
+     * 不把三层共振算进来 —— 那个每年都有，标了等于没标。
+     */
+    notable: bps.some((b) => b.personal) || events.some((e) => e.valence === '凶'),
   };
 }
 

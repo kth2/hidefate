@@ -8,5 +8,6 @@
 export * from './types.js';
 export * from './tables.js';
 export * from './mingGua.js';
+export * from './shenSha.js';
 export * from './elementStrength.js';
 export * from './chart.js';
