@@ -15,7 +15,8 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import type { PropertyProfile } from '@hidefate/core-fengshui';
 import type { ResidencePeriod } from '@hidefate/core-synthesis';
 import type { PredictionRecord } from '@hidefate/core-ledger';
-import { AppBar, Empty, Expandable, Meter, Skeleton } from '../../components/mobile/ui';
+import { AppBar, Empty, Expandable, Meter, Sheet, Skeleton } from '../../components/mobile/ui';
+import { ResidenceEditor } from '../../components/mobile/ResidenceEditor';
 import { useProperty } from '../../lib/PropertyContext';
 import { db } from '../../lib/db';
 import type { PredictedEvent } from '@hidefate/core-events';
@@ -155,6 +156,7 @@ export default function LifePage() {
   const [residences, setResidences] = useState<ResidencePeriod[]>([]);
   const [records, setRecords] = useState<PredictionRecord[]>([]);
   const [msg, setMsg] = useState<string | null>(null);
+  const [editingResidence, setEditingResidence] = useState(false);
   const [aiText, setAiText] = useState('');
   const [aiBusy, setAiBusy] = useState(false);
   const [aiErr, setAiErr] = useState<string | null>(null);
@@ -299,6 +301,38 @@ export default function LifePage() {
             ))}
           </div>
         )}
+
+        {/* ── 居住史 ── 没有它风水层就全程缺席，所以入口摆在最前面。 */}
+        <section>
+          <h2 className="section-title">住过哪些地方</h2>
+          <button
+            type="button"
+            onClick={() => setEditingResidence(true)}
+            className="card flex w-full items-center gap-3 text-left active:bg-rice-deep/40"
+          >
+            <div className="min-w-0 flex-1">
+              {residences.length === 0 ? (
+                <>
+                  <p className="text-[0.9375rem]">还没有关联房屋</p>
+                  <p className="mt-1 text-[0.75rem] leading-relaxed text-ink-mute">
+                    风水层现在全程缺席，只有命与运两层在说话。把这个人住过的房子关联上
+                    （哪怕只记得大致朝向），预测会明显具体起来。
+                  </p>
+                </>
+              ) : (
+                <>
+                  <p className="text-[0.9375rem]">{residences.length} 段居住记录</p>
+                  <p className="mt-0.5 truncate text-[0.75rem] text-ink-mute">
+                    {residences.map((r) => `${r.fromYear}–${r.toYear ?? '今'}`).join('、')}
+                  </p>
+                </>
+              )}
+            </div>
+            <span className="shrink-0 text-[0.8125rem] text-cinnabar">
+              {residences.length === 0 ? '关联房屋' : '编辑'}
+            </span>
+          </button>
+        </section>
 
         {/* ── 一句话看懂今年 ── */}
         {narrative && (
@@ -575,6 +609,22 @@ export default function LifePage() {
           这些条目都没有人群基准率，所以它们是提醒，不是统计意义上的「准」。
         </p>
       </div>
+
+      <Sheet open={editingResidence} onClose={() => setEditingResidence(false)} title="居住史">
+        {person && (
+          <ResidenceEditor
+            personId={person.id}
+            properties={properties}
+            value={residences}
+            onChange={async (next) => {
+              const sorted = [...next].sort((a, b) => a.fromYear - b.fromYear);
+              setResidences(sorted);
+              await db().residences.where('personId').equals(person.id).delete();
+              await db().residences.bulkPut(sorted);
+            }}
+          />
+        )}
+      </Sheet>
     </>
   );
 }

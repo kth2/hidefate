@@ -17,8 +17,9 @@ const CONF_TONE: Record<string, string> = {
 };
 
 export default function MembersPage() {
-  const { property, members, loading, reload } = useProperty();
+  const { property, members, memberRows, loading, reload } = useProperty();
   const [adding, setAdding] = useState(false);
+  const [editing, setEditing] = useState<StoredMember | null>(null);
 
   if (loading) {
     return (
@@ -90,16 +91,28 @@ export default function MembersPage() {
                     {m.chart.input.gender} · {m.chart.input.year} 年{m.chart.zodiac && ` · 属${m.chart.zodiac}`}
                   </p>
                 </div>
-                <button
-                  type="button"
-                  className="min-h-[2.5rem] shrink-0 px-2 text-[0.8125rem] text-ink-mute active:text-cinnabar"
-                  onClick={async () => {
-                    await db().members.delete(m.id);
-                    reload();
-                  }}
-                >
-                  移除
-                </button>
+                <div className="flex shrink-0 items-center">
+                  <button
+                    type="button"
+                    className="min-h-[2.5rem] px-2 text-[0.8125rem] text-ink-mute active:text-cinnabar"
+                    onClick={() => {
+                      const row = memberRows.find((r) => r.id === m.id);
+                      if (row) setEditing(row);
+                    }}
+                  >
+                    编辑
+                  </button>
+                  <button
+                    type="button"
+                    className="min-h-[2.5rem] px-2 text-[0.8125rem] text-ink-mute active:text-cinnabar"
+                    onClick={async () => {
+                      await db().members.delete(m.id);
+                      reload();
+                    }}
+                  >
+                    移除
+                  </button>
+                </div>
               </div>
 
               <div className="mt-2 flex flex-wrap gap-1.5">
@@ -177,7 +190,7 @@ export default function MembersPage() {
       </div>
 
       <Sheet open={adding} onClose={() => setAdding(false)} title={<span className="font-serif text-[1.0625rem] font-semibold">添加成员</span>}>
-        <AddMemberWizard
+        <MemberWizard
           propertyId={property.id}
           onDone={() => {
             setAdding(false);
@@ -185,20 +198,47 @@ export default function MembersPage() {
           }}
         />
       </Sheet>
+
+      <Sheet open={editing != null} onClose={() => setEditing(null)} title={<span className="font-serif text-[1.0625rem] font-semibold">编辑成员</span>}>
+        {editing && (
+          <MemberWizard
+            propertyId={property.id}
+            member={editing}
+            onDone={() => {
+              setEditing(null);
+              reload();
+            }}
+          />
+        )}
+      </Sheet>
     </>
   );
 }
 
-/** 分步录入：一屏一件事，不做长表单。 */
-function AddMemberWizard({ propertyId, onDone }: { propertyId: string; onDone: () => void }) {
+/**
+ * 分步录入：一屏一件事，不做长表单。
+ *
+ * 传入 `member` 即为编辑模式：沿用原 id 与已有的常用房间等字段，只覆盖表单里这几项，
+ * 不新建记录，也不丢掉用户之前挂在这个人身上的房间关联。
+ */
+function MemberWizard({
+  propertyId,
+  member,
+  onDone,
+}: {
+  propertyId: string;
+  member?: StoredMember;
+  onDone: () => void;
+}) {
+  const editing = member != null;
   const [step, setStep] = useState(1);
-  const [name, setName] = useState('');
-  const [relation, setRelation] = useState('');
-  const [gender, setGender] = useState<'男' | '女'>('男');
-  const [year, setYear] = useState<number>(1990);
-  const [month, setMonth] = useState<number | ''>('');
-  const [day, setDay] = useState<number | ''>('');
-  const [hour, setHour] = useState<number | ''>('');
+  const [name, setName] = useState(member?.name ?? '');
+  const [relation, setRelation] = useState(member?.relation ?? '');
+  const [gender, setGender] = useState<'男' | '女'>((member?.gender as '男' | '女') ?? '男');
+  const [year, setYear] = useState<number>(member?.year ?? 1990);
+  const [month, setMonth] = useState<number | ''>(member?.month ?? '');
+  const [day, setDay] = useState<number | ''>(member?.day ?? '');
+  const [hour, setHour] = useState<number | ''>(member?.hour ?? '');
   const [saving, setSaving] = useState(false);
 
   const precision =
@@ -208,8 +248,9 @@ function AddMemberWizard({ propertyId, onDone }: { propertyId: string; onDone: (
     if (!name.trim()) return;
     setSaving(true);
     const rec: StoredMember = {
-      id: newId('m'),
-      propertyId,
+      ...member,
+      id: member?.id ?? newId('m'),
+      propertyId: member?.propertyId ?? propertyId,
       name: name.trim(),
       relation: relation.trim() || undefined,
       gender,
@@ -347,7 +388,7 @@ function AddMemberWizard({ propertyId, onDone }: { propertyId: string; onDone: (
               上一步
             </button>
             <button type="button" className="btn btn-primary flex-1" onClick={submit} disabled={saving}>
-              {saving ? '保存中…' : '完成'}
+              {saving ? '保存中…' : editing ? '保存修改' : '完成'}
             </button>
           </div>
         </div>
