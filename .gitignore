@@ -4,7 +4,11 @@ apps/web/out/
 dist/
 *.tsbuildinfo
 .DS_Store
-.env
-.env.local
+# 覆盖 .env.production / .env.*.local 等全部变体，只留示例文件
+.env*
+!.env.example
 apps/web/public/vendor/
 coverage/
+
+# 用户备份导出（「我的 → 导出」产出，内含姓名与出生时辰），绝不入库
+hidefate-备份-*.json
