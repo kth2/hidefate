@@ -33,6 +33,9 @@ const GAN = ['甲', '乙', '丙', '丁', '戊', '己', '庚', '辛', '壬', '癸
 /** 九宫按洛书方位排布：4 9 2 / 3 5 7 / 8 1 6。 */
 const GRID: readonly string[] = ['4', '9', '2', '3', '5', '7', '8', '1', '6'];
 
+/** 应验标准的最短字数。短于此数，几乎不可能写出日后能一口咬定的判据。 */
+const MIN_CRITERION_LEN = 6;
+
 export default function DivinationPage() {
   const { memberRows } = useProperty();
   const [rules, setRules] = useState<YongShenRule[] | null>(null);
@@ -118,7 +121,19 @@ export default function DivinationPage() {
     }
   }
 
-  const canCast = question.trim().length > 0 && criterion.trim().length >= 6 && !busy;
+  /**
+   * 起局被什么挡住 —— null 表示可以起。
+   *
+   * 从前这里是一个布尔 canCast，条件不满足就把按钮置灰。规矩本身是对的
+   * （判据先于盘面），可界面从不说差在哪，尤其「至少 6 个字」从未写在任何地方，
+   * 于是用户只看到一个按不动的按钮，以为功能坏了。改成把缺口直接讲出来。
+   */
+  const castBlocker = useMemo(() => {
+    if (question.trim().length === 0) return '先写清楚占什么事。';
+    const short = MIN_CRITERION_LEN - criterion.trim().length;
+    if (short > 0) return `应验标准还差 ${short} 个字 —— 要写成日后能一口咬定「中／没中」的样子。`;
+    return null;
+  }, [question, criterion]);
 
   return (
     <>
@@ -185,6 +200,11 @@ export default function DivinationPage() {
               />
               <span className="mt-1 block text-[0.6875rem] text-ink-mute">
                 「顺不顺利」「有起伏」这类写法会被拒收 —— 它们永远为真，记下来也没用。
+                至少 {MIN_CRITERION_LEN} 个字
+                {criterion.trim().length > 0 && criterion.trim().length < MIN_CRITERION_LEN && (
+                  <span className="text-cinnabar">（已写 {criterion.trim().length} 字）</span>
+                )}
+                。
               </span>
             </label>
 
@@ -225,9 +245,17 @@ export default function DivinationPage() {
               </p>
             )}
 
-            <button type="button" onClick={() => void cast()} disabled={!canCast} className="btn btn-primary btn-block">
+            <button
+              type="button"
+              onClick={() => void cast()}
+              disabled={castBlocker != null || busy}
+              className="btn btn-primary btn-block"
+            >
               {busy ? '起局中…' : '此刻起局'}
             </button>
+            {castBlocker && !busy && (
+              <p className="text-center text-[0.75rem] leading-relaxed text-ink-mute">{castBlocker}</p>
+            )}
 
             {offerGeneral && (
               <button
