@@ -19,6 +19,10 @@ import { AppBar, Empty, Expandable, Meter, Skeleton } from '../../components/mob
 import { useProperty } from '../../lib/PropertyContext';
 import { db } from '../../lib/db';
 import type { PredictedEvent } from '@hidefate/core-events';
+import { narratePalace } from '@hidefate/core-events';
+import { buildYearNarrative, curesOf, summaryPrompt } from '../../lib/lifeNarrative';
+import { chatStream, type AiConfig } from '../../lib/ai';
+import { loadSettings } from '../../lib/db';
 import {
   buildLifeView,
   freezeOutlook,
@@ -67,22 +71,43 @@ function PalaceRows({ palaces }: { palaces: readonly PalaceSnapshot[] }) {
     );
   }
   return (
-    <div className="space-y-1.5">
-      {active.map((p) => (
-        <div key={p.palace} className="flex items-start gap-2 text-[0.8125rem]">
-          <span className="w-10 shrink-0 text-ink-mute">{p.direction}</span>
-          <span className="min-w-0 flex-1">
-            <span className={p.comboNature === '凶' ? 'text-cinnabar' : p.comboNature === '吉' ? 'text-jade' : ''}>
-              {p.comboName}
-            </span>
-            <span className="text-ink-mute">（{p.shan}-{p.xiang}）</span>
-            <span className="ml-1 text-[0.6875rem] text-ink-mute">
-              流年{p.annual}入 · 动气{p.dongQiLevel}
-            </span>
-            <span className="mt-0.5 block text-[0.6875rem] leading-relaxed text-ink-mute">{p.dongQiNote}</span>
-          </span>
-        </div>
-      ))}
+    <div className="space-y-3">
+      {active.map((p) => {
+        const cures = curesOf(p);
+        const n = narratePalace({
+          direction: p.direction,
+          comboName: p.comboName,
+          comboMeaning: p.comboMeaning,
+          comboNature: p.comboNature,
+          dongQiLevel: p.dongQiLevel,
+          dongQiNote: p.dongQiNote,
+          roomWords: p.roomWords,
+          cures,
+        });
+        return (
+          <div key={p.palace} className="rounded-xl border border-rice-line bg-white p-3">
+            <p className={`text-[0.9375rem] font-medium leading-relaxed ${p.comboNature === '凶' ? 'text-cinnabar' : p.comboNature === '吉' ? 'text-jade' : ''}`}>
+              {n.headline}
+            </p>
+            <p className="mt-1.5 text-[0.8125rem] leading-relaxed text-ink-soft">{n.meaning}</p>
+            {n.action && (
+              <p className="mt-2 rounded-lg border border-jade/30 bg-jade/[0.05] p-2 text-[0.8125rem] leading-relaxed text-jade">
+                怎么办：{n.action}
+              </p>
+            )}
+            <details className="mt-2">
+              <summary className="flex min-h-11 cursor-pointer list-none items-center text-[0.75rem] text-ink-mute">
+                盘面细节
+              </summary>
+              <p className="pb-1 text-[0.75rem] leading-relaxed text-ink-mute">
+                {p.direction} · {p.comboName}（山星 {p.shan} 向星 {p.xiang}）· 今年流年 {p.annual} 飞入
+                <br />
+                {p.dongQiNote}
+              </p>
+            </details>
+          </div>
+        );
+      })}
     </div>
   );
 }
@@ -130,6 +155,9 @@ export default function LifePage() {
   const [residences, setResidences] = useState<ResidencePeriod[]>([]);
   const [records, setRecords] = useState<PredictionRecord[]>([]);
   const [msg, setMsg] = useState<string | null>(null);
+  const [aiText, setAiText] = useState('');
+  const [aiBusy, setAiBusy] = useState(false);
+  const [aiErr, setAiErr] = useState<string | null>(null);
 
   const person = useMemo(
     () => memberRows.find((m) => m.id === personId) ?? memberRows[0] ?? null,
@@ -174,6 +202,44 @@ export default function LifePage() {
     await load(person.id);
     setMsg(`已把 ${outlook.year} 年的 ${frozen.length} 条预测存入账本，到时候去对轨页结算。`);
   }
+
+  /**
+   * AI 综述 —— 架在确定性白话之上，不是它的替代。
+   * 喂进去的只有 `facts`（引擎算好的事实清单），system 提示写死不得新增。
+   */
+  async function runAiSummary() {
+    if (!view) return;
+    setAiBusy(true);
+    setAiErr(null);
+    setAiText('');
+    try {
+      const st = await loadSettings();
+      if (!st.aiBaseUrl || !st.aiModel) {
+        throw new Error('还没配置 AI。到「我的 → AI 设置」填一个 OpenAI 兼容端点即可 —— 不配也不影响上面的白话解读，那部分是本机算的。');
+      }
+      const years = [view.present, ...view.future.slice(0, 3)].map((o) => ({
+        year: o.year,
+        n: buildYearNarrative(o),
+      }));
+      const { system, user } = summaryPrompt(years, view.person.name);
+      const cfg: AiConfig = {
+        baseUrl: st.aiBaseUrl,
+        apiKey: st.aiApiKey ?? '',
+        model: st.aiModel,
+        direct: st.aiDirect ?? false,
+      };
+      await chatStream(cfg, [
+        { role: 'system', content: system },
+        { role: 'user', content: user },
+      ], (d) => setAiText((t) => t + d));
+    } catch (e) {
+      setAiErr(e instanceof Error ? e.message : String(e));
+    } finally {
+      setAiBusy(false);
+    }
+  }
+
+  const narrative = useMemo(() => (view ? buildYearNarrative(view.present) : null), [view]);
 
   const trackedYears = useMemo(
     () => new Set(records.map((r) => r.window.fromYear)),
@@ -232,6 +298,64 @@ export default function LifePage() {
               </button>
             ))}
           </div>
+        )}
+
+        {/* ── 一句话看懂今年 ── */}
+        {narrative && (
+          <section className="rounded-2xl border border-ink/10 bg-white p-4">
+            <p className="text-[0.75rem] text-ink-mute">一句话看懂今年</p>
+            <p className="mt-1.5 text-[1rem] font-medium leading-relaxed">{narrative.headline}</p>
+
+            {narrative.lines.length > 0 && (
+              <ul className="mt-3 space-y-2">
+                {narrative.lines.map((l, i) => (
+                  <li key={i} className="text-[0.875rem] leading-relaxed text-ink-soft">
+                    · {l}
+                  </li>
+                ))}
+              </ul>
+            )}
+
+            {narrative.terms.length > 0 && (
+              <details className="mt-3">
+                <summary className="flex min-h-11 cursor-pointer list-none items-center text-[0.75rem] text-ink-mute">
+                  上面这些词是什么意思（{narrative.terms.length}）
+                </summary>
+                <dl className="space-y-1.5 pb-1">
+                  {narrative.terms.map((t) => (
+                    <div key={t.term}>
+                      <dt className="inline text-[0.8125rem] font-medium">{t.term}</dt>
+                      <dd className="inline text-[0.8125rem] leading-relaxed text-ink-mute">　{t.plain}</dd>
+                    </div>
+                  ))}
+                </dl>
+              </details>
+            )}
+
+            <div className="mt-3 border-t border-rice-line pt-3">
+              {aiText ? (
+                <p className="whitespace-pre-wrap text-[0.875rem] leading-relaxed">{aiText}</p>
+              ) : (
+                <p className="text-[0.75rem] leading-relaxed text-ink-mute">
+                  上面这段是本机算出来的，不联网也有。想要一段更连贯的整体解读，可以让 AI 把
+                  未来几年一起串起来讲 —— 它只能引用已经算好的事实，不会自己编事件或改数字。
+                </p>
+              )}
+              {aiErr && (
+                <p className="mt-2 rounded-lg border border-gold/40 bg-gold/5 p-2.5 text-[0.75rem] leading-relaxed">
+                  {aiErr}
+                </p>
+              )}
+              <button
+                type="button"
+                onClick={() => void runAiSummary()}
+                disabled={aiBusy}
+                className="btn btn-block mt-2"
+              >
+                {aiBusy ? 'AI 正在写…' : aiText ? '重新生成' : '让 AI 串起来讲一遍'}
+              </button>
+            </div>
+          </section>
         )}
 
         {/* ── 现在 ── */}
@@ -296,6 +420,9 @@ export default function LifePage() {
         {/* ── 命盘概览 ── */}
         <section>
           <h2 className="section-title">这张盘</h2>
+          <p className="mb-2 text-[0.75rem] leading-relaxed text-ink-mute">
+            下面是术语部分，看不懂可以跳过 —— 上面那段白话已经是它推出来的结论。
+          </p>
           <div className="card space-y-2">
             <p className="text-[0.8125rem]">
               八字大运 {view.eras.length} 段

@@ -241,6 +241,8 @@ export interface PalaceSnapshot {
   readonly comboKey: string;
   readonly comboNature: '吉' | '凶' | '中';
   readonly comboMeaning: string;
+  /** 该宫有哪些房间 —— 「你家大门所在的正东」这句话的来源。 */
+  readonly roomWords: readonly string[];
   /** 动气强度 0–1 与分档。 */
   readonly dongQi: number;
   readonly dongQiLevel: string;
@@ -303,6 +305,7 @@ export function palaceSnapshots(
           comboKey: combo.key,
           comboNature: combo.nature,
           comboMeaning: combo.meaning,
+          roomWords: dq.sources.map((x) => x.label ?? x.kind),
           dongQi: dq.strength,
           dongQiLevel: dq.level,
           dongQiNote: dq.note,

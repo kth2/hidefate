@@ -166,10 +166,12 @@ export function predictEvents(
     if (resonance < tpl.minResonance) continue;
 
     const monthIndex = tpl.granularity === '月' ? (ctx.monthIndex ?? null) : null;
+    // 年级不写「年内」—— criterion 模板本身是「{窗口}内是否…」，
+    // 写成「2026 年内」会拼出「2026 年内内是否…」。实跑界面时看到的。
     const whenLabel =
       monthIndex != null
         ? `${ctx.year} 年 ${MONTH_LABEL[monthIndex] ?? `第 ${monthIndex} 月`}`
-        : `${ctx.year} 年内`;
+        : `${ctx.year} 年`;
 
     out.push({
       templateId: tpl.id,
