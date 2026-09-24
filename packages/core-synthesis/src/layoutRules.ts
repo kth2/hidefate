@@ -116,6 +116,8 @@ function mkCure(
     avoid,
     domains,
     urgency: SEV_URGENCY[severity],
+    // 布局体检只报硬伤，其化解一律是纠错。
+    intent: '化凶',
   };
 }
 

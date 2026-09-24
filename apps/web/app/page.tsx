@@ -3,7 +3,7 @@
 /** 首页 —— 站在屋里打开 App 时，最想先知道的三件事：今年如何、这屋如何、先做什么。 */
 
 import Link from 'next/link';
-import { STAR_NAME, annualStar, periodOfYear } from '@hidefate/core-fengshui';
+import { STAR_NAME, annualStar, periodOfYear, roomExposure } from '@hidefate/core-fengshui';
 import { RISK_COLOR, buildAlerts, yearGlance } from '@hidefate/core-synthesis';
 import { useMemo } from 'react';
 import { AppBar, Empty, Expandable, Meter, Skeleton } from '../components/mobile/ui';
@@ -13,6 +13,26 @@ export default function HomePage() {
   const { property, result, members, cures, year, monthIndex, loading, properties } = useProperty();
 
   const glance = useMemo(() => yearGlance(year), [year]);
+
+  /**
+   * 首页只放「化凶」且每个方位一条 —— 早先前三条常是同一个阳台的三种说法，
+   * 还夹着催吉的句子，看不出真正该先做哪件。
+   */
+  const topFixes = useMemo(() => {
+    if (!result) return [];
+    const seen = new Set<number>();
+    return result.prioritisedCures.filter((c) => {
+      if (c.intent !== '化凶' || seen.has(c.palace)) return false;
+      seen.add(c.palace);
+      return true;
+    }).slice(0, 3);
+  }, [result]);
+
+  /** 还没指定谁住的卧房、书房 —— 不指定，预测就落不到人身上。 */
+  const unassigned = useMemo(
+    () => (property?.rooms ?? []).filter((r) => roomExposure(r.kind) === '专属' && !(r.occupants?.length)),
+    [property],
+  );
 
   const alerts = useMemo(() => {
     if (!property) return [];
@@ -92,18 +112,33 @@ export default function HomePage() {
               </Link>
             </section>
 
+            {/* 谁住哪间 —— 预测落到人身上的前提 */}
+            {members.length > 0 && unassigned.length > 0 && (
+              <Link
+                href="/members"
+                className="block rounded-2xl border border-risk-warn/40 bg-risk-warn/[0.06] p-4 active:opacity-80"
+              >
+                <p className="text-[0.9375rem] font-medium">还没指定谁住哪间</p>
+                <p className="mt-1 text-[0.8125rem] leading-relaxed text-ink-soft">
+                  {unassigned.map((r) => r.label ?? r.kind).join('、')} 还没有住户。指定之后，
+                  每个人会看到自己房间的吉凶、自己的概率和床头该朝哪。
+                  <span className="text-cinnabar"> 去指定 ›</span>
+                </p>
+              </Link>
+            )}
+
             {/* 最该先做的事 */}
-            {result.prioritisedCures.length > 0 && (
+            {topFixes.length > 0 && (
               <section>
                 <h2 className="section-title">先做这几件</h2>
                 <div className="space-y-2">
-                  {result.prioritisedCures.slice(0, 3).map((c) => (
+                  {topFixes.map((c, i) => (
                     <Expandable
                       key={`${c.palace}-${c.priority}`}
                       title={
                         <span className="flex items-start gap-2">
                           <span className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-ink text-[0.75rem] text-white">
-                            {c.priority}
+                            {i + 1}
                           </span>
                           {/* 同一宫常有多条化解，只显示方位会三条长得一模一样 —— 带上动作首句才分得清 */}
                           <span className="min-w-0 flex-1">

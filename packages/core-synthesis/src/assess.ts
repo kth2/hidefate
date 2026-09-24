@@ -25,6 +25,7 @@ import {
   assessMissingCorner,
   buildFlyingStarChart,
   buildHouseBaZhai,
+  cureIntentOf,
   deriveCombination,
   floorAdjustment,
   missingAt,
@@ -407,6 +408,7 @@ export function synthesise(input: AnalysisInput): SynthesisResult {
       rooms,
       score,
       hostile,
+      qmScore: qmCell?.score ?? 0,
     });
 
     const dedupSchools = Array.from(new Set(breakdownSchools));
@@ -523,6 +525,7 @@ interface CureContext {
   rooms: ReturnType<typeof roomsInPalace>;
   score: number;
   hostile: WuXing[];
+  qmScore: number;
 }
 
 /** 为单宫生成化解清单。 */
@@ -541,6 +544,7 @@ function buildCures(palace: PalaceIndex, ctx: CureContext): Cure[] {
 
   if (ctx.score < 0.1) {
     ctx.combo.cures.forEach((action, i) => {
+      const intent = cureIntentOf(ctx.combo, action);
       out.push({
         priority: basePriority + i,
         palace,
@@ -548,9 +552,11 @@ function buildCures(palace: PalaceIndex, ctx: CureContext): Cure[] {
         room: roomLabel,
         action,
         rationale: `${ctx.combo.name}：${ctx.combo.meaning}`,
-        avoid: forbiddenFor(ctx.hostile),
+        avoid: intent === '化凶' ? forbiddenFor(ctx.hostile) : [],
         domains: ctx.combo.domains,
-        urgency,
+        // 催吉与维持从不「立即」—— 不做也不会出事，排在化凶之后。
+        urgency: intent === '化凶' ? urgency : '可从容安排',
+        intent,
       });
     });
   }
@@ -566,6 +572,7 @@ function buildCures(palace: PalaceIndex, ctx: CureContext): Cure[] {
         avoid: [],
         domains: ['健康', '人丁'],
         urgency: '本年内',
+        intent: '化凶',
       });
     });
   }
@@ -582,6 +589,7 @@ function buildCures(palace: PalaceIndex, ctx: CureContext): Cure[] {
       avoid: MATERIAL_BY_WUXING[reverseGenerate(wx)].slice(0, 3),
       domains: STAR_META[ctx.stars.annual].riskDomains,
       urgency,
+      intent: '化凶',
     });
   }
   if (ctx.bzStar && !YOU_NIAN_META[ctx.bzStar].auspicious && roomWeight >= 0.7) {
@@ -595,6 +603,7 @@ function buildCures(palace: PalaceIndex, ctx: CureContext): Cure[] {
       avoid: [],
       domains: ['健康', '感情'],
       urgency,
+      intent: '化凶',
     });
   }
   for (const a of ctx.qmAdvice) {
@@ -608,6 +617,7 @@ function buildCures(palace: PalaceIndex, ctx: CureContext): Cure[] {
       avoid: [],
       domains: ['事业', '财运'],
       urgency: '可从容安排',
+      intent: ctx.qmScore < 0 ? '化凶' : '催吉',
     });
   }
   return out;
@@ -630,8 +640,14 @@ export function mergeCures(cures: readonly Cure[]): Cure[] {
     if (!prev || c.priority < prev.priority) seen.set(key, c);
   }
   const urgencyRank: Record<Cure['urgency'], number> = { 立即: 0, 本年内: 1, 可从容安排: 2 };
+  const intentRank: Record<Cure['intent'], number> = { 化凶: 0, 催吉: 1, 维持: 2 };
   return [...seen.values()]
-    .sort((a, b) => urgencyRank[a.urgency] - urgencyRank[b.urgency] || a.priority - b.priority)
+    .sort(
+      (a, b) =>
+        urgencyRank[a.urgency] - urgencyRank[b.urgency] ||
+        intentRank[a.intent] - intentRank[b.intent] ||
+        a.priority - b.priority,
+    )
     .map((c, i) => ({ ...c, priority: i + 1 }));
 }
 

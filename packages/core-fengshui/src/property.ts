@@ -320,6 +320,44 @@ export function roomNature(kind: RoomKind): RoomNature {
   return ROOM_META[kind].nature;
 }
 
+/**
+ * 一间房对「人」的影响方式 —— 按人拆分风水影响的关键。
+ *
+ *   专属   —— 睡在这里或长时间坐在这里的人才受它影响（卧房、书房、办公位…），
+ *            须指定使用者；没指定就不知道影响的是谁，不能摊给全家。
+ *   共用   —— 全家天天经过、共用的地方（大门、客厅、厨房、神位…），人人都受影响，但比自己的卧房轻。
+ *   少停留 —— 卫浴、储藏、楼梯、阳台之类，停留短，对个人影响最轻。
+ */
+export type RoomExposure = '专属' | '共用' | '少停留';
+
+const PERSONAL_ROOMS: ReadonlySet<RoomKind> = new Set<RoomKind>([
+  '主卧', '次卧', '儿童房', '老人房', '客房', '佣人房',
+  '书房', '办公位', '老板位', '收银台', '讲台', '诊疗室', '机台区',
+]);
+const SHARED_ROOMS: ReadonlySet<RoomKind> = new Set<RoomKind>([
+  '大门', '后门', '侧门', '玄关', '客厅', '餐厅', '家庭厅', '厨房', '灶位',
+  '神位', '祖先牌位', '会议室', '前台接待', '教室座区',
+]);
+
+export function roomExposure(kind: RoomKind): RoomExposure {
+  if (PERSONAL_ROOMS.has(kind)) return '专属';
+  if (SHARED_ROOMS.has(kind)) return '共用';
+  return '少停留';
+}
+
+/**
+ * 某人受某间房影响的程度 0–1。
+ *
+ * 自己的专属房 1；共用房人人 0.6；少停留 0.25；别人的专属房 0（不住那里）。
+ * 专属房未指定使用者时返回 0 —— 宁可不下结论，也不把卧房的吉凶摊给全家。
+ */
+export function exposureOf(room: RoomPlacement, memberId: string): number {
+  const kind = roomExposure(room.kind);
+  if (kind === '专属') return room.occupants?.includes(memberId) ? 1 : 0;
+  if (room.occupants?.includes(memberId)) return 1;
+  return kind === '共用' ? 0.6 : 0.25;
+}
+
 /** 按分类取房间种类，供 UI 分组。 */
 export function roomKindsByCategory(category: RoomCategory): RoomKind[] {
   return (Object.keys(ROOM_META) as RoomKind[]).filter((k) => ROOM_META[k].category === category);

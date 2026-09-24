@@ -9,16 +9,17 @@
  */
 
 import {
-  OUTER_PALACES,
   PALACE_DIRECTION,
   ROOM_PRIORITY,
   YOU_NIAN_META,
   crossPersonHouse,
+  exposureOf,
   personalDirections,
+  roomExposure,
   type PalaceIndex,
 } from '@hidefate/core-fengshui';
 import { synthesise } from './assess.js';
-import { predict } from './predict.js';
+import { predict, probabilityFor } from './predict.js';
 import type { AnalysisInput, Member, SynthesisResult } from './types.js';
 
 export interface MemberFit {
@@ -79,15 +80,21 @@ function verdictOf(score: number): MemberFit['verdict'] {
 export function memberFit(s: SynthesisResult, m: Member): MemberFit {
   const cells = crossPersonHouse(s.baZhai.houseGua, m.mingGua.gua as never);
 
-  // 契合度：以「实际有房间的宫位」加权，而非八方平均 —— 人不住的地方不该拉分。
+  /**
+   * 契合度：按**此人实际用到的地方**加权 —— 自己的卧房、书桌最重，全家共用处次之，
+   * 别人的卧房不计。早先按全屋八方平均，同为东四命的一家人分数几乎必然相同，
+   * 于是「最受助益者」与「最受压制者」都是 51 分，报告自相矛盾。
+   *
+   * 个人部分只取「此方于其命」那颗八宅星；宅之八宅星对全家相同，已在宫位分里。
+   */
+  const personal = (p: PalaceIndex) =>
+    p === 5 ? 0 : YOU_NIAN_META[cells[p as Exclude<PalaceIndex, 5>].personStar].power / 3;
   let numer = 0;
   let denom = 0;
-  for (const p of OUTER_PALACES) {
-    const rooms = s.profile.rooms.filter((r) => r.primaryPalace === p);
-    const w = rooms.length ? Math.max(...rooms.map((r) => ROOM_PRIORITY[r.kind])) : 0.25;
-    const cell = cells[p as Exclude<PalaceIndex, 5>];
-    // cell.score ∈ [-6, 6]；再叠加该宫飞星综合分
-    const combined = (cell.score / 6) * 0.6 + s.palaces[p].score * 0.4;
+  for (const r of s.profile.rooms) {
+    const w = exposureOf(r, m.id) * ROOM_PRIORITY[r.kind];
+    if (w <= 0) continue;
+    const combined = personal(r.primaryPalace) * 0.6 + s.palaces[r.primaryPalace].score * 0.4;
     numer += combined * w;
     denom += w;
   }
@@ -96,7 +103,7 @@ export function memberFit(s: SynthesisResult, m: Member): MemberFit {
   const scored = s.profile.rooms.map((r) => {
     const p = r.primaryPalace;
     const cell = p === 5 ? null : cells[p as Exclude<PalaceIndex, 5>];
-    const combined = (cell ? cell.score / 6 : 0) * 0.6 + s.palaces[p].score * 0.4;
+    const combined = personal(p) * 0.6 + s.palaces[p].score * 0.4;
     return {
       roomId: r.id,
       label: r.label ?? r.kind,
@@ -162,15 +169,17 @@ export function buildFamilyFusionReport(
     const sy = synthesise(yi);
     const preds = predict(yi, sy);
     for (const m of input.members) {
-      const mine = preds.filter((p) => p.memberIds.includes(m.id));
+      const mine = preds
+        .map((p) => ({ p, risk: probabilityFor(p, m.id) }))
+        .filter((x): x is { p: typeof preds[number]; risk: number } => x.risk != null);
       if (mine.length === 0) continue;
-      const worst = mine.reduce((a, b) => (b.probability > a.probability ? b : a));
-      if (worst.probability >= 0.55) {
+      const { p: worst, risk } = mine.reduce((a, b) => (b.risk > a.risk ? b : a));
+      if (risk >= 0.55) {
         conflictYears.push({
           year: y,
           memberId: m.id,
           name: m.name,
-          risk: worst.probability,
+          risk,
           reason: `${worst.direction}${worst.room ? `的${worst.room}` : ''}：${worst.headline}`,
         });
       }
@@ -178,36 +187,53 @@ export function buildFamilyFusionReport(
   }
   conflictYears.sort((a, b) => b.risk - a.risk || a.year - b.year);
 
-  // 房间分配建议：把每间关键房间配给最合适的人
+  /**
+   * 房间分配建议 —— 只针对能分配给人的房间（卧房、书房、办公位）。
+   * 大门、厨房、客厅是全家共用的，谈不上「最宜谁住」。
+   */
   const advice: string[] = [];
   const keyRooms = s.profile.rooms
-    .filter((r) => ROOM_PRIORITY[r.kind] >= 0.5)
+    .filter((r) => roomExposure(r.kind) === '专属' && ROOM_PRIORITY[r.kind] >= 0.5)
     .sort((a, b) => ROOM_PRIORITY[b.kind] - ROOM_PRIORITY[a.kind]);
+  const starOf = (memberId: string, p: PalaceIndex) => {
+    if (p === 5) return null;
+    const mm = input.members.find((x) => x.id === memberId)!;
+    return crossPersonHouse(s.baZhai.houseGua, mm.mingGua.gua as never)[p as Exclude<PalaceIndex, 5>].personStar;
+  };
   for (const room of keyRooms) {
+    const name = `「${room.label ?? room.kind}」（${PALACE_DIRECTION[room.primaryPalace]}）`;
     const ranked = fits
       .map((f) => {
-        const hit = [...f.bestRooms, ...f.worstRooms].find((r) => r.roomId === room.id);
-        const p = room.primaryPalace;
-        const cells = crossPersonHouse(s.baZhai.houseGua, input.members.find((m) => m.id === f.memberId)!.mingGua.gua as never);
-        const cell = p === 5 ? null : cells[p as Exclude<PalaceIndex, 5>];
-        return { f, score: cell ? cell.score : 0, hit };
+        const star = starOf(f.memberId, room.primaryPalace);
+        return { f, star, power: star ? YOU_NIAN_META[star].power : 0 };
       })
-      .sort((a, b) => b.score - a.score);
+      .sort((a, b) => b.power - a.power);
     const best = ranked[0];
-    const worst = ranked[ranked.length - 1];
-    if (!best) continue;
-    if (ranked.length === 1) {
-      advice.push(`「${room.label ?? room.kind}」（${PALACE_DIRECTION[room.primaryPalace]}）：${best.f.name} 于此得${best.score >= 1 ? '吉' : best.score <= -1 ? '凶' : '平'}，${best.score <= -1 ? '建议另择四吉方' : '可用'}。`);
-    } else if (best.score !== worst!.score) {
+    if (!best || !best.star) continue;
+    const users = ranked.filter((x) => room.occupants?.includes(x.f.memberId));
+    const badUsers = users.filter((x) => x.power < 0);
+    if (users.length === 0) {
       advice.push(
-        `「${room.label ?? room.kind}」（${PALACE_DIRECTION[room.primaryPalace]}）最宜 ${best.f.name}（${best.f.mingGua}命，得吉）；` +
-        `最忌 ${worst!.f.name}（${worst!.f.mingGua}命，得凶）—— 若目前正是 ${worst!.f.name} 使用，建议与 ${best.f.name} 对调。`,
+        best.power > 0
+          ? `${name}还没指定谁住；按命卦最宜 ${best.f.name}（于其命为「${best.star}」）。`
+          : `${name}还没指定谁住；此方对全家都不算吉，谁住都要把床头转向本人的四吉方。`,
+      );
+    } else if (badUsers.length > 0) {
+      const alt = ranked.find((x) => x.power > 0 && !users.some((u) => u.f.memberId === x.f.memberId));
+      advice.push(
+        `${name}现由 ${badUsers.map((u) => `${u.f.name}（其「${u.star}」方）`).join('、')} 使用，于其命不利。` +
+        (alt
+          ? `可考虑与 ${alt.f.name}（其「${alt.star}」方）对调；不便对调，至少把床头转向本人的四吉方。`
+          : '家里没有更合适的人选，把床头转向本人的四吉方即可。'),
       );
     }
   }
 
-  const helped = sortedFits[0] ?? null;
-  const harmed = sortedFits.length > 1 ? sortedFits[sortedFits.length - 1]! : null;
+  // 分数拉不开时不硬分高下 —— 相差不到 5 分还说「最受益／最受压制」，就是在编。
+  const MIN_SPREAD = 5;
+  const spread = sortedFits.length > 1 ? sortedFits[0]!.fitScore - sortedFits[sortedFits.length - 1]!.fitScore : 0;
+  const helped = sortedFits.length === 1 || spread >= MIN_SPREAD ? (sortedFits[0] ?? null) : null;
+  const harmed = spread >= MIN_SPREAD ? sortedFits[sortedFits.length - 1]! : null;
 
   return {
     propertyName: s.profile.name,
@@ -222,6 +248,7 @@ export function buildFamilyFusionReport(
     summary:
       `${s.profile.name}（${s.baZhai.label}，${s.flyingStar.period.label}，${s.flyingStar.pattern}）与全家契合度 ${familyFitScore}/100，判「${verdictOf(familyFitScore)}」。` +
       (helped ? `最受本宅助益者：${helped.name}（${helped.mingGua}命，${helped.fitScore}/100）。` : '') +
+      (!helped && sortedFits.length > 1 ? '全家与本宅的契合度相近，没有特别受益或受压制的人。' : '') +
       (harmed && harmed.memberId !== helped?.memberId ? `最受本宅压制者：${harmed.name}（${harmed.mingGua}命，${harmed.fitScore}/100），应优先为其调整房间与床向。` : '') +
       (conflictYears.length
         ? `未来 ${conflictSpan} 年内需重点留意：${conflictYears.slice(0, 3).map((c) => `${c.year} 年 ${c.name}`).join('、')}。`

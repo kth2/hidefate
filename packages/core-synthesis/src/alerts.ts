@@ -162,7 +162,8 @@ export function buildAlerts(
             `本月流月${STAR_NAME[mStar]}加临，与本宫「${a.combinationName}」及流年${STAR_NAME[a.stars.annual]}叠加。` +
             `${meta.whenDeclining}。${occupants.length ? `此房使用者：${occupants.join('、')}。` : ''}` +
             `此宫全年评级为「${a.riskLevel}」，本月为其中较险的一段。`,
-          action: a.cures[0]?.action ?? `本月此方保持静置，避免动土、搬迁与长时间停留。`,
+          // 只取化凶 —— 这是凶星加临的提醒，配催吉的话等于答非所问
+          action: a.cures.find((c) => c.intent === '化凶')?.action ?? `本月此方保持静置，避免动土、搬迁与长时间停留。`,
         });
       }
     }
