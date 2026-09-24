@@ -133,6 +133,19 @@ describe('纪律三：复占留档，不许挑答案', () => {
     expect(v.previous).toHaveLength(2);
   });
 
+  it('作废的旧占同样计入序号 —— 作废不退号，挑答案的口子不因作废重开', () => {
+    const key = divinationKey(REQ);
+    const v = checkRepeat(
+      [
+        { key, castAt: new Date().toISOString(), windowDays: 45, status: '已作废' },
+        { key, castAt: new Date().toISOString(), windowDays: 45, status: '已作废' },
+      ],
+      key,
+    );
+    expect(v.sequence).toBe(3);
+    expect(v.reason).toContain('2 次已作废');
+  });
+
   it('别人的占不计入我的序号', () => {
     const v = checkRepeat(
       [{ key: 'deadbeef', castAt: new Date().toISOString(), windowDays: 45, status: '待结算' }],

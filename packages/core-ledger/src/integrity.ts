@@ -96,6 +96,7 @@ export function isCalibratable(record: PredictionRecord): boolean {
 
 /** 排除原因说明，供 UI 解释「为什么这条不算数」。 */
 export function calibrationExclusionReason(record: PredictionRecord): string | null {
+  if (record.status === '已作废') return '已作废 —— 使用者撤下的记录，不参与校准。';
   if (record.status !== '已结算') return '尚未结算。';
   if (record.intervened) {
     return '窗口内施做过化解 —— 无法区分是化解生效还是预测本来就错，故不参与校准。';

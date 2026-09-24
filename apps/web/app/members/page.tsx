@@ -7,6 +7,7 @@ import { useState } from 'react';
 import { PALACE_DIRECTION, personalDirections } from '@hidefate/core-fengshui';
 import { AppBar, Empty, Expandable, Sheet, Skeleton } from '../../components/mobile/ui';
 import { useProperty } from '../../lib/PropertyContext';
+import { deleteMember, describeImpact, memberDeletionImpact } from '../../lib/cascade';
 import { db, newId, type StoredMember } from '../../lib/db';
 
 const CONF_TONE: Record<string, string> = {
@@ -106,7 +107,13 @@ export default function MembersPage() {
                     type="button"
                     className="min-h-[2.5rem] px-2 text-[0.8125rem] text-ink-mute active:text-cinnabar"
                     onClick={async () => {
-                      await db().members.delete(m.id);
+                      const extra = describeImpact(await memberDeletionImpact(m.id), { includeMembers: false });
+                      const msg =
+                        `确定移除「${m.name}」？` +
+                        (extra ? `此人名下的 ${extra} 会一并删除，` : '') +
+                        '且无法撤销。';
+                      if (!confirm(msg)) return;
+                      await deleteMember(m.id);
                       reload();
                     }}
                   >

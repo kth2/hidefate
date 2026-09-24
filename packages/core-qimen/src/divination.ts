@@ -81,7 +81,8 @@ export interface OpenDivination {
   /** ISO 时刻。 */
   readonly castAt: string;
   readonly windowDays: number;
-  readonly status: '待结算' | '已结算' | '窗口过期';
+  /** `已作废` 的局照样传进来 —— 作废不退号，编号照算。 */
+  readonly status: '待结算' | '已结算' | '窗口过期' | '已作废';
 }
 
 export interface DivinationContext {
@@ -251,12 +252,14 @@ export function checkRepeat(
     return { isRepeat: false, sequence: 1, previous: [], reason: '同一事项的首次起局。' };
   }
   const pending = previous.filter((d) => d.status === '待结算').length;
+  const voided = previous.filter((d) => d.status === '已作废').length;
   return {
     isRepeat: true,
     sequence,
     previous,
     reason:
-      `同一事项已占过 ${previous.length} 次（其中 ${pending} 次未结算），本局记为第 ${sequence} 次。` +
+      `同一事项已占过 ${previous.length} 次（其中 ${pending} 次未结算` +
+      `${voided ? `、${voided} 次已作废` : ''}），本局记为第 ${sequence} 次。` +
       '每一次都会留档 —— 到期请把每一局各自结算，不要只认最合心意的那一局，' +
       '否则这批记录对校准就没有价值了。',
   };

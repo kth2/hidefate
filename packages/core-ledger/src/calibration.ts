@@ -52,7 +52,9 @@ export function summariseCalibration(
       continue;
     }
     const key =
-      r.status !== '已结算' ? '未结算' : r.intervened ? '窗口内已化解' : '无基准率';
+      r.status === '已作废' ? '已作废'
+        : r.status !== '已结算' ? '未结算'
+          : r.intervened ? '窗口内已化解' : '无基准率';
     excluded[key] = (excluded[key] ?? 0) + 1;
   }
 
