@@ -11,7 +11,7 @@ import { deleteProperty, describeImpact, propertyDeletionImpact } from '../../li
 import { exportAll, importAll } from '../../lib/db';
 
 export default function MePage() {
-  const { properties, property, activeId, setActive, reload, year, setYear, enableQiMen, setEnableQiMen } = useProperty();
+  const { properties, property, members, activeId, setActive, reload, year, setYear, enableQiMen, setEnableQiMen } = useProperty();
   const [switching, setSwitching] = useState(false);
   const [msg, setMsg] = useState<string | null>(null);
 
@@ -106,10 +106,79 @@ export default function MePage() {
           </section>
         )}
 
-        {/* 更多分析 */}
+        {/* 家人 —— 这房子对每个人的影响，一人一页 */}
         {property && (
           <section>
-            <h2 className="section-title">更多</h2>
+            <h2 className="section-title">家人</h2>
+            <div className="overflow-hidden rounded-2xl border border-rice-line bg-white">
+              {members.map((m) => (
+                <Link key={m.id} href={`/person?id=${encodeURIComponent(m.id)}`} className="row">
+                  <span className="flex-1">
+                    这屋对{m.name}
+                    <span className="block text-[0.75rem] text-ink-mute">
+                      {m.relation ? `${m.relation} · ` : ''}{m.mingGua.gua}{m.mingGua.number}命 · 今年各方面、逐月、该做的事
+                    </span>
+                  </span>
+                  <Chevron />
+                </Link>
+              ))}
+              <Link href="/members" className="row">
+                <span className="flex-1">
+                  成员管理
+                  <span className="block text-[0.75rem] text-ink-mute">添加成员、生辰、住哪间</span>
+                </span>
+                <Chevron />
+              </Link>
+            </div>
+          </section>
+        )}
+
+        {/* 看分析 */}
+        {property && (
+          <section>
+            <h2 className="section-title">看分析</h2>
+            <div className="overflow-hidden rounded-2xl border border-rice-line bg-white">
+              <Link href="/analysis/fusion" className="row">
+                <span className="flex-1">
+                  家庭融合报告
+                  <span className="block text-[0.75rem] text-ink-mute">谁最受益、谁该换房、未来高冲突年份</span>
+                </span>
+                <Chevron />
+              </Link>
+              <Link href="/analysis/matrix" className="row">
+                <span className="flex-1">
+                  房间 × 成员 风险矩阵
+                  <span className="block text-[0.75rem] text-ink-mute">每个人在每间房的实际影响</span>
+                </span>
+                <Chevron />
+              </Link>
+              <Link href="/analysis/timeline" className="row">
+                <span className="flex-1">
+                  宅运时间轴
+                  <span className="block text-[0.75rem] text-ink-mute">这处房子未来十二年的起伏</span>
+                </span>
+                <Chevron />
+              </Link>
+              <Link href="/analysis/ask" className="row">
+                <span className="flex-1">
+                  问答与 AI 对话
+                </span>
+                <Chevron />
+              </Link>
+              <Link href="/report" className="row">
+                <span className="flex-1">
+                  生成 PDF 报告
+                </span>
+                <Chevron />
+              </Link>
+            </div>
+          </section>
+        )}
+
+        {/* 调整与记录 */}
+        {property && (
+          <section>
+            <h2 className="section-title">调整与记录</h2>
             <div className="overflow-hidden rounded-2xl border border-rice-line bg-white">
               <Link href="/edit" className="row">
                 <span className="flex-1">
@@ -121,16 +190,7 @@ export default function MePage() {
               <Link href="/rooms" className="row">
                 <span className="flex-1">
                   房间管理
-                  <span className="block text-[0.75rem] text-ink-mute">
-                    增删改房间与楼层，{property.rooms.length} 个已标注
-                  </span>
-                </span>
-                <Chevron />
-              </Link>
-              <Link href="/members" className="row">
-                <span className="flex-1">
-                  成员管理
-                  <span className="block text-[0.75rem] text-ink-mute">生辰、性别、常用房间</span>
+                  <span className="block text-[0.75rem] text-ink-mute">增删改房间与楼层，{property.rooms.length} 个已标注</span>
                 </span>
                 <Chevron />
               </Link>
@@ -141,37 +201,18 @@ export default function MePage() {
                 </span>
                 <Chevron />
               </Link>
-              <Link href="/calibrate" className="row">
+              <Link href="/analysis/cures" className="row">
                 <span className="flex-1">
-                  对轨 · 用真实经历收敛取象
-                  <span className="block text-[0.75rem] text-ink-mute">
-                    先出回溯并锁定，再由你逐条评 —— 系统据此学你这盘走哪条道
-                  </span>
+                  化解追踪与回访
+                  <span className="block text-[0.75rem] text-ink-mute">做了哪些化解、效果如何</span>
                 </span>
                 <Chevron />
               </Link>
-              <Link href="/analysis/timeline" className="row">
-                <span className="flex-1">宅运时间轴</span>
-                <Chevron />
-              </Link>
-              <Link href="/analysis/matrix" className="row">
-                <span className="flex-1">房间 × 成员 风险矩阵</span>
-                <Chevron />
-              </Link>
-              <Link href="/analysis/fusion" className="row">
-                <span className="flex-1">家庭融合报告</span>
-                <Chevron />
-              </Link>
-              <Link href="/analysis/cures" className="row">
-                <span className="flex-1">化解追踪与回访</span>
-                <Chevron />
-              </Link>
-              <Link href="/analysis/ask" className="row">
-                <span className="flex-1">问答与 AI 对话</span>
-                <Chevron />
-              </Link>
-              <Link href="/report" className="row">
-                <span className="flex-1">生成 PDF 报告</span>
+              <Link href="/calibrate" className="row">
+                <span className="flex-1">
+                  对轨 · 用真实经历收敛取象
+                  <span className="block text-[0.75rem] text-ink-mute">先出回溯并锁定，再由你逐条评 —— 系统据此学你这盘走哪条道</span>
+                </span>
                 <Chevron />
               </Link>
             </div>
