@@ -16,3 +16,4 @@ export * from './types.js';
 export * from './loader.js';
 export * from './shanXiang.js';
 export * from './divination.js';
+export * from './reading.js';

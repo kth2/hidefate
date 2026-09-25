@@ -188,6 +188,43 @@ export interface Divination {
   readonly caveats: readonly string[];
 }
 
+/* ============ 占类补充关键词 ============ */
+
+/**
+ * 日常说法 → 占类。
+ *
+ * 上游引擎的占类关键词偏古（「功名」「词讼」），「这次换工作能成吗」这种最常见的问法它认不出，
+ * 于是界面自带的示例问题本身就起不了局。vendor 目录禁止就地修改，所以补在这里：
+ * 只在上游认不出、且使用者没有手动选占类时才用，并在盘上注明「按哪个词归的类」。
+ * 顺序有意义：具体的在前（「考试」先于「钱」），免得被宽泛的词抢走。
+ */
+const EVERYDAY_KEYWORDS: readonly [string, readonly string[]][] = [
+  ['怀孕', ['怀孕', '备孕', '生孩子', '生子', '怀上']],
+  ['疾病', ['病', '手术', '住院', '身体', '健康', '康复', '检查结果', '治疗']],
+  ['官司', ['官司', '诉讼', '起诉', '法院', '仲裁', '判决']],
+  ['讨债', ['欠款', '欠钱', '还钱', '讨债', '追款', '借出去']],
+  ['寻物', ['丢了', '丢失', '找不到', '遗失', '不见了']],
+  ['婚姻', ['结婚', '婚', '恋爱', '对象', '男朋友', '女朋友', '复合', '分手', '感情', '相亲', '伴侣', '另一半']],
+  ['竞赛', ['比赛', '竞赛', '竞标', '投标', '选拔', '评选']],
+  ['功名', ['工作', '求职', '面试', '录用', 'offer', '升职', '升迁', '晋升', '转正', '考试', '考公', '考研', '考证', '升学', '录取', '岗位', '职位', '应聘', '跳槽']],
+  ['出行', ['出差', '旅行', '旅游', '出国', '出门', '远行', '签证', '航班']],
+  ['家宅', ['搬家', '买房', '卖房', '租房', '装修', '房子', '家里']],
+  ['文书音讯', ['消息', '通知', '回复', '审批', '批下来', '合同', '签约', '邮件']],
+  ['行人', ['回来', '回家', '归期', '到家']],
+  ['口舌斗殴', ['吵架', '争执', '冲突', '打架']],
+  ['求财', ['钱', '赚', '投资', '生意', '收入', '股票', '基金', '盈利', '回本', '奖金', '加薪', '财', '买卖']],
+];
+
+/** 按日常说法猜占类；猜不出返回 null。 */
+export function suggestCategory(question: string): { category: string; keyword: string } | null {
+  const q = question.toLowerCase();
+  for (const [category, words] of EVERYDAY_KEYWORDS) {
+    const hit = words.find((w) => q.includes(w.toLowerCase()));
+    if (hit) return { category, keyword: hit };
+  }
+  return null;
+}
+
 /* ============ 查重键 ============ */
 
 /** FNV-1a 32 位。只用于查重，不作安全用途。 */
@@ -409,7 +446,18 @@ export async function castDivination(
     ...(req.fallbackCategory != null ? { fallbackCategory: req.fallbackCategory } : {}),
     ...(req.nianMingGan != null ? { nianMingGan: req.nianMingGan } : {}),
   };
-  const sel = engine.feipanPredict.selectYongShen(pan, req.question, opts);
+  let sel = engine.feipanPredict.selectYongShen(pan, req.question, opts);
+  let categoryHint: string | null = null;
+  if (!sel.matched && req.category == null) {
+    const guess = suggestCategory(req.question);
+    if (guess) {
+      const retry = engine.feipanPredict.selectYongShen(pan, req.question, { ...opts, category: guess.category });
+      if (retry.matched) {
+        sel = retry;
+        categoryHint = `占问里有「${guess.keyword}」，按「${guess.category}」取用神；若不对，可在上面手动选占类重起。`;
+      }
+    }
+  }
 
   if (!sel.matched && req.allowGeneralReading !== true) {
     throw new Error(
@@ -452,7 +500,7 @@ export async function castDivination(
     maStar: pan.maStar ?? null,
     palaces: projectPalaces(pan),
     engineSignature: `${school}|${pan.juShu.formatCode}|${pan.siZhu.year}${pan.siZhu.month}${pan.siZhu.day}${pan.siZhu.time}`,
-    caveats: collectCaveats(req, pan, sel, sanYi),
+    caveats: [...(categoryHint ? [categoryHint] : []), ...collectCaveats(req, pan, sel, sanYi)],
   };
 }
 
