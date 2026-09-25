@@ -4,11 +4,20 @@
 
 import Link from 'next/link';
 import { useState } from 'react';
-import { PALACE_DIRECTION, personalDirections } from '@hidefate/core-fengshui';
+import {
+  PALACE_DIRECTION,
+  YOU_NIAN_META,
+  crossPersonHouse,
+  personalDirections,
+  roomExposure,
+  type PalaceIndex,
+} from '@hidefate/core-fengshui';
+import { computeMingGua } from '@hidefate/core-bazi';
 import { AppBar, Empty, Expandable, Sheet, Skeleton } from '../../components/mobile/ui';
 import { useProperty } from '../../lib/PropertyContext';
 import { deleteMember, describeImpact, memberDeletionImpact } from '../../lib/cascade';
-import { db, newId, type StoredMember } from '../../lib/db';
+import { db, newId, type StoredMember, type StoredProperty } from '../../lib/db';
+import { ensureResidence, roomsOf, saveOccupancy } from '../../lib/occupancy';
 
 const CONF_TONE: Record<string, string> = {
   高: 'border-jade/40 bg-jade/10 text-jade',
@@ -18,7 +27,7 @@ const CONF_TONE: Record<string, string> = {
 };
 
 export default function MembersPage() {
-  const { property, members, memberRows, loading, reload } = useProperty();
+  const { property, result, members, memberRows, loading, reload } = useProperty();
   const [adding, setAdding] = useState(false);
   const [editing, setEditing] = useState<StoredMember | null>(null);
 
@@ -122,6 +131,27 @@ export default function MembersPage() {
                 </div>
               </div>
 
+              {(() => {
+                const mine = property.rooms.filter((r) => r.occupants?.includes(m.id));
+                return mine.length > 0 ? (
+                  <p className="mt-2 text-[0.8125rem] text-ink-soft">
+                    住／常待：<b>{mine.map((r) => `${r.label ?? r.kind}（${PALACE_DIRECTION[r.primaryPalace]}）`).join('、')}</b>
+                  </p>
+                ) : (
+                  <button
+                    type="button"
+                    className="mt-2 w-full rounded-xl border border-dashed border-risk-warn/50 bg-risk-warn/[0.05] px-3 py-2.5 text-left text-[0.8125rem] leading-relaxed text-ink-soft active:opacity-70"
+                    onClick={() => {
+                      const row = memberRows.find((r) => r.id === m.id);
+                      if (row) setEditing(row);
+                    }}
+                  >
+                    还没指定{m.name}住哪间 —— 指定后才算得出这间房对{m.name}的影响。
+                    <span className="text-cinnabar"> 指定 ›</span>
+                  </button>
+                );
+              })()}
+
               <div className="mt-2 flex flex-wrap gap-1.5">
                 <span className="tag border-cinnabar/40 bg-cinnabar/10 text-cinnabar">
                   {m.mingGua.gua}
@@ -198,7 +228,8 @@ export default function MembersPage() {
 
       <Sheet open={adding} onClose={() => setAdding(false)} title={<span className="font-serif text-[1.0625rem] font-semibold">添加成员</span>}>
         <MemberWizard
-          propertyId={property.id}
+          property={property}
+          houseGua={result?.baZhai.houseGua ?? null}
           onDone={() => {
             setAdding(false);
             reload();
@@ -209,7 +240,8 @@ export default function MembersPage() {
       <Sheet open={editing != null} onClose={() => setEditing(null)} title={<span className="font-serif text-[1.0625rem] font-semibold">编辑成员</span>}>
         {editing && (
           <MemberWizard
-            propertyId={property.id}
+            property={property}
+            houseGua={result?.baZhai.houseGua ?? null}
             member={editing}
             onDone={() => {
               setEditing(null);
@@ -229,14 +261,18 @@ export default function MembersPage() {
  * 不新建记录，也不丢掉用户之前挂在这个人身上的房间关联。
  */
 function MemberWizard({
-  propertyId,
+  property,
+  houseGua,
   member,
   onDone,
 }: {
-  propertyId: string;
+  property: StoredProperty;
+  /** 宅卦；用来当场告诉用户每间房于此人命卦是吉是凶。 */
+  houseGua: string | null;
   member?: StoredMember;
   onDone: () => void;
 }) {
+  const propertyId = property.id;
   const editing = member != null;
   const [step, setStep] = useState(1);
   const [name, setName] = useState(member?.name ?? '');
@@ -247,6 +283,29 @@ function MemberWizard({
   const [day, setDay] = useState<number | ''>(member?.day ?? '');
   const [hour, setHour] = useState<number | ''>(member?.hour ?? '');
   const [saving, setSaving] = useState(false);
+  const [roomIds, setRoomIds] = useState<string[]>(() => (member ? roomsOf(property, member.id) : []));
+
+  /** 可指定给人的房间：卧房书房等专属房在前，其次是可能「常待」的共用空间（门不算）。 */
+  const personalRooms = property.rooms.filter((r) => roomExposure(r.kind) === '专属');
+  const sharedRooms = property.rooms.filter(
+    (r) => roomExposure(r.kind) === '共用' && !['大门', '后门', '侧门', '玄关'].includes(r.kind),
+  );
+  const hasRoomStep = personalRooms.length + sharedRooms.length > 0;
+
+  /** 此方于此人命卦是哪颗八宅星 —— 选房时当场可见。 */
+  const starFor = (palace: PalaceIndex) => {
+    if (!houseGua || palace === 5) return null;
+    try {
+      const mg = computeMingGua(
+        year,
+        gender,
+        month === '' ? undefined : { month: Number(month), day: day === '' ? undefined : Number(day) },
+      );
+      return crossPersonHouse(houseGua as never, mg.gua as never)[palace as Exclude<PalaceIndex, 5>].personStar;
+    } catch {
+      return null;
+    }
+  };
 
   const precision =
     month === '' ? '仅年' : day === '' ? '年月' : hour === '' ? '年月日（缺时柱）' : '四柱全';
@@ -267,13 +326,15 @@ function MemberWizard({
       hour: hour === '' ? undefined : Number(hour),
     };
     await db().members.put(rec);
+    await saveOccupancy(propertyId, rec.id, roomIds);
+    await ensureResidence(rec, property);
     onDone();
   }
 
   return (
     <div className="space-y-4">
       <div className="flex items-center gap-2 text-[0.8125rem]">
-        {['是谁', '出生年', '更精确（可跳过）'].map((l, i) => (
+        {(hasRoomStep ? ['是谁', '出生年', '更精确', '住哪间'] : ['是谁', '出生年', '更精确（可跳过）']).map((l, i) => (
           <span key={l} className={`flex items-center gap-1 ${step === i + 1 ? 'text-cinnabar' : 'text-ink-mute'}`}>
             <span
               className={`flex h-5 w-5 items-center justify-center rounded-full text-[0.6875rem] ${
@@ -392,6 +453,85 @@ function MemberWizard({
 
           <div className="flex gap-2">
             <button type="button" className="btn flex-1" onClick={() => setStep(2)}>
+              上一步
+            </button>
+            {hasRoomStep ? (
+              <button type="button" className="btn btn-primary flex-1" onClick={() => setStep(4)}>
+                下一步
+              </button>
+            ) : (
+              <button type="button" className="btn btn-primary flex-1" onClick={submit} disabled={saving}>
+                {saving ? '保存中…' : editing ? '保存修改' : '完成'}
+              </button>
+            )}
+          </div>
+        </div>
+      )}
+
+      {step === 4 && (
+        <div className="space-y-3">
+          <p className="rounded-xl border border-rice-line bg-rice-deep/40 p-3 text-[0.8125rem] leading-relaxed text-ink-soft">
+            {name || '此人'}睡哪间、平时坐哪里？<b>这一步决定风水的吉凶落到谁身上</b> ——
+            卧房的吉凶只影响睡在里面的人，不再摊给全家。可多选，也可以先跳过。
+          </p>
+          {[
+            { title: '卧房、书房、座位', rooms: personalRooms },
+            { title: '常待的共用空间（可选）', rooms: sharedRooms },
+          ]
+            .filter((g) => g.rooms.length > 0)
+            .map((g) => (
+              <div key={g.title}>
+                <p className="label">{g.title}</p>
+                <div className="space-y-1.5">
+                  {g.rooms.map((r) => {
+                    const on = roomIds.includes(r.id);
+                    const star = starFor(r.primaryPalace);
+                    const others = (r.occupants ?? []).filter((id) => id !== member?.id);
+                    return (
+                      <button
+                        key={r.id}
+                        type="button"
+                        aria-pressed={on}
+                        onClick={() => setRoomIds((cur) => (on ? cur.filter((x) => x !== r.id) : [...cur, r.id]))}
+                        className={`flex min-h-[3rem] w-full items-center gap-2 rounded-xl border px-3 py-2 text-left transition active:scale-[0.99] ${
+                          on ? 'border-cinnabar bg-cinnabar/[0.06]' : 'border-rice-line bg-white'
+                        }`}
+                      >
+                        <span
+                          className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-md border text-[0.75rem] ${
+                            on ? 'border-cinnabar bg-cinnabar text-white' : 'border-rice-line'
+                          }`}
+                        >
+                          {on ? '✓' : ''}
+                        </span>
+                        <span className="min-w-0 flex-1">
+                          <span className="block text-[0.9375rem]">
+                            {r.label ?? r.kind}
+                            <span className="ml-1.5 text-[0.75rem] text-ink-mute">{PALACE_DIRECTION[r.primaryPalace]}</span>
+                          </span>
+                          {others.length > 0 && (
+                            <span className="block text-[0.6875rem] text-ink-mute">已有 {others.length} 人使用</span>
+                          )}
+                        </span>
+                        {star && (
+                          <span
+                            className={`tag shrink-0 ${
+                              YOU_NIAN_META[star].auspicious
+                                ? 'border-jade/40 bg-jade/10 text-jade'
+                                : 'border-risk-warn/40 bg-risk-warn/10 text-risk-warn'
+                            }`}
+                          >
+                            于其命「{star}」
+                          </span>
+                        )}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            ))}
+          <div className="flex gap-2">
+            <button type="button" className="btn flex-1" onClick={() => setStep(3)}>
               上一步
             </button>
             <button type="button" className="btn btn-primary flex-1" onClick={submit} disabled={saving}>

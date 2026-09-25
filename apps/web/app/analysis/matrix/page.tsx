@@ -6,6 +6,9 @@
  * 手机上不做宽表格 —— 横向滚动的表在小屏上很难对齐读。
  * 改成「按成员分组的热力卡片」，每位成员一张卡，卡内是房间热力块，
  * 点任一块弹出依据与化解。
+ *
+ * 格子里的数字按**实际使用**算：自己的房全量、共用处打六折、偶尔经过打两五折、
+ * 别人的卧房不计（显示「—」）。「假如住这里」的值放在弹层里，供换房参考。
  */
 
 import { useMemo, useState } from 'react';
@@ -56,19 +59,27 @@ export default function MatrixPage() {
               {matrix.columns.map((c) => {
                 const cur = matrix.index[`${m.id}|${c.id}`];
                 const v = cur?.intensity[domain] ?? 0;
+                const notMine = cur != null && cur.exposure === 0;
                 return (
                   <button
                     key={c.id}
                     type="button"
                     onClick={() => cur && setCell(cur)}
-                    className="flex min-h-[3.5rem] flex-col items-center justify-center rounded-xl border border-rice-line px-1 transition active:scale-[0.97]"
+                    className={`relative flex min-h-[3.5rem] flex-col items-center justify-center rounded-xl border px-1 transition active:scale-[0.97] ${
+                      cur?.occupied ? 'border-ink border-2' : 'border-rice-line'
+                    } ${notMine ? 'border-dashed opacity-60' : ''}`}
                     style={{
-                      background: `rgba(168,53,42,${(v * 0.82).toFixed(2)})`,
+                      background: notMine ? 'transparent' : `rgba(168,53,42,${(v * 0.82).toFixed(2)})`,
                       color: v > 0.5 ? 'white' : '#3d3733',
                     }}
                   >
+                    {cur?.occupied && (
+                      <span className="absolute right-1 top-0.5 text-[0.625rem] font-medium">住</span>
+                    )}
                     <span className="truncate text-[0.75rem] leading-tight">{c.label}</span>
-                    <span className="font-serif text-[1.0625rem] font-bold leading-none">{Math.round(v * 100)}</span>
+                    <span className="font-serif text-[1.0625rem] font-bold leading-none">
+                      {notMine ? '—' : Math.round(v * 100)}
+                    </span>
                   </button>
                 );
               })}
@@ -77,7 +88,9 @@ export default function MatrixPage() {
         ))}
 
         <p className="px-1 text-[0.75rem] leading-relaxed text-ink-mute">
-          数字为该维度风险强度（0–100），色越深风险越高。点任一格看古法依据与化解。
+          数字为该维度对此人的实际风险强度（0–100），色越深风险越高：自己住的房（框「住」）全量计，
+          全家共用处打六折，偶尔经过打两五折，别人的卧房对此人不计（「—」）。点任一格看依据、化解，
+          以及「假如住这里」的参考值。
         </p>
       </div>
 
@@ -99,13 +112,28 @@ export default function MatrixPage() {
           <div className="space-y-4">
             <p className="text-[0.9375rem] leading-relaxed">{cell.brief}</p>
 
-            <div className="flex flex-wrap gap-1.5">
-              {MATRIX_DOMAINS.map((d) => (
-                <span key={d} className="tag border-rice-line text-ink-soft">
-                  {d} {Math.round(cell.intensity[d] * 100)}
-                </span>
-              ))}
+            <div>
+              <p className="label">对此人的实际影响</p>
+              <div className="flex flex-wrap gap-1.5">
+                {MATRIX_DOMAINS.map((d) => (
+                  <span key={d} className="tag border-rice-line text-ink-soft">
+                    {d} {cell.exposure === 0 ? '—' : Math.round(cell.intensity[d] * 100)}
+                  </span>
+                ))}
+              </div>
             </div>
+            {cell.exposure < 1 && (
+              <div>
+                <p className="label">假如{cell.memberName}就住这里</p>
+                <div className="flex flex-wrap gap-1.5">
+                  {MATRIX_DOMAINS.map((d) => (
+                    <span key={d} className="tag border-dashed border-rice-line text-ink-mute">
+                      {d} {Math.round(cell.ifUsed[d] * 100)}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
 
             <div>
               <h3 className="section-title px-0">古法依据</h3>

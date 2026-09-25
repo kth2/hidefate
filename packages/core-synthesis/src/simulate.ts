@@ -25,8 +25,8 @@ import {
   type RoomPlacement,
 } from '@hidefate/core-fengshui';
 import { synthesise } from './assess.js';
-import { predict } from './predict.js';
-import type { AnalysisInput, Cure, Member, RiskLevel, SynthesisResult } from './types.js';
+import { predict, probabilityFor } from './predict.js';
+import type { AnalysisInput, Cure, Member, Prediction, RiskLevel, SynthesisResult } from './types.js';
 
 /** 可模拟的变量。全部可选，只改想改的那几项。 */
 export interface ScenarioChanges {
@@ -239,8 +239,8 @@ export function simulate(
   const topWorsened = sortedByDelta.filter((d) => d.delta < -0.02).slice(-3).reverse();
 
   const memberDeltas: MemberDelta[] = members.map((m) => {
-    const bMax = maxProb(beforePreds.filter((p) => p.memberIds.includes(m.id)));
-    const aMax = maxProb(afterPreds.filter((p) => p.memberIds.includes(m.id)));
+    const bMax = maxProbFor(beforePreds, m.id);
+    const aMax = maxProbFor(afterPreds, m.id);
     const d = bMax - aMax; // 风险下降为正收益
     const verdict: MemberDelta['verdict'] =
       d > 0.12 ? '明显受益' : d > 0.04 ? '略有改善' : d < -0.12 ? '明显受损' : d < -0.04 ? '略转不利' : '基本不变';
@@ -294,8 +294,10 @@ export function simulate(
   };
 }
 
-function maxProb(preds: readonly { probability: number }[]): number {
-  return preds.length ? Math.max(...preds.map((p) => p.probability)) : 0.05;
+/** 此人的最高个人风险 —— 取其个人概率，而不是整条预测里别人的最高值。 */
+function maxProbFor(preds: readonly Prediction[], memberId: string): number {
+  const mine = preds.map((p) => probabilityFor(p, memberId)).filter((x): x is number => x != null);
+  return mine.length ? Math.max(...mine) : 0.05;
 }
 
 /** 多方案并排比较（最多 3 个）。 */

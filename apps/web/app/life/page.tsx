@@ -19,6 +19,7 @@ import { AppBar, Empty, Expandable, Meter, Sheet, Skeleton } from '../../compone
 import { ResidenceEditor } from '../../components/mobile/ResidenceEditor';
 import { useProperty } from '../../lib/PropertyContext';
 import { db } from '../../lib/db';
+import { ensureResidence } from '../../lib/occupancy';
 import type { PredictedEvent } from '@hidefate/core-events';
 import { narratePalace } from '@hidefate/core-events';
 import { buildYearNarrative, curesOf, summaryPrompt } from '../../lib/lifeNarrative';
@@ -152,6 +153,7 @@ function EventCard({ e }: { e: PredictedEvent }) {
 
 export default function LifePage() {
   const { memberRows, properties, loading, year } = useProperty();
+
   const [personId, setPersonId] = useState<string | null>(null);
   const [residences, setResidences] = useState<ResidencePeriod[]>([]);
   const [records, setRecords] = useState<PredictionRecord[]>([]);
@@ -164,6 +166,11 @@ export default function LifePage() {
   const person = useMemo(
     () => memberRows.find((m) => m.id === personId) ?? memberRows[0] ?? null,
     [memberRows, personId],
+  );
+  /** 此人建档时所在的房屋 —— 居住史为空时给一键关联。 */
+  const homeProperty = useMemo(
+    () => properties.find((p) => p.id === person?.propertyId) ?? null,
+    [properties, person],
   );
 
   const load = useCallback(async (pid: string) => {
@@ -305,6 +312,25 @@ export default function LifePage() {
         {/* ── 居住史 ── 没有它风水层就全程缺席，所以入口摆在最前面。 */}
         <section>
           <h2 className="section-title">住过哪些地方</h2>
+          {residences.length === 0 && homeProperty && (
+            <button
+              type="button"
+              onClick={async () => {
+                if (!person) return;
+                await ensureResidence(person, homeProperty);
+                await load(person.id);
+              }}
+              className="mb-2 w-full rounded-2xl border border-cinnabar/40 bg-cinnabar/[0.06] p-3.5 text-left active:opacity-80"
+            >
+              <p className="text-[0.9375rem] font-medium">
+                {person?.name}住在「{homeProperty.name}」？一键关联
+              </p>
+              <p className="mt-1 text-[0.75rem] leading-relaxed text-ink-mute">
+                按 {Math.max(homeProperty.moveInYear, person?.year ?? 0)} 年入住至今记入居住史，
+                这处房子的风水就会进到一生轨迹里。住过别处的，可再点下面补上。
+              </p>
+            </button>
+          )}
           <button
             type="button"
             onClick={() => setEditingResidence(true)}

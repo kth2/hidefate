@@ -351,11 +351,30 @@ describe('家庭融合报告', () => {
     }
   });
 
-  it('标出最受益与最受损者', () => {
+  it('分数拉得开才标出最受益与最受损者，拉不开就明说相近', () => {
     const r = buildFamilyFusionReport(base, 2026, 5);
-    expect(r.mostHelped).not.toBeNull();
     expect(r.familyFitScore).toBeGreaterThanOrEqual(0);
     expect(r.summary).toContain('契合度');
+    const scores = r.members.map((m) => m.fitScore);
+    const spread = Math.max(...scores) - Math.min(...scores);
+    if (spread < 5) {
+      expect(r.mostHelped).toBeNull();
+      expect(r.mostHarmed).toBeNull();
+      expect(r.summary).toContain('相近');
+    }
+
+    // 把小明的房间搬到他的生气方（巽命生气在正北），分数就该拉开
+    const moved = {
+      ...SAMPLE_PROFILE,
+      rooms: SAMPLE_PROFILE.rooms.map((x) => (x.id === 'r-kid' ? { ...x, primaryPalace: 1 as const, palaces: [1 as const] } : x)),
+    };
+    const r2 = buildFamilyFusionReport({ ...base, profile: moved }, 2026, 5);
+    const son = r2.members.find((m) => m.memberId === 'm-son')!;
+    const before = r.members.find((m) => m.memberId === 'm-son')!;
+    expect(son.fitScore).toBeGreaterThan(before.fitScore);
+    expect(r2.mostHelped?.memberId).toBe('m-son');
+    expect(r2.mostHarmed).not.toBeNull();
+    expect(r2.mostHarmed!.memberId).not.toBe('m-son');
   });
 
   it('残缺八字成员的命卦部分照常完整', () => {

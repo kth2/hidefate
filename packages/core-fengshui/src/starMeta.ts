@@ -444,6 +444,25 @@ export function deriveCombination(shan: PalaceIndex, xiang: PalaceIndex, period:
   };
 }
 
+/** 化解的用意：化凶（泄/压凶气）、催吉（加强吉应）、维持（无需布局）。 */
+export type CureIntent = '化凶' | '催吉' | '维持';
+
+const ENHANCE_MARK = '可加强其吉应';
+const MAINTAIN_MARK = '不必刻意布局';
+
+/**
+ * 判定一条组合化解的用意。
+ *
+ * 吉组合的化解全是催吉；凶／中性组合里，通则推导会对当令之星给出「生之」的句子，
+ * 那也是催吉 —— 把它当成「风险化解」推给用户，就会出现「报凶却教你催吉」的矛盾。
+ * 判据用的标记与 `genericCures()` 同处一文件，改措辞时一起改。
+ */
+export function cureIntentOf(combo: Pick<Combination, 'nature'>, action: string): CureIntent {
+  if (action.includes(MAINTAIN_MARK)) return '维持';
+  if (combo.nature === '吉' || action.includes(ENHANCE_MARK)) return '催吉';
+  return '化凶';
+}
+
 /** 通用化解：泄凶星之气、生吉星之气。 */
 function genericCures(shan: PalaceIndex, xiang: PalaceIndex, period: PalaceIndex): string[] {
   const out: string[] = [];
@@ -455,10 +474,10 @@ function genericCures(shan: PalaceIndex, xiang: PalaceIndex, period: PalaceIndex
       out.push(`${STAR_NAME[s]}（${wx}）失令为患，宜以「${drain}」泄之：${MATERIAL_BY_WUXING[drain].join('、')}；忌用「${reverseGenerate(wx)}」之物助其凶。`);
     } else if (score > 0.4) {
       const feed = reverseGenerate(wx);
-      out.push(`${STAR_NAME[s]}（${wx}）当令有力，宜以「${feed}」生之：${MATERIAL_BY_WUXING[feed].join('、')}，可加强其吉应。`);
+      out.push(`${STAR_NAME[s]}（${wx}）当令有力，宜以「${feed}」生之：${MATERIAL_BY_WUXING[feed].join('、')}，${ENHANCE_MARK}。`);
     }
   }
-  if (out.length === 0) out.push('此宫星力平和，维持整洁通风即可，不必刻意布局。');
+  if (out.length === 0) out.push(`此宫星力平和，维持整洁通风即可，${MAINTAIN_MARK}。`);
   return out;
 }
 
