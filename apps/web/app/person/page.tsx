@@ -12,7 +12,8 @@
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { Suspense, useMemo } from 'react';
-import { RISK_COLOR, buildPersonView, type PersonDomainCell } from '@hidefate/core-synthesis';
+import { RISK_COLOR, buildPersonView, monthlyOutlook, type PersonDomainCell } from '@hidefate/core-synthesis';
+import { currentFengShuiTime } from '../../lib/useAnalysis';
 import { AppBar, Empty, Expandable, Skeleton } from '../../components/mobile/ui';
 import { useProperty } from '../../lib/PropertyContext';
 
@@ -23,6 +24,13 @@ export default function PersonPage() {
     </Suspense>
   );
 }
+
+/** 逐月的徽章按「比平时」着色 —— 全年都不好的人，要看的是哪几个月更要紧。 */
+const TREND_TONE: Record<string, string> = {
+  加重: 'border-risk-high/40 bg-risk-high/10 text-risk-high',
+  如常: 'border-rice-line text-ink-mute',
+  缓和: 'border-jade/40 bg-jade/10 text-jade',
+};
 
 /** 概率 → 底色深浅；未达门槛的淡显，不适用的留白。 */
 function tone(p: number | null): { bg: string; fg: string } {
@@ -50,13 +58,30 @@ function DomainTile({ c }: { c: PersonDomainCell }) {
 
 function PersonInner() {
   const params = useSearchParams();
-  const { property, result, members, loading } = useProperty();
+  const { property, result, members, cures, qiMen, year, loading } = useProperty();
   const id = params.get('id') ?? members[0]?.id ?? null;
 
   const view = useMemo(
     () => (result && id ? buildPersonView(result, members, id) : null),
     [result, members, id],
   );
+
+  /** 逐月：分析年是今年就从本月起，否则从该年正月起。 */
+  const months = useMemo(() => {
+    if (!property || !id || members.length === 0) return null;
+    const now = currentFengShuiTime();
+    try {
+      const out = monthlyOutlook(
+        { profile: property, members, qiMen: result?.qiMenEnabled ? qiMen : null, appliedCures: cures },
+        year,
+        year === now.year ? now.monthIndex : 1,
+        12,
+      );
+      return out.rows.find((r) => r.memberId === id) ?? null;
+    } catch {
+      return null;
+    }
+  }, [property, members, cures, qiMen, result, year, id]);
 
   if (loading) return <><AppBar title="这屋对我" back="/" /><div className="px-4 py-4"><Skeleton lines={5} /></div></>;
 
@@ -127,6 +152,59 @@ function PersonInner() {
             {view.stage === '儿童' || view.stage === '少年' ? '孩子不看财运与感情；「事业」按学业看。' : ''}
           </p>
         </section>
+
+        {/* 逐月 */}
+        {months && (
+          <section>
+            <h2 className="section-title">逐月 · 接下来十二个节气月</h2>
+            <div className="space-y-1.5">
+              {months.months.map((c, i) => (
+                <Expandable
+                  key={`${c.slot.year}-${c.slot.monthIndex}`}
+                  title={
+                    <span className="flex items-center gap-2">
+                      <span className="w-[4.5rem] shrink-0 leading-tight">
+                        <span className="block text-[0.9375rem] font-medium">
+                          {c.slot.label}
+                          {i === 0 && <span className="ml-1 text-[0.6875rem] text-cinnabar">本月</span>}
+                        </span>
+                        <span className="block text-[0.6875rem] text-ink-mute">{c.slot.range}</span>
+                      </span>
+                      <span className="min-w-0 flex-1 truncate text-[0.8125rem] text-ink-soft">
+                        {c.top
+                          ? `${c.top.label} ${Math.round(c.top.probability * 100)}%（平时 ${Math.round(c.top.baseline * 100)}%）`
+                          : '无相关条目'}
+                      </span>
+                    </span>
+                  }
+                  badge={<span className={`tag shrink-0 ${TREND_TONE[c.trend]}`}>{c.top ? c.trend : '—'}</span>}
+                >
+                  {c.domains.length === 0 ? (
+                    <p className="text-[0.875rem] text-ink-mute">这个月没有涉及{view.name}的条目。</p>
+                  ) : (
+                    <ul className="space-y-1.5">
+                      {c.domains.map((d) => (
+                        <li key={d.domain} className="flex items-baseline gap-2 text-[0.8125rem]">
+                          <b className="w-10 shrink-0 font-serif text-[0.9375rem]">{Math.round(d.probability * 100)}%</b>
+                          <span className="min-w-0 flex-1 leading-relaxed">
+                            <b>{d.label}</b>
+                            <span className="text-ink-mute">
+                              {' '}· 平时 {Math.round(d.baseline * 100)}% · {d.reason}
+                            </span>
+                          </span>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </Expandable>
+              ))}
+            </div>
+            <p className="mt-2 px-1 text-[0.75rem] leading-relaxed text-ink-mute">
+              以今年的个人机率为底（「平时」），再看每月飞入各处的流月星：凶星加临就调高、吉星加临就调低，
+              而且只按{view.name}受那一处影响的程度加减。「加重」即这个月比平时更要紧。月份按节气换，不是公历月。
+            </p>
+          </section>
+        )}
 
         {/* 我的房间 */}
         <section>

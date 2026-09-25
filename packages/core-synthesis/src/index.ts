@@ -10,6 +10,7 @@ export * from './assess.js';
 export * from './predict.js';
 export * from './family.js';
 export * from './person.js';
+export * from './monthly.js';
 export * from './matrix.js';
 export * from './timeline.js';
 export * from './residence.js';
