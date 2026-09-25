@@ -7,7 +7,8 @@ import { useState } from 'react';
 import { periodOfYear } from '@hidefate/core-fengshui';
 import { AppBar, Empty, Sheet } from '../../components/mobile/ui';
 import { useProperty } from '../../lib/PropertyContext';
-import { db, exportAll, importAll } from '../../lib/db';
+import { deleteProperty, describeImpact, propertyDeletionImpact } from '../../lib/cascade';
+import { exportAll, importAll } from '../../lib/db';
 
 export default function MePage() {
   const { properties, property, activeId, setActive, reload, year, setYear, enableQiMen, setEnableQiMen } = useProperty();
@@ -60,7 +61,7 @@ export default function MePage() {
                 </p>
               </div>
               <span className="shrink-0 text-[0.8125rem] text-cinnabar">
-                {properties.length > 1 ? '切换' : '管理'}
+                {properties.length > 1 ? '切换 · 删除' : '管理 · 删除'}
               </span>
             </button>
           ) : (
@@ -216,54 +217,56 @@ export default function MePage() {
       </div>
 
       {/* 房屋切换 */}
-      <Sheet open={switching} onClose={() => setSwitching(false)} title={<span className="font-serif text-[1.0625rem] font-semibold">选择房屋</span>}>
+      <Sheet open={switching} onClose={() => setSwitching(false)} title={<span className="font-serif text-[1.0625rem] font-semibold">房屋（点选切换）</span>}>
         <div className="space-y-2">
           {properties.map((p) => (
-            <button
+            <div
               key={p.id}
-              type="button"
-              onClick={() => {
-                setActive(p.id);
-                setSwitching(false);
-              }}
-              className={`w-full rounded-2xl border p-3.5 text-left transition active:scale-[0.99] ${
+              className={`flex items-stretch rounded-2xl border transition ${
                 p.id === activeId ? 'border-cinnabar bg-cinnabar/[0.06]' : 'border-rice-line bg-white'
               }`}
             >
-              <div className="flex items-center gap-2">
-                <span className="min-w-0 flex-1 truncate font-serif text-[1rem] font-semibold">{p.name}</span>
-                {p.id === activeId && <span className="tag border-cinnabar/40 bg-cinnabar/10 text-cinnabar">当前</span>}
-              </div>
-              <p className="mt-0.5 text-[0.75rem] text-ink-mute">
-                {p.buildingType}
-                {p.floor != null && ` · ${p.floor} 楼`} · {p.entryMode}建档 · {p.rooms.length} 个房间
-              </p>
-            </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setActive(p.id);
+                  setSwitching(false);
+                }}
+                className="min-w-0 flex-1 p-3.5 text-left active:scale-[0.99]"
+              >
+                <div className="flex items-center gap-2">
+                  <span className="min-w-0 flex-1 truncate font-serif text-[1rem] font-semibold">{p.name}</span>
+                  {p.id === activeId && <span className="tag border-cinnabar/40 bg-cinnabar/10 text-cinnabar">当前</span>}
+                </div>
+                <p className="mt-0.5 text-[0.75rem] text-ink-mute">
+                  {p.buildingType}
+                  {p.floor != null && ` · ${p.floor} 楼`} · {p.entryMode}建档 · {p.rooms.length} 个房间
+                </p>
+              </button>
+              <button
+                type="button"
+                aria-label={`删除${p.name}`}
+                className="shrink-0 border-l border-rice-line px-3.5 text-[0.8125rem] text-ink-mute active:text-cinnabar"
+                onClick={async () => {
+                  const extra = describeImpact(await propertyDeletionImpact(p.id), { includeMembers: true });
+                  const msg =
+                    `确定删除「${p.name}」？` +
+                    (extra ? `${extra}会一并删除，` : '') +
+                    '且无法撤销。';
+                  if (!confirm(msg)) return;
+                  await deleteProperty(p.id);
+                  reload();
+                }}
+              >
+                删除
+              </button>
+            </div>
           ))}
 
           <Link href="/new" className="btn btn-primary btn-block mt-2">
             建立新房屋
           </Link>
 
-          {property && properties.length > 0 && (
-            <button
-              type="button"
-              className="btn btn-block mt-2 text-cinnabar"
-              onClick={async () => {
-                if (!confirm(`确定删除「${property.name}」？其成员与化解记录会一并删除，且无法撤销。`)) return;
-                const d = db();
-                await d.transaction('rw', d.properties, d.members, d.cures, async () => {
-                  await d.properties.delete(property.id);
-                  await d.members.where('propertyId').equals(property.id).delete();
-                  await d.cures.where('propertyId').equals(property.id).delete();
-                });
-                setSwitching(false);
-                reload();
-              }}
-            >
-              删除当前房屋
-            </button>
-          )}
         </div>
       </Sheet>
     </>

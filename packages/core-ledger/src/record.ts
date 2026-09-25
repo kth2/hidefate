@@ -162,6 +162,9 @@ export function resolvePrediction(
         '要更正请另立一条更正记录并注明缘由，不得覆盖原结论。',
     );
   }
+  if (record.status === '已作废') {
+    throw new Error(`预测 ${record.id} 已作废，不能结算。要结算请先恢复。`);
+  }
   if (Number.isNaN(Date.parse(outcome.recordedAt))) {
     throw new Error(`结算时刻无法解析：${outcome.recordedAt}`);
   }
@@ -171,6 +174,45 @@ export function resolvePrediction(
     intervened: record.intervened || intervenedDuringWindow,
     outcome: Object.freeze({ ...outcome }),
   };
+  return Object.freeze(next);
+}
+
+/**
+ * 作废一条预测。**不删除、不修改原记录**，返回一条新的。
+ *
+ * 作废是「撤下」而非「抹掉」：断语、概率、结论原样保留，只是不再参与校准
+ * （`isCalibratable` 只认「已结算」）。已结算的也可作废 —— 例如事后发现判据写错了。
+ */
+export function voidPrediction(
+  record: PredictionRecord,
+  mark: { readonly recordedAt: string; readonly reason?: string },
+): PredictionRecord {
+  if (record.status === '已作废') {
+    throw new Error(`预测 ${record.id} 已作废，无需重复作废。`);
+  }
+  if (Number.isNaN(Date.parse(mark.recordedAt))) {
+    throw new Error(`作废时刻无法解析：${mark.recordedAt}`);
+  }
+  const reason = mark.reason?.trim();
+  const next: PredictionRecord = {
+    ...record,
+    status: '已作废',
+    voided: Object.freeze({
+      recordedAt: mark.recordedAt,
+      ...(reason ? { reason } : {}),
+      previousStatus: record.status,
+    }),
+  };
+  return Object.freeze(next);
+}
+
+/** 恢复一条作废的预测：还原到作废前的状态，结论（若有）原样保留。 */
+export function restorePrediction(record: PredictionRecord): PredictionRecord {
+  if (record.status !== '已作废' || !record.voided) {
+    throw new Error(`预测 ${record.id} 未作废，无需恢复。`);
+  }
+  const { voided, ...rest } = record;
+  const next: PredictionRecord = { ...rest, status: voided.previousStatus };
   return Object.freeze(next);
 }
 

@@ -11,7 +11,14 @@
  */
 
 import type { Divination } from '@hidefate/core-qimen';
-import { freezePrediction, resolvePrediction, type PredictionRecord, type Verdict } from '@hidefate/core-ledger';
+import {
+  freezePrediction,
+  resolvePrediction,
+  restorePrediction,
+  voidPrediction,
+  type PredictionRecord,
+  type Verdict,
+} from '@hidefate/core-ledger';
 import { db, newId, type StoredDivinationRow } from './db';
 
 /**
@@ -109,3 +116,42 @@ export async function settleDivination(id: string, verdict: Verdict): Promise<vo
   await db().divinations.put({ ...row, status: '已结算', outcome: verdict });
 }
 
+
+/**
+ * 作废：误占、测试、重复的局撤下来。
+ *
+ * **不删除** —— 盘面与账本那条都留着，只是账本那条改为「已作废」、不参与校准，
+ * 列表默认隐藏。复占编号照样把它算进去（`checkRepeat` 收到的仍是全部局），
+ * 所以作废不会重开「问到满意为止、只留合心意那条」的口子。
+ */
+export async function voidDivination(id: string, reason?: string): Promise<void> {
+  const d = db();
+  await d.transaction('rw', [d.divinations, d.predictions], async () => {
+    const row = await d.divinations.get(id);
+    if (!row || row.status === '已作废') return;
+    const recordedAt = new Date().toISOString();
+    const pred = await d.predictions.get(row.predictionId);
+    if (pred && pred.status !== '已作废') {
+      await d.predictions.put(voidPrediction(pred, { recordedAt, ...(reason ? { reason } : {}) }));
+    }
+    const trimmed = reason?.trim();
+    await d.divinations.put({
+      ...row,
+      status: '已作废',
+      voided: { recordedAt, ...(trimmed ? { reason: trimmed } : {}), previousStatus: row.status },
+    });
+  });
+}
+
+/** 恢复一局作废的占：还原到作废前的状态，已结算的结论原样保留。 */
+export async function restoreDivination(id: string): Promise<void> {
+  const d = db();
+  await d.transaction('rw', [d.divinations, d.predictions], async () => {
+    const row = await d.divinations.get(id);
+    if (!row || row.status !== '已作废') return;
+    const pred = await d.predictions.get(row.predictionId);
+    if (pred && pred.status === '已作废') await d.predictions.put(restorePrediction(pred));
+    const { voided, ...rest } = row;
+    await d.divinations.put({ ...rest, status: voided?.previousStatus ?? (row.outcome ? '已结算' : '待结算') });
+  });
+}

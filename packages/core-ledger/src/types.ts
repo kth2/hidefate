@@ -41,7 +41,11 @@ export interface PredictionWindow {
   readonly toISO?: string;
 }
 
-export type PredictionStatus = '待结算' | '已结算' | '窗口过期' | '资料不足';
+/**
+ * `已作废`：用户撤下的记录（误占、测试、重复）。**不删除、不参与校准**，
+ * 但仍留在账本里 —— 占局的复占编号照样把它算进去，挑答案的口子不会因作废而重开。
+ */
+export type PredictionStatus = '待结算' | '已结算' | '窗口过期' | '资料不足' | '已作废';
 
 export type Verdict = '中' | '部分中' | '未发生' | '反向';
 
@@ -100,6 +104,17 @@ export interface PredictionRecord {
   readonly intervened: boolean;
   readonly status: PredictionStatus;
   readonly outcome?: Outcome;
+  /** 作废留痕：何时、为何、作废前是什么状态（恢复时据此还原）。 */
+  readonly voided?: VoidMark;
+}
+
+/** 作废留痕。 */
+export interface VoidMark {
+  /** ISO。 */
+  readonly recordedAt: string;
+  readonly reason?: string;
+  /** 作废前的状态；恢复时原样还原。 */
+  readonly previousStatus: Exclude<PredictionStatus, '已作废'>;
 }
 
 /**

@@ -62,6 +62,8 @@ export interface StoredPosterior extends XiangPosterior {
   key: string;
 }
 
+export type DivinationStatus = '待结算' | '已结算' | '窗口过期' | '已作废';
+
 /** 占局盘面快照。权威仍是按 castAt 重放，此表只为回看省一次重排。 */
 export interface StoredDivinationRow {
   id: string;
@@ -73,8 +75,10 @@ export interface StoredDivinationRow {
   castAt: string;
   resolveBy: string;
   juShu: string;
-  status: '待结算' | '已结算' | '窗口过期';
+  status: DivinationStatus;
   outcome?: string;
+  /** 作废留痕。作废的局不删除 —— 复占编号照算，只是不再显示于默认列表、不参与校准。 */
+  voided?: { recordedAt: string; reason?: string; previousStatus: Exclude<DivinationStatus, '已作废'> };
   resolution: { criterion: string; judge: '用户自评' | '客观记录'; windowDays: number };
   predictionId: string;
   chartJson: string;

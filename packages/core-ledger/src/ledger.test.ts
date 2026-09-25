@@ -13,9 +13,11 @@ import {
   outcomeValue,
   reliabilityBins,
   resolvePrediction,
+  restorePrediction,
   summariseCalibration,
   toXiangEvidence,
   verifyReplay,
+  voidPrediction,
   type Outcome,
   type PredictionDraft,
   type PredictionRecord,
@@ -218,6 +220,53 @@ describe('转成象意证据', () => {
   it('混杂样本一律不转 —— 否则后验学到的是化解的效果', () => {
     const dirty = resolvePrediction(freeze({}, 'r2'), OUTCOME, true);
     expect(toXiangEvidence([dirty]).size).toBe(0);
+  });
+});
+
+describe('作废：撤下而不抹掉', () => {
+  const MARK = { recordedAt: '2026-08-01T00:00:00.000Z', reason: '误占' };
+
+  it('作废产出新记录，原记录与断语不动', () => {
+    const r = freeze();
+    const v = voidPrediction(r, MARK);
+    expect(v).not.toBe(r);
+    expect(r.status).toBe('待结算');
+    expect(v.status).toBe('已作废');
+    expect(v.statement).toBe(r.statement);
+    expect(v.voided).toEqual({ ...MARK, previousStatus: '待结算' });
+    expect(Object.isFrozen(v)).toBe(true);
+  });
+
+  it('已结算的也可作废，且作废后不参与校准', () => {
+    const done = resolvePrediction(freeze(), OUTCOME);
+    expect(isCalibratable(done)).toBe(true);
+    const v = voidPrediction(done, MARK);
+    expect(isCalibratable(v)).toBe(false);
+    expect(calibrationExclusionReason(v)).toMatch(/已作废/);
+    expect(summariseCalibration([v]).excluded).toEqual({ 已作废: 1 });
+    expect(toXiangEvidence([v]).size).toBe(0);
+  });
+
+  it('作废的不能结算、不能重复作废', () => {
+    const v = voidPrediction(freeze(), MARK);
+    expect(() => resolvePrediction(v, OUTCOME)).toThrow(/已作废/);
+    expect(() => voidPrediction(v, MARK)).toThrow(/已作废/);
+  });
+
+  it('恢复还原到作废前的状态，结论原样保留', () => {
+    const done = resolvePrediction(freeze(), OUTCOME);
+    const back = restorePrediction(voidPrediction(done, MARK));
+    expect(back.status).toBe('已结算');
+    expect(back.outcome).toEqual(done.outcome);
+    expect(back.voided).toBeUndefined();
+    expect(isCalibratable(back)).toBe(true);
+    expect(() => restorePrediction(done)).toThrow(/未作废/);
+  });
+
+  it('作废的不会被到期扫描改成窗口过期', () => {
+    const v = voidPrediction(freeze(), MARK);
+    const [x] = expireStale([v], new Date(2029, 5, 1));
+    expect(x!.status).toBe('已作废');
   });
 });
 

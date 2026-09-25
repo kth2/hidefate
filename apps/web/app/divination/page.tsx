@@ -26,12 +26,22 @@ import { computeBaziChart } from '@hidefate/core-bazi';
 import { AppBar, Empty, Expandable, Sheet } from '../../components/mobile/ui';
 import { useProperty } from '../../lib/PropertyContext';
 import { db, newId } from '../../lib/db';
-import { loadDivinations, saveDivination, settleDivination, type StoredDivination } from '../../lib/divinationStore';
+import {
+  loadDivinations,
+  restoreDivination,
+  saveDivination,
+  settleDivination,
+  voidDivination,
+  type StoredDivination,
+} from '../../lib/divinationStore';
 
 const GAN = ['甲', '乙', '丙', '丁', '戊', '己', '庚', '辛', '壬', '癸'];
 
 /** 九宫按洛书方位排布：4 9 2 / 3 5 7 / 8 1 6。 */
 const GRID: readonly string[] = ['4', '9', '2', '3', '5', '7', '8', '1', '6'];
+
+/** 作废的常见缘由 —— 给按钮而不是空白输入框，单手也能点完。 */
+const VOID_REASONS = ['误占 / 手滑', '测试用', '重复记录', '判据写错'] as const;
 
 export default function DivinationPage() {
   const { memberRows } = useProperty();
@@ -50,6 +60,9 @@ export default function DivinationPage() {
   /** 占类未识别时，提供一条明示的「按综合断」出路，而不是把 API 名字甩给用户。 */
   const [offerGeneral, setOfferGeneral] = useState(false);
   const [opened, setOpened] = useState<Divination | null>(null);
+  const [voiding, setVoiding] = useState<StoredDivination | null>(null);
+  const [voidReason, setVoidReason] = useState<string>(VOID_REASONS[0]);
+  const [showVoided, setShowVoided] = useState(false);
 
   const reload = useCallback(async () => setRows(await loadDivinations()), []);
 
@@ -81,6 +94,10 @@ export default function DivinationPage() {
     () => rows.map((r) => ({ key: r.key, castAt: r.castAt, windowDays: r.resolution.windowDays, status: r.status })),
     [rows],
   );
+
+  const activeRows = useMemo(() => rows.filter((r) => r.status !== '已作废'), [rows]);
+  const voidedRows = useMemo(() => rows.filter((r) => r.status === '已作废'), [rows]);
+  const shownRows = showVoided ? rows : activeRows;
 
   const selectedRule = rules?.find((r) => r.category === category) ?? null;
 
@@ -244,13 +261,31 @@ export default function DivinationPage() {
 
         {/* 历史 */}
         <section>
-          <h2 className="section-title">占过的局 · {rows.length}</h2>
-          {rows.length === 0 ? (
-            <Empty title="还没有占过" desc="占局是这套系统里唯一能在几天内验证的一层 —— 也是取象收敛最快的来源。" />
+          <div className="flex items-center justify-between gap-2">
+            <h2 className="section-title">占过的局 · {activeRows.length}</h2>
+            {voidedRows.length > 0 && (
+              <button
+                type="button"
+                className="min-h-[2.5rem] px-2 text-[0.8125rem] text-ink-mute active:text-cinnabar"
+                onClick={() => setShowVoided((v) => !v)}
+              >
+                {showVoided ? '隐藏已作废' : `显示已作废（${voidedRows.length}）`}
+              </button>
+            )}
+          </div>
+          {shownRows.length === 0 ? (
+            <Empty
+              title={rows.length === 0 ? '还没有占过' : '没有有效的局'}
+              desc={
+                rows.length === 0
+                  ? '占局是这套系统里唯一能在几天内验证的一层 —— 也是取象收敛最快的来源。'
+                  : '占过的局都已作废。点右上角可以查看或恢复。'
+              }
+            />
           ) : (
             <div className="space-y-2">
-              {rows.map((r) => (
-                <div key={r.id} className="card">
+              {shownRows.map((r) => (
+                <div key={r.id} className={`card ${r.status === '已作废' ? 'opacity-60' : ''}`}>
                   <div className="flex items-start gap-2">
                     <span className="shrink-0 rounded-md border border-rice-line px-1.5 py-0.5 text-[0.6875rem] text-ink-mute">
                       {r.category}
@@ -286,6 +321,36 @@ export default function DivinationPage() {
                           {v}
                         </button>
                       ))}
+                    </div>
+                  )}
+                  {r.status === '已作废' ? (
+                    <div className="mt-2 flex items-center gap-2">
+                      <p className="min-w-0 flex-1 text-[0.75rem] text-ink-mute">
+                        {r.voided?.recordedAt.slice(0, 10)} 作废{r.voided?.reason && ` · ${r.voided.reason}`}
+                      </p>
+                      <button
+                        type="button"
+                        className="btn btn-sm shrink-0"
+                        onClick={async () => {
+                          await restoreDivination(r.id);
+                          await reload();
+                        }}
+                      >
+                        恢复
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="mt-1 flex justify-end">
+                      <button
+                        type="button"
+                        className="min-h-[2.5rem] px-2 text-[0.8125rem] text-ink-mute active:text-cinnabar"
+                        onClick={() => {
+                          setVoidReason(VOID_REASONS[0]);
+                          setVoiding(r);
+                        }}
+                      >
+                        作废
+                      </button>
                     </div>
                   )}
                 </div>
@@ -438,6 +503,46 @@ export default function DivinationPage() {
             </p>
 
             <Link href="/calibrate" className="btn btn-block">应期到了去结算</Link>
+          </div>
+        )}
+      </Sheet>
+
+      <Sheet open={voiding != null} onClose={() => setVoiding(null)} title="作废这一局">
+        {voiding && (
+          <div className="space-y-4">
+            <p className="rounded-xl border border-rice-line bg-rice-deep/40 p-3 text-[0.875rem] leading-relaxed">
+              {voiding.question}
+            </p>
+            <div>
+              <p className="label">缘由</p>
+              <div className="grid grid-cols-2 gap-2">
+                {VOID_REASONS.map((x) => (
+                  <button
+                    key={x}
+                    type="button"
+                    className={`btn ${voidReason === x ? 'btn-primary' : ''}`}
+                    onClick={() => setVoidReason(x)}
+                  >
+                    {x}
+                  </button>
+                ))}
+              </div>
+            </div>
+            <p className="text-[0.8125rem] leading-relaxed text-ink-mute">
+              作废后这一局从列表隐藏，也不再计入准确度统计；随时可以在「显示已作废」里恢复。
+              它仍占着编号 —— 同一件事再占，序号照样往后排。
+            </p>
+            <button
+              type="button"
+              className="btn btn-primary btn-block"
+              onClick={async () => {
+                await voidDivination(voiding.id, voidReason);
+                setVoiding(null);
+                await reload();
+              }}
+            >
+              确认作废
+            </button>
           </div>
         )}
       </Sheet>
