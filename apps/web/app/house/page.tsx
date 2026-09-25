@@ -634,7 +634,7 @@ export default function HousePage() {
                       </span>
                     </span>
                   }
-                  badge={<span className="tag shrink-0 border-cinnabar/40 bg-cinnabar/10 text-cinnabar">{p.domain}</span>}
+                  badge={<span className="tag shrink-0 border-cinnabar/40 bg-cinnabar/10 text-cinnabar">{p.domainLabel}</span>}
                 >
                   <p className="text-[0.9375rem] leading-relaxed">{p.headline}。</p>
                   <p className="mt-2 text-[0.8125rem] text-ink-mute">置信度 {p.confidence}</p>
@@ -646,6 +646,7 @@ export default function HousePage() {
                           <b className="w-10 shrink-0 font-serif text-[0.9375rem]">{Math.round(m.probability * 100)}%</b>
                           <span className="min-w-0 flex-1 leading-relaxed">
                             <b>{m.name}</b>
+                            {m.domainLabel !== p.domain && <span className="text-cinnabar">（{m.domainLabel}）</span>}
                             <span className="text-ink-mute"> · {m.via}</span>
                           </span>
                         </li>

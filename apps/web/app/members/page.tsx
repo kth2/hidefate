@@ -131,6 +131,14 @@ export default function MembersPage() {
                 </div>
               </div>
 
+              <Link
+                href={`/person?id=${encodeURIComponent(m.id)}`}
+                className="mt-2 flex min-h-[2.75rem] items-center justify-between rounded-xl border border-cinnabar/30 bg-cinnabar/[0.05] px-3 text-[0.875rem] text-cinnabar active:opacity-70"
+              >
+                <span>这屋对{m.name}的影响</span>
+                <span aria-hidden>›</span>
+              </Link>
+
               {(() => {
                 const mine = property.rooms.filter((r) => r.occupants?.includes(m.id));
                 return mine.length > 0 ? (
