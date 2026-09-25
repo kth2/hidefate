@@ -165,7 +165,9 @@ describe('这屋对我', () => {
     expect(v.domains.find((d) => d.domain === '事业')?.label).toBe('学业');
     expect(v.summary).toContain('小明');
     for (const it of v.items) expect(it.probability).toBe(probabilityFor(it.prediction, 'm-son'));
-    for (let i = 1; i < v.items.length; i++) expect(v.items[i]!.probability).toBeLessThanOrEqual(v.items[i - 1]!.probability);
+    // 按「比平常高出多少」排，而不是绝对百分比
+    const d = (x: (typeof v.items)[number]) => Math.log(x.probability / (1 - x.probability)) - Math.log(x.neutral / (1 - x.neutral));
+    for (let i = 1; i < v.items.length; i++) expect(d(v.items[i]!)).toBeLessThanOrEqual(d(v.items[i - 1]!) + 1e-9);
   });
 
   it('该做的事：个人化解排在前面，且不重复', () => {

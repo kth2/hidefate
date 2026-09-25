@@ -6,6 +6,8 @@ import Link from 'next/link';
 import { STAR_NAME, annualStar, periodOfYear, roomExposure } from '@hidefate/core-fengshui';
 import {
   OVERVIEW_DOMAINS,
+  RELATIVE_NOTE,
+  RELATIVE_SHORT,
   RISK_COLOR,
   buildAlerts,
   familyOverview,
@@ -17,6 +19,15 @@ import { useMemo, useState } from 'react';
 import { AppBar, Empty, Expandable, Meter, SegRow, Skeleton } from '../components/mobile/ui';
 import { currentFengShuiTime } from '../lib/useAnalysis';
 import { useProperty } from '../lib/PropertyContext';
+
+/** 相对档位 → 底色：看的是比平常高出多少，而不是绝对百分比。 */
+const REL_BG: Record<string, { bg: string; fg: string }> = {
+  明显偏高: { bg: 'rgba(168,53,42,0.82)', fg: 'white' },
+  偏高: { bg: 'rgba(168,53,42,0.38)', fg: '#3d3733' },
+  与平常相当: { bg: 'rgba(0,0,0,0.03)', fg: '#3d3733' },
+  偏低: { bg: 'rgba(46,125,50,0.16)', fg: '#2e5d32' },
+  明显偏低: { bg: 'rgba(46,125,50,0.32)', fg: '#1f4a22' },
+};
 
 const MONTH_SHORT = ['正', '二', '三', '四', '五', '六', '七', '八', '九', '十', '冬', '腊'];
 
@@ -110,18 +121,23 @@ function FamilyRow({ row }: { row: ReturnType<typeof familyOverview>[number] }) 
         {row.roleLabel && <span className="w-full truncate text-[0.625rem] text-ink-mute">{row.roleLabel}</span>}
       </Link>
       {row.cells.map((c) => {
-        const p = c.probability;
-        const a = p == null ? 0 : Math.max(0.08, Math.min(0.85, (p - 0.1) * 1.1));
+        const t = c.relative ? REL_BG[c.relative]! : { bg: 'transparent', fg: '#9b928a' };
         return (
           <span
             key={c.domain}
-            className={`flex min-h-[2.75rem] items-center justify-center rounded-lg border font-serif text-[0.875rem] ${
+            className={`flex min-h-[2.75rem] items-center justify-center rounded-lg border text-[0.875rem] font-bold ${
               c.label ? 'border-rice-line' : 'border-dashed border-rice-line'
             }`}
-            style={{ background: p == null ? 'transparent' : `rgba(168,53,42,${a.toFixed(2)})`, color: a > 0.45 ? 'white' : '#3d3733' }}
-            title={c.label ?? '不适用'}
+            style={{ background: t.bg, color: t.fg }}
+            title={
+              !c.label
+                ? '不适用'
+                : c.relative
+                  ? `${c.label}：比平常${c.relative}（指数 ${Math.round((c.probability ?? 0) * 100)}）`
+                  : `${c.label}：无相关条目`
+            }
           >
-            {!c.label ? '·' : p == null ? '—' : Math.round(p * 100)}
+            {!c.label ? '·' : c.relative ? RELATIVE_SHORT[c.relative] : ''}
           </span>
         );
       })}
@@ -256,7 +272,11 @@ export default function HomePage() {
             {overview.length > 0 && (
               <section className="card">
                 <h2 className="card-title">全家 {span === 'year' ? `${year} 年` : '逐月'}</h2>
-                <p className="mt-0.5 text-[0.75rem] text-ink-mute">每格是此人个人的机率；点名字看这屋对其的影响。</p>
+                <p className="mt-0.5 text-[0.75rem] leading-relaxed text-ink-mute">
+                  {span === 'year'
+                    ? '↑ 比平常偏高、↑↑ 明显偏高、↓ 偏低；点名字看这屋对其的影响。'
+                    : '每格是此人个人的指数；点名字看这屋对其的影响。'}
+                </p>
                 <div className="mt-2">
                   <SegRow
                     value={span}
@@ -284,11 +304,12 @@ export default function HomePage() {
                     <li key={row.memberId}>
                       <b>{row.name}</b>：
                       {row.worst
-                        ? `最该留意${row.worst.label}（${Math.round(row.worst.probability * 100)}%）`
-                        : '今年没有达到留意门槛的风险'}
+                        ? `最该留意${row.worst.label}（比平常${row.worst.relative}）`
+                        : '这处房子没有让其哪一方面比平常明显偏高'}
                     </li>
                   ))}
                 </ul>
+                <p className="mt-2 text-[0.6875rem] leading-relaxed text-ink-mute">{RELATIVE_NOTE}</p>
                 </>
                 )}
               </section>

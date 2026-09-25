@@ -22,6 +22,7 @@ import type {
   CureIntent,
 } from '@hidefate/core-fengshui';
 import type { ShanXiangResult } from '@hidefate/core-qimen';
+import type { RelativeLevel } from './relative.js';
 
 /** 参与合参的门派。 */
 export type School = '玄空飞星' | '八宅' | '山向奇门' | '八字命理' | '形峦缺角';
@@ -157,6 +158,10 @@ export interface Prediction {
   readonly perMember: readonly MemberExposure[];
   /** 显示用的维度名：受影响者都是孩子时，「事业」显示为「学业」。 */
   readonly domainLabel: string;
+  /** 受影响最深者（无人时按宅论）比平常高还是低。 */
+  readonly relative: RelativeLevel;
+  /** 与 relative 对应的「平常」概率。 */
+  readonly neutral: number;
   readonly headline: string;
   readonly findings: readonly Finding[];
   readonly cures: readonly Cure[];
@@ -184,6 +189,10 @@ export interface MemberExposure {
   readonly reading: string;
   /** 此宫恰为此人的六亲之宫时，其六亲称谓（如「长子」）。 */
   readonly liuQin: string | null;
+  /** 「平常」：同一个人住在吉凶平和的位置时的概率。见 relative.ts。 */
+  readonly neutral: number;
+  /** 比平常高还是低。 */
+  readonly relative: RelativeLevel;
 }
 
 /** 合参输入。 */

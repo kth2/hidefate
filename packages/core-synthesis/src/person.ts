@@ -25,13 +25,17 @@ import {
   type LifeStage,
 } from './family.js';
 import { probabilityFor } from './predict.js';
+import { isElevated, relativeDelta, type RelativeLevel } from './relative.js';
 import type { Cure, Member, Prediction, RiskLevel, SynthesisResult } from './types.js';
 
 /** 总览固定列。孩子的「事业」读作「学业」。 */
 export const OVERVIEW_DOMAINS: readonly RiskDomain[] = ['健康', '意外', '事业', '财运', '感情'] as const;
 
-/** 达到这个概率才算「今年最该留意」—— 低于它就明说没有，不硬凑。 */
-export const NOTABLE = 0.45;
+/*
+ * 「今年最该留意」看的是**比平常高出多少**（这间房子带来的影响），不是绝对百分比：
+ * 孩子健康指数本来就高，按绝对值排，孩子永远排第一、成年人的真问题被挤掉。
+ * 只有「偏高」以上才算（isElevated）；都没有就明说没有，不硬凑。
+ */
 
 export interface PersonDomainCell {
   readonly domain: RiskDomain;
@@ -39,6 +43,10 @@ export interface PersonDomainCell {
   readonly label: string | null;
   /** 此人此维度今年的最高个人概率；无相关预测为 null。 */
   readonly probability: number | null;
+  /** 同一条的「平常」概率。 */
+  readonly neutral: number | null;
+  /** 比平常高还是低（取此维度里比平常高出最多的那一条）。 */
+  readonly relative: RelativeLevel | null;
   readonly top: Prediction | null;
 }
 
@@ -56,6 +64,8 @@ export interface PersonRoomLine {
 export interface PersonItem {
   readonly prediction: Prediction;
   readonly probability: number;
+  readonly neutral: number;
+  readonly relative: RelativeLevel;
   readonly label: string;
   readonly reading: string;
   readonly via: string;
@@ -87,14 +97,25 @@ export interface PersonView {
 function cellsFor(s: SynthesisResult, m: Member, stage: LifeStage): PersonDomainCell[] {
   return OVERVIEW_DOMAINS.map((domain) => {
     const reading = domainReading(domain, stage);
-    if (!reading) return { domain, label: null, probability: null, top: null };
-    let best: { p: Prediction; prob: number } | null = null;
+    if (!reading) return { domain, label: null, probability: null, neutral: null, relative: null, top: null };
+    // 取比平常高出最多的一条 —— 那才是「房子对此人此事的影响」最大的地方
+    let best: { p: Prediction; prob: number; neutral: number; relative: RelativeLevel; d: number } | null = null;
     for (const p of s.predictions) {
       if (p.domain !== domain) continue;
       const prob = probabilityFor(p, m.id);
-      if (prob != null && (!best || prob > best.prob)) best = { p, prob };
+      const pm = p.perMember.find((x) => x.memberId === m.id);
+      if (prob == null || !pm) continue;
+      const d = relativeDelta(prob, pm.neutral);
+      if (!best || d > best.d) best = { p, prob, neutral: pm.neutral, relative: pm.relative, d };
     }
-    return { domain, label: reading.label, probability: best?.prob ?? null, top: best?.p ?? null };
+    return {
+      domain,
+      label: reading.label,
+      probability: best?.prob ?? null,
+      neutral: best?.neutral ?? null,
+      relative: best?.relative ?? null,
+      top: best?.p ?? null,
+    };
   });
 }
 
@@ -141,10 +162,19 @@ export function buildPersonView(s: SynthesisResult, members: readonly Member[], 
       const pm = p.perMember.find((x) => x.memberId === m.id);
       const prob = probabilityFor(p, m.id);
       if (!pm || prob == null) return null;
-      return { prediction: p, probability: prob, label: pm.domainLabel, reading: pm.reading, via: pm.via };
+      return {
+        prediction: p,
+        probability: prob,
+        neutral: pm.neutral,
+        relative: pm.relative,
+        label: pm.domainLabel,
+        reading: pm.reading,
+        via: pm.via,
+      };
     })
     .filter((x): x is PersonItem => x != null)
-    .sort((a, b) => b.probability - a.probability);
+    // 按「比平常高出多少」排，同档再按指数
+    .sort((a, b) => relativeDelta(b.probability, b.neutral) - relativeDelta(a.probability, a.neutral) || b.probability - a.probability);
 
   const seen = new Set<string>();
   const todo: Cure[] = [];
@@ -159,13 +189,13 @@ export function buildPersonView(s: SynthesisResult, members: readonly Member[], 
   const dirs = personalDirections(m.mingGua.gua as never);
   const top = items[0];
   const parts: string[] = [];
-  if (top && top.probability >= NOTABLE) {
+  if (top && isElevated(top.relative)) {
     parts.push(
-      `今年${m.name}最该留意${top.label}：${top.reading}` +
-        `（约 ${Math.round(top.probability * 100)}%，来自${top.prediction.direction}${top.prediction.room ? `的${top.prediction.room}` : ''}）。`,
+      `今年${m.name}最该留意${top.label}：${top.reading}的可能比平常${top.relative}` +
+        `（来自${top.prediction.direction}${top.prediction.room ? `的${top.prediction.room}` : ''}）。`,
     );
   } else {
-    parts.push(`今年${m.name}没有达到留意门槛的风险 —— 这是好消息，不是没算出来。`);
+    parts.push(`今年这处房子没有让${m.name}哪一方面比平常明显偏高 —— 这是好消息，不是没算出来。`);
   }
   if (rooms.some((r) => r.auspicious === false)) {
     const bad = rooms.filter((r) => r.auspicious === false);
@@ -199,8 +229,8 @@ export interface FamilyOverviewRow {
   readonly stage: LifeStage;
   readonly roleLabel: string | null;
   readonly cells: readonly PersonDomainCell[];
-  /** 此人今年最高的一项；都未达门槛为 null。 */
-  readonly worst: { label: string; probability: number } | null;
+  /** 此人今年比平常高出最多的一项；没有偏高的为 null。 */
+  readonly worst: { label: string; probability: number; relative: RelativeLevel } | null;
 }
 
 /** 全家今年：成员 × 领域。 */
@@ -210,8 +240,8 @@ export function familyOverview(s: SynthesisResult, members: readonly Member[]): 
     const stage = lifeStageOf(m, s.year);
     const cells = cellsFor(s, m, stage);
     const hi = cells
-      .filter((c) => c.probability != null && c.label)
-      .sort((a, b) => b.probability! - a.probability!)[0];
+      .filter((c) => c.probability != null && c.neutral != null && c.label)
+      .sort((a, b) => relativeDelta(b.probability!, b.neutral!) - relativeDelta(a.probability!, a.neutral!))[0];
     const role = roles.get(m.id);
     return {
       memberId: m.id,
@@ -219,7 +249,7 @@ export function familyOverview(s: SynthesisResult, members: readonly Member[]): 
       stage,
       roleLabel: role ? ROLE_LABEL[role.role] : null,
       cells,
-      worst: hi && hi.probability! >= NOTABLE ? { label: hi.label!, probability: hi.probability! } : null,
+      worst: hi && isElevated(hi.relative) ? { label: hi.label!, probability: hi.probability!, relative: hi.relative! } : null,
     };
   });
 }
