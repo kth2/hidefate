@@ -272,6 +272,20 @@ function PersonInner() {
           </section>
         )}
 
+        {/* 命与运 —— 房子之外的那两层 */}
+        <Link
+          href={`/life?id=${encodeURIComponent(view.memberId)}`}
+          className="card flex items-center gap-3 active:bg-rice-deep/40"
+        >
+          <div className="min-w-0 flex-1">
+            <p className="font-serif text-[1rem] font-semibold">{view.name}的一生轨迹</p>
+            <p className="mt-0.5 text-[0.8125rem] leading-relaxed text-ink-mute">
+              本页只看这处房子；八字、紫微、流年这些「命与运」层面的事，在一生轨迹里。
+            </p>
+          </div>
+          <span className="shrink-0 text-cinnabar" aria-hidden>›</span>
+        </Link>
+
         {/* 吉方 */}
         <section className="card">
           <h2 className="card-title">{view.name}的方位</h2>

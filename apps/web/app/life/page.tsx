@@ -21,7 +21,7 @@ import { useProperty } from '../../lib/PropertyContext';
 import { db } from '../../lib/db';
 import { ensureResidence } from '../../lib/occupancy';
 import type { PredictedEvent } from '@hidefate/core-events';
-import { narratePalace } from '@hidefate/core-events';
+import { foldRecurring, narratePalace } from '@hidefate/core-events';
 import { buildYearNarrative, curesOf, summaryPrompt } from '../../lib/lifeNarrative';
 import { chatStream, type AiConfig } from '../../lib/ai';
 import { loadSettings } from '../../lib/db';
@@ -155,6 +155,11 @@ export default function LifePage() {
   const { memberRows, properties, loading, year } = useProperty();
 
   const [personId, setPersonId] = useState<string | null>(null);
+  // 从「这屋对我」跳过来时带 ?id=，直接看那个人（不用 useSearchParams，免得整页要包 Suspense）
+  useEffect(() => {
+    const id = new URLSearchParams(window.location.search).get('id');
+    if (id) setPersonId(id);
+  }, []);
   const [residences, setResidences] = useState<ResidencePeriod[]>([]);
   const [records, setRecords] = useState<PredictionRecord[]>([]);
   const [msg, setMsg] = useState<string | null>(null);
@@ -253,6 +258,12 @@ export default function LifePage() {
   const trackedYears = useMemo(
     () => new Set(records.map((r) => r.window.fromYear)),
     [records],
+  );
+
+  /** 往后十年：年年都报的同一件事折成一条，每年只展开特有的事。 */
+  const folded = useMemo(
+    () => (view ? foldRecurring(view.future.map((y) => ({ year: y.year, events: y.events }))) : null),
+    [view],
   );
 
   if (loading) return (<><AppBar title="一生轨迹" /><div className="px-4 py-4"><Skeleton lines={5} /></div></>);
@@ -581,17 +592,71 @@ export default function LifePage() {
         {/* ── 未来 ── */}
         <section>
           <h2 className="section-title">往后十年</h2>
-          <div className="space-y-2">
-            {view.future.map((y) => (
+
+          {folded && folded.standoutYears.length > 0 && (
+            <div className="mb-2 rounded-2xl border border-cinnabar/25 bg-cinnabar/[0.05] p-3.5">
+              <p className="text-[0.8125rem] font-medium text-cinnabar">这十年里最值得留意的年份</p>
+              <ul className="mt-1.5 space-y-1 text-[0.8125rem] leading-relaxed">
+                {folded.standoutYears.map(({ year: yy, event }) => (
+                  <li key={yy}>
+                    <b className="tabular-nums">{yy}</b> · {event.title}
+                    <span className="text-ink-mute">（{event.whenLabel}，{Math.round(event.probability * 100)}%）</span>
+                  </li>
+                ))}
+              </ul>
+              <p className="mt-1.5 text-[0.6875rem] leading-relaxed text-ink-mute">
+                只看「那一年才有」的事 —— 年年都有的另列在下面，不拿来排名。
+              </p>
+            </div>
+          )}
+
+          {folded && folded.recurring.length > 0 && (
+            <Expandable
+              title={<span className="text-[0.9375rem]">十年里反复出现的事（{folded.recurring.length}）</span>}
+              badge={<span className="tag shrink-0 border-rice-line text-ink-mute">不是某一年独有</span>}
+            >
+              <p className="mb-2 text-[0.75rem] leading-relaxed text-ink-mute">
+                这些事由大运、本命这类十年不变的底子撑着，所以年年都够门槛。与其每年当新消息看，
+                不如当成这十年的常态来防。
+              </p>
+              <div className="space-y-2">
+                {folded.recurring.map((r) => (
+                  <div key={r.templateId} className={`rounded-xl border bg-white p-3 ${r.valence === '凶' ? 'border-cinnabar/35' : 'border-rice-line'}`}>
+                    <div className="flex items-center gap-2">
+                      <span className={`rounded-md border px-1.5 py-0.5 text-[0.6875rem] ${tone(r.domain)}`}>{r.domain}</span>
+                      <span className="text-[0.6875rem] text-ink-mute">{new Set(r.occurrences.map((o) => o.year)).size} 年出现</span>
+                      <span className="ml-auto text-[0.875rem] font-medium tabular-nums">最高 {Math.round(r.maxProbability * 100)}%</span>
+                    </div>
+                    <p className="mt-1.5 text-[0.9375rem] font-medium leading-relaxed">
+                      <span className={r.valence === '凶' ? 'text-cinnabar' : 'text-ink-mute'}>{VALENCE_MARK[r.valence]}</span> {r.title}
+                    </p>
+                    <p className="mt-1 text-[0.75rem] leading-relaxed text-ink-mute">
+                      {r.occurrences.map((o) => `${o.whenLabel} ${Math.round(o.probability * 100)}%`).join('；')}
+                    </p>
+                    <p className="mt-1.5 text-[0.8125rem] leading-relaxed text-ink-soft">{r.advice}</p>
+                  </div>
+                ))}
+              </div>
+            </Expandable>
+          )}
+
+          <div className="mt-2 space-y-2">
+            {view.future.map((y) => {
+              const own = folded?.specific.get(y.year) ?? y.events;
+              const again = y.events.filter((e) => folded?.isRecurring(e.templateId));
+              const standout = folded?.standoutYears.some((s) => s.year === y.year) ?? false;
+              return (
               <Expandable
                 key={y.year}
                 title={`${y.year}　${y.ganZhi}　${y.age} 岁`}
-                defaultOpen={y.notable}
+                defaultOpen={y.notable || standout}
                 badge={
-                  y.notable ? (
+                  standout || y.notable ? (
                     <span className="shrink-0 rounded-md border border-cinnabar/40 bg-cinnabar/10 px-1.5 py-0.5 text-[0.6875rem] text-cinnabar">
-                      留意
+                      {standout ? '值得留意' : '留意'}
                     </span>
+                  ) : own.length > 0 ? (
+                    <span className="shrink-0 text-[0.6875rem] text-ink-mute">特有 {own.length}</span>
                   ) : undefined
                 }
               >
@@ -609,8 +674,16 @@ export default function LifePage() {
                 <div className="mt-2 space-y-2">
                   {y.events.length === 0 ? (
                     <p className="text-[0.8125rem] text-ink-mute">该年没有达到门槛的事件。</p>
+                  ) : own.length === 0 ? (
+                    <p className="text-[0.8125rem] text-ink-mute">这一年没有特有的事，只有十年里反复出现的那几件。</p>
                   ) : (
-                    y.events.map((e) => <EventCard key={e.templateId} e={e} />)
+                    own.map((e) => <EventCard key={`${e.templateId}-${e.monthIndex ?? 'y'}`} e={e} />)
+                  )}
+                  {again.length > 0 && (
+                    <p className="text-[0.75rem] leading-relaxed text-ink-mute">
+                      也会出现（十年里反复出现，见上）：
+                      {again.map((e) => `${e.title} ${Math.round(e.probability * 100)}%`).join('、')}
+                    </p>
                   )}
                 </div>
                 {y.drafts.length > 0 && (
@@ -624,7 +697,8 @@ export default function LifePage() {
                   </button>
                 )}
               </Expandable>
-            ))}
+              );
+            })}
           </div>
         </section>
 

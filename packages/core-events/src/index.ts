@@ -17,3 +17,4 @@ export * from './tokens.js';
 export * from './templates.js';
 export * from './match.js';
 export * from './narrate.js';
+export * from './recurring.js';
