@@ -19,6 +19,7 @@ import type {
   RoomKind,
   RoomPlacement,
   YouNianStar,
+  CureIntent,
 } from '@hidefate/core-fengshui';
 import type { ShanXiangResult } from '@hidefate/core-qimen';
 
@@ -59,6 +60,13 @@ export interface Cure {
   readonly domains: readonly RiskDomain[];
   /** 紧急度：'立即' | '本年内' | '可从容安排'。 */
   readonly urgency: '立即' | '本年内' | '可从容安排';
+  /**
+   * 用意：化凶（压/泄凶气）、催吉（加强吉应）、维持（无需布局）。
+   * 风险预测与预警只能挂「化凶」—— 报凶却教人催吉，是最让人摸不着头脑的矛盾。
+   */
+  readonly intent: CureIntent;
+  /** 针对哪位成员（个人化解，如床头朝向）；缺省为针对此宫。 */
+  readonly memberId?: string;
 }
 
 /** 单宫的三派合参评估。 */
@@ -141,14 +149,41 @@ export interface Prediction {
   readonly direction: string;
   readonly room: string | null;
   readonly roomKind: RoomKind | null;
-  /** 涉及的成员 id；空数组表示全家。 */
+  /**
+   * 受影响的成员 id（按受影响程度从高到低）；空数组表示此处未指定使用者、按宅论，不落到具体的人。
+   */
   readonly memberIds: readonly string[];
+  /** 每位受影响成员各自的概率与个人因素 —— 同一处房间对不同的人轻重不同。 */
+  readonly perMember: readonly MemberExposure[];
+  /** 显示用的维度名：受影响者都是孩子时，「事业」显示为「学业」。 */
+  readonly domainLabel: string;
   readonly headline: string;
   readonly findings: readonly Finding[];
   readonly cures: readonly Cure[];
   readonly confidence: ConfidenceLevel;
   /** 概率是怎么算出来的 —— 逐项加权明细，完全透明。 */
   readonly breakdown: readonly { factor: string; contribution: number; note: string }[];
+}
+
+/** 某位成员在某条预测上的个人结果。 */
+export interface MemberExposure {
+  readonly memberId: string;
+  readonly name: string;
+  readonly probability: number;
+  /** 受此处影响的程度 0–1：自己的房 1、共用 0.6、少停留 0.25。 */
+  readonly exposure: number;
+  /** 为何受影响：「睡在这里」「全家共用」等。 */
+  readonly via: string;
+  /** 个人因素（命卦、八字）的加权明细。 */
+  readonly breakdown: readonly { factor: string; contribution: number; note: string }[];
+  /** 人生阶段：儿童／少年／成人／长者。 */
+  readonly stage: '儿童' | '少年' | '成人' | '长者';
+  /** 此维度对此人的叫法（孩子的「事业」是「学业」）。 */
+  readonly domainLabel: string;
+  /** 对此人具体会是什么样的事。 */
+  readonly reading: string;
+  /** 此宫恰为此人的六亲之宫时，其六亲称谓（如「长子」）。 */
+  readonly liuQin: string | null;
 }
 
 /** 合参输入。 */

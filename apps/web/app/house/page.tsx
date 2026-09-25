@@ -21,7 +21,10 @@ import {
   judgeRoomPlacement,
   layoutSummary,
   opportunitySummary,
+  predictionsForMember,
+  probabilityFor,
 } from '@hidefate/core-synthesis';
+import { roomExposure } from '@hidefate/core-fengshui';
 import {
   dailyStar,
   monthlyStar,
@@ -31,7 +34,7 @@ import {
 } from '@hidefate/core-fengshui';
 import { computeComposite } from '@hidefate/core-synthesis';
 import { BigNineGrid, type LayerToggles } from '../../components/mobile/BigNineGrid';
-import { AppBar, Empty, Expandable, Sheet, Skeleton } from '../../components/mobile/ui';
+import { AppBar, Empty, Expandable, SegRow, Sheet, Skeleton } from '../../components/mobile/ui';
 import { useProperty } from '../../lib/PropertyContext';
 
 type View = '九宫' | '峦头' | '吉方' | '布局' | '预测' | '化解';
@@ -74,8 +77,22 @@ export default function HousePage() {
   const [selected, setSelected] = useState<PalaceIndex | null>(null);
   const [layers, setLayers] = useState<LayerToggles>({ feixing: true, bazhai: true, qimen: false });
   const [activeFloor, setActiveFloor] = useState(1);
+  /** 预测按人看：'all' 为全部；否则只列此人的，并按其个人概率排序。 */
+  const [who, setWho] = useState<string>('all');
 
   const floors = property ? floorLevelsOf(property) : [];
+  const shownPredictions = useMemo(
+    () => (!result ? [] : who === 'all' ? result.predictions : predictionsForMember(result.predictions, who)),
+    [result, who],
+  );
+  /** 还没指定使用者的专属房间（卧房、书房…）—— 它们的吉凶落不到人身上。 */
+  const unassignedRooms = useMemo(
+    () =>
+      (property?.rooms ?? [])
+        .filter((r) => roomExposure(r.kind) === '专属' && !(r.occupants?.length))
+        .map((r) => r.label ?? r.kind),
+    [property],
+  );
   const layoutIssues = useMemo(() => (result ? checkLayout(result) : []), [result]);
   const opportunities = useMemo(
     () => (result ? findOpportunities(result, members) : []),
@@ -567,25 +584,89 @@ export default function HousePage() {
 
         {view === '预测' && (
           <div className="space-y-2">
-            {result.predictions.length === 0 ? (
-              <Empty title="本年未触发显著风险" desc="若尚未标注房间与成员，建议先补齐 —— 房间权重与个人命理是概率的主要来源。" />
+            {members.length > 0 && (
+              <SegRow
+                label="按人看"
+                value={who}
+                onChange={setWho}
+                options={[{ value: 'all', label: '全部' }, ...members.map((m) => ({ value: m.id, label: m.name }))]}
+              />
+            )}
+            {unassignedRooms.length > 0 && (
+              <Link
+                href="/members"
+                className="block rounded-xl border border-risk-warn/40 bg-risk-warn/[0.06] p-3 text-[0.8125rem] leading-relaxed text-ink-soft"
+              >
+                <b className="text-risk-warn">{unassignedRooms.join('、')}</b> 还没指定谁住 ——
+                这些房间的吉凶落不到具体的人身上。<span className="text-cinnabar">到成员页指定 ›</span>
+              </Link>
+            )}
+            {shownPredictions.length === 0 ? (
+              <Empty
+                title={who === 'all' ? '本年未触发显著风险' : '本年此人未触发显著风险'}
+                desc={
+                  who === 'all'
+                    ? '若尚未标注房间与成员，建议先补齐 —— 房间权重与个人命理是概率的主要来源。'
+                    : '此人常用的房间与全家共用处，今年都没有达到出报门槛。若还没指定此人住哪间，先去成员页指定。'
+                }
+              />
             ) : (
-              result.predictions.map((p) => (
+              shownPredictions.map((p) => {
+                const pct = who === 'all' ? p.probability : (probabilityFor(p, who) ?? p.probability);
+                const mine = p.cures.filter((c) => c.memberId && (who === 'all' || c.memberId === who));
+                const general = p.cures.filter((c) => !c.memberId);
+                return (
                 <Expandable
                   key={p.id}
                   title={
                     <span className="flex items-center gap-2">
-                      <b className="font-serif text-lg">{Math.round(p.probability * 100)}%</b>
+                      <b className="font-serif text-lg">{Math.round(pct * 100)}%</b>
                       <span className="min-w-0 flex-1 truncate text-[0.875rem]">
                         {p.direction}
                         {p.room && ` · ${p.room}`}
+                        {who === 'all' && (
+                          <span className="ml-1 text-[0.75rem] text-ink-mute">
+                            {p.perMember.length === 0
+                              ? '· 未落到人'
+                              : `· ${p.perMember.filter((m) => p.memberIds.includes(m.memberId)).map((m) => m.name).join('、')}`}
+                          </span>
+                        )}
                       </span>
                     </span>
                   }
-                  badge={<span className="tag shrink-0 border-cinnabar/40 bg-cinnabar/10 text-cinnabar">{p.domain}</span>}
+                  badge={<span className="tag shrink-0 border-cinnabar/40 bg-cinnabar/10 text-cinnabar">{p.domainLabel}</span>}
                 >
                   <p className="text-[0.9375rem] leading-relaxed">{p.headline}。</p>
                   <p className="mt-2 text-[0.8125rem] text-ink-mute">置信度 {p.confidence}</p>
+
+                  {p.perMember.length > 0 && (
+                    <ul className="mt-3 space-y-1.5">
+                      {p.perMember.map((m) => (
+                        <li key={m.memberId} className="flex items-baseline gap-2 text-[0.8125rem]">
+                          <b className="w-10 shrink-0 font-serif text-[0.9375rem]">{Math.round(m.probability * 100)}%</b>
+                          <span className="min-w-0 flex-1 leading-relaxed">
+                            <b>{m.name}</b>
+                            {m.domainLabel !== p.domain && <span className="text-cinnabar">（{m.domainLabel}）</span>}
+                            <span className="text-ink-mute"> · {m.via}</span>
+                          </span>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+
+                  {(mine.length > 0 || general.length > 0) && (
+                    <div className="mt-3 rounded-xl border border-jade/30 bg-jade/[0.05] p-3">
+                      <p className="text-[0.75rem] font-medium text-jade">怎么做</p>
+                      <ul className="mt-1 space-y-1.5 text-[0.875rem] leading-relaxed">
+                        {[...mine, ...general].slice(0, 3).map((c, i) => (
+                          <li key={i}>
+                            {c.urgency !== '可从容安排' && <span className="mr-1 text-cinnabar">〔{c.urgency}〕</span>}
+                            {c.action}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
 
                   <details className="mt-3">
                     <summary className="min-h-[2.5rem] cursor-pointer text-[0.8125rem] text-cinnabar">
@@ -609,7 +690,8 @@ export default function HousePage() {
                     看 {PALACE_DIRECTION[p.palace]} 的完整依据
                   </button>
                 </Expandable>
-              ))
+                );
+              })
             )}
           </div>
         )}
@@ -628,6 +710,9 @@ export default function HousePage() {
                       {c.direction}
                       {c.room && ` · ${c.room}`}
                     </span>
+                    {c.intent !== '化凶' && (
+                      <span className="tag shrink-0 border-jade/40 bg-jade/10 text-jade">{c.intent}</span>
+                    )}
                   </span>
                 }
                 badge={

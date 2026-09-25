@@ -13,7 +13,7 @@ import {
   type PalaceIndex,
 } from '@hidefate/core-fengshui';
 import { synthesise } from './assess.js';
-import { predict } from './predict.js';
+import { predict, probabilityFor } from './predict.js';
 import type {
   AnalysisInput,
   AppliedCure,
@@ -114,8 +114,8 @@ export function buildTimeline(
 
     const memberRisk: Record<string, number> = {};
     for (const m of input.members) {
-      const mine = preds.filter((p) => p.memberIds.includes(m.id));
-      memberRisk[m.id] = mine.length ? Math.max(...mine.map((p) => p.probability)) : 0.05;
+      const mine = preds.map((p) => probabilityFor(p, m.id)).filter((x): x is number => x != null);
+      memberRisk[m.id] = mine.length ? Math.max(...mine) : 0.05;
     }
 
     years.push({

@@ -2,7 +2,10 @@
  * 房间 × 成员 风险矩阵。
  *
  * 行 = 家庭/公司成员，列 = 房间（或年份）。
- * 每格是「这个人在这个位置」的四维风险强度，点开即见古法依据与化解。
+ * 每格给两个数：
+ *   - `intensity`：按**实际使用**算的风险 —— 别人的卧房对你是 0，卫浴只是偶尔经过
+ *   - `ifUsed`：假如此人就用这间（睡这里、坐这里），风险多高 —— 供「谁住哪间」参考
+ * 早先只有后者，于是卫浴、阳台对全家人人 100，看起来比自己的卧房还危险。
  */
 
 import {
@@ -11,6 +14,9 @@ import {
   STAR_NAME,
   YOU_NIAN_META,
   crossPersonHouse,
+  exposureOf,
+  roomExposure,
+  roomNature,
   type PalaceIndex,
   type RiskDomain,
   type RoomPlacement,
@@ -27,10 +33,16 @@ export interface MatrixCell {
   readonly columnLabel: string;
   readonly palace: PalaceIndex | null;
   readonly direction: string | null;
-  /** 四维风险强度 0–1，1 为最高。 */
+  /** 按实际使用算的四维风险强度 0–1（已乘受影响程度）。 */
   readonly intensity: Readonly<Record<RiskDomain, number>>;
-  /** 综合强度（取四维加权最大项）。 */
+  /** 综合强度（取四维最大项）。 */
   readonly overall: number;
+  /** 假如此人就用这间，四维风险强度 0–1。 */
+  readonly ifUsed: Readonly<Record<RiskDomain, number>>;
+  /** 受影响程度 0–1：自己的房 1、共用 0.6、少停留 0.25、别人的房 0。 */
+  readonly exposure: number;
+  /** 此人是否被指定为这间房的使用者。 */
+  readonly occupied: boolean;
   readonly riskLevel: RiskLevel;
   readonly findings: readonly Finding[];
   readonly cures: readonly Cure[];
@@ -52,6 +64,7 @@ function domainIntensity(
   s: SynthesisResult,
   palace: PalaceIndex,
   member: Member,
+  room: RoomPlacement | null,
 ): Record<RiskDomain, number> {
   const a = s.palaces[palace];
   const base = Math.max(0, -a.score); // 0–1
@@ -59,16 +72,19 @@ function domainIntensity(
     健康: 0, 财运: 0, 感情: 0, 事业: 0, 人丁: 0, 意外: 0, 官非: 0,
   };
 
+  // 厕所、储藏落在凶方是「以凶制凶」的正解 —— 凶气被压住，宫位部分大幅打折
+  const pressed = room != null && roomNature(room.kind) === '宜凶' && a.score < 0 ? 0.3 : 1;
+
   // 该宫各 finding 按其 domain 累积
   for (const f of a.findings) {
-    const w = Math.max(0, -f.impact);
+    const w = Math.max(0, -f.impact) * pressed;
     for (const d of f.domains) out[d] = Math.min(1, out[d] + w * 0.45);
   }
 
-  // 八宅宅命交叉：个人化的关键一层
+  // 八宅命卦：个人化的关键一层（只取「此方于其命」那颗星；宅星已在宫位分里）
   if (palace !== 5) {
     const cell = crossPersonHouse(s.baZhai.houseGua, member.mingGua.gua as never)[palace as Exclude<PalaceIndex, 5>];
-    const personal = Math.max(0, -cell.score / 6);
+    const personal = Math.max(0, -YOU_NIAN_META[cell.personStar].power / 3);
     for (const d of MATRIX_DOMAINS) out[d] = Math.min(1, out[d] + personal * 0.35);
     // 五鬼六煞专攻感情与意外，绝命专攻健康与财
     if (cell.personStar === '五鬼' || cell.personStar === '六煞') {
@@ -85,7 +101,7 @@ function domainIntensity(
   const es = member.chart.elementStrength;
   if (es.dayMasterElement) {
     const factor = member.chart.confidence.factor;
-    for (const d of MATRIX_DOMAINS) out[d] = Math.min(1, out[d] * (0.75 + 0.25 * factor) + base * 0.15);
+    for (const d of MATRIX_DOMAINS) out[d] = Math.min(1, out[d] * (0.75 + 0.25 * factor) + base * pressed * 0.15);
   } else {
     // 八字残缺：只用命卦层，强度不因缺料而虚高
     for (const d of MATRIX_DOMAINS) out[d] = Math.min(1, out[d] * 0.85);
@@ -93,14 +109,43 @@ function domainIntensity(
   return out;
 }
 
-function briefOf(s: SynthesisResult, palace: PalaceIndex, member: Member, overall: number): string {
+function scaleBy(v: Readonly<Record<RiskDomain, number>>, k: number): Record<RiskDomain, number> {
+  const out = { ...v } as Record<RiskDomain, number>;
+  for (const d of Object.keys(out) as RiskDomain[]) out[d] = out[d] * k;
+  return out;
+}
+
+function usageNote(room: RoomPlacement | null, member: Member): string {
+  if (!room) return '';
+  const kind = roomExposure(room.kind);
+  const name = room.label ?? room.kind;
+  if (room.occupants?.includes(member.id)) return `${name}是${member.name}常用的地方，按全量计。`;
+  if (kind === '专属') {
+    return room.occupants?.length
+      ? `${name}不是${member.name}的房间，对其实际影响不计。`
+      : `${name}还没指定谁住，对${member.name}的实际影响暂不计。`;
+  }
+  return kind === '共用'
+    ? `${name}全家共用，按六成计。`
+    : `${name}只是偶尔经过，按两成半计${roomNature(room.kind) === '宜凶' ? '；且它正好压住本宫凶气' : ''}。`;
+}
+
+function briefOf(
+  s: SynthesisResult,
+  palace: PalaceIndex,
+  member: Member,
+  room: RoomPlacement | null,
+  ifUsed: Readonly<Record<RiskDomain, number>>,
+): string {
   const a = s.palaces[palace];
-  if (palace === 5) return `中宫：${a.combinationName}，不入八宅论断，仅以飞星与流年论。`;
+  const hypo = Math.max(...MATRIX_DOMAINS.map((d) => ifUsed[d]));
+  const tail = `假如${member.name}就用这里，风险强度 ${(hypo * 100).toFixed(0)}%。${usageNote(room, member)}`;
+  if (palace === 5) return `中宫：${a.combinationName}，不入八宅论断，仅以飞星与流年论。${tail}`;
   const cell = crossPersonHouse(s.baZhai.houseGua, member.mingGua.gua as never)[palace as Exclude<PalaceIndex, 5>];
   return (
     `${PALACE_DIRECTION[palace]}：飞星${STAR_NAME[a.stars.shan]}／${STAR_NAME[a.stars.xiang]}成「${a.combinationName}」，` +
-    `流年${STAR_NAME[a.stars.annual]}临；宅得「${cell.houseStar}」而${member.name}（${member.mingGua.gua}命）得「${cell.personStar}」` +
-    `（${YOU_NIAN_META[cell.personStar].governs}），合判「${cell.verdict}」，风险强度 ${(overall * 100).toFixed(0)}%。`
+    `流年${STAR_NAME[a.stars.annual]}临；此方于${member.name}（${member.mingGua.gua}命）为「${cell.personStar}」` +
+    `（${YOU_NIAN_META[cell.personStar].governs}）。${tail}`
   );
 }
 
@@ -116,7 +161,9 @@ export function buildRoomMemberMatrix(
   for (const m of members) {
     for (const room of rooms) {
       const palace = room.primaryPalace;
-      const intensity = domainIntensity(s, palace, m);
+      const ifUsed = domainIntensity(s, palace, m, room);
+      const exposure = exposureOf(room, m.id);
+      const intensity = scaleBy(ifUsed, exposure);
       const overall = Math.max(...MATRIX_DOMAINS.map((d) => intensity[d]));
       const a = s.palaces[palace];
       const cell: MatrixCell = {
@@ -128,10 +175,13 @@ export function buildRoomMemberMatrix(
         direction: PALACE_DIRECTION[palace],
         intensity,
         overall,
+        ifUsed,
+        exposure,
+        occupied: room.occupants?.includes(m.id) ?? false,
         riskLevel: riskLevelOf(-overall * 1.4 + 0.35),
         findings: a.findings,
-        cures: a.cures,
-        brief: briefOf(s, palace, m, overall),
+        cures: a.cures.filter((c) => c.intent === '化凶'),
+        brief: briefOf(s, palace, m, room, ifUsed),
       };
       cells.push(cell);
       index[`${m.id}|${room.id}`] = cell;
@@ -152,7 +202,7 @@ export function buildRoomMemberMatrix(
 export function buildYearMemberMatrix(
   perYear: readonly SynthesisResult[],
   members: readonly Member[],
-  /** 每人取哪一间房作代表；缺省取主卧，再缺省取全屋均值。 */
+  /** 每人取哪一间房作代表；缺省取其主卧，再缺省取其任一房间，再缺省取主卧。 */
   representativeRoom?: (m: Member, s: SynthesisResult) => RoomPlacement | null,
 ): RiskMatrix {
   const cells: MatrixCell[] = [];
@@ -168,7 +218,8 @@ export function buildYearMemberMatrix(
     for (const s of perYear) {
       const room = pick(m, s);
       const palace = room?.primaryPalace ?? 5;
-      const intensity = domainIntensity(s, palace, m);
+      // 年份矩阵取此人的代表房间，按「就住这里」算
+      const intensity = domainIntensity(s, palace, m, room);
       const overall = Math.max(...MATRIX_DOMAINS.map((d) => intensity[d]));
       const a = s.palaces[palace];
       const cell: MatrixCell = {
@@ -180,10 +231,13 @@ export function buildYearMemberMatrix(
         direction: PALACE_DIRECTION[palace],
         intensity,
         overall,
+        ifUsed: intensity,
+        exposure: 1,
+        occupied: room?.occupants?.includes(m.id) ?? false,
         riskLevel: riskLevelOf(-overall * 1.4 + 0.35),
         findings: a.findings,
-        cures: a.cures,
-        brief: briefOf(s, palace, m, overall),
+        cures: a.cures.filter((c) => c.intent === '化凶'),
+        brief: briefOf(s, palace, m, room, intensity),
       };
       cells.push(cell);
       index[`${m.id}|${s.year}`] = cell;
