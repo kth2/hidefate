@@ -22,11 +22,14 @@ import {
 import {
   RISK_COLOR,
   buildFamilyFusionReport,
+  buildPersonView,
   buildTimeline,
+  monthlyOutlook,
   synthesise,
   analyse,
   type AnalysisInput,
 } from '@hidefate/core-synthesis';
+import { PersonReportPage } from '../../components/PersonReportPage';
 import { computeShanXiang, type ShanXiangResult } from '@hidefate/core-qimen';
 import { currentFengShuiTime } from '../../lib/useAnalysis';
 import { useProperty } from '../../lib/PropertyContext';
@@ -38,6 +41,14 @@ export default function ReportPage() {
   const [now] = useState(() => currentFengShuiTime());
   const [qiMen, setQiMen] = useState<ShanXiangResult | null>(null);
   const [qiMenPending, setQiMenPending] = useState(false);
+  /** 打印范围：完整报告，或只印某一位家人的那一页（方便交给本人）。 */
+  const [scope, setScope] = useState<string>('full');
+
+  // 从「这屋对我」点「打印这一页」过来时带 ?person=，直接切到那个人
+  useEffect(() => {
+    const id = new URLSearchParams(window.location.search).get('person');
+    if (id) setScope(id);
+  }, []);
 
   // 报告须完整呈现「所有已启用门派」的盘，故此处主动把奇门层也载入，
   // 载入完成前不渲染报告 —— 否则会印出一份声称「未启用奇门」的错报告。
@@ -69,7 +80,13 @@ export default function ReportPage() {
       const fusion = members.length
         ? buildFamilyFusionReport({ profile: property, members, qiMen: null }, now.year, 10)
         : null;
-      return { result, timeline, fusion };
+      const people = members
+        .map((m) => buildPersonView(result, members, m.id))
+        .filter((v): v is NonNullable<typeof v> => v != null);
+      const monthly = members.length
+        ? monthlyOutlook({ profile: property, members, qiMen: result.qiMenEnabled ? qiMen : null, appliedCures: cures }, now.year, now.monthIndex, 12)
+        : null;
+      return { result, timeline, fusion, people, monthly };
     } catch {
       return null;
     }
@@ -81,23 +98,72 @@ export default function ReportPage() {
   }
   if (property === null || !data) return <p className="text-sm text-cinnabar">找不到此物业，或推算失败。</p>;
 
-  const { result, timeline, fusion } = data;
+  const { result, timeline, fusion, people, monthly } = data;
   const today = new Date().toISOString().slice(0, 10);
+  const monthsOf = (id: string) => monthly?.rows.find((r) => r.memberId === id) ?? null;
 
-  return (
-    <div className="report">
-      {/* 屏幕上的操作条，打印时隐藏 */}
-      <div className="no-print mb-6 flex flex-wrap items-center gap-2 rounded-lg border border-rice-line bg-white p-3">
+  // 章节号按实际出现的章节编 —— 早先写死，没有预测时会从「三」跳到「五」
+  const NUMERALS = ['一', '二', '三', '四', '五', '六', '七', '八', '九', '十'];
+  const chapters = [
+    'summary', 'grid', 'palaces',
+    ...(result.predictions.length > 0 ? ['predictions'] : []),
+    'cures',
+    ...(members.length > 0 ? ['members', 'people'] : []),
+    'timeline',
+  ];
+  const no = (key: string) => NUMERALS[chapters.indexOf(key)] ?? '';
+
+  const single = scope !== 'full' ? people.find((v) => v.memberId === scope) ?? null : null;
+
+  const controls = (
+    <div className="no-print mb-6 space-y-2 rounded-lg border border-rice-line bg-white p-3">
+      <div className="flex flex-wrap items-center gap-2">
         <button type="button" className="btn btn-primary" onClick={() => window.print()}>
           打印 / 另存为 PDF
         </button>
         <Link href="/house" className="btn">
           返回分析
         </Link>
-        <span className="text-xs text-ink-mute">
-          在打印对话框中选择「另存为 PDF」，并勾选「背景图形」以保留风险配色。
-        </span>
       </div>
+      {people.length > 0 && (
+        <label className="flex flex-wrap items-center gap-2 text-sm">
+          <span className="text-ink-mute">打印范围</span>
+          <select className="field max-w-[16rem] py-1.5" value={scope} onChange={(e) => setScope(e.target.value)}>
+            <option value="full">完整报告（含每人一页）</option>
+            {people.map((v) => (
+              <option key={v.memberId} value={v.memberId}>
+                只印「这屋对{v.name}」一页
+              </option>
+            ))}
+          </select>
+        </label>
+      )}
+      <p className="text-xs text-ink-mute">
+        在打印对话框中选择「另存为 PDF」，并勾选「背景图形」以保留风险配色。只印一人时，可以直接把 PDF 发给那位家人。
+      </p>
+    </div>
+  );
+
+  if (single) {
+    return (
+      <div className="report">
+        {controls}
+        <PersonReportPage
+          view={single}
+          months={monthsOf(single.memberId)}
+          year={result.year}
+          propertyName={property.name}
+          today={today}
+        />
+        <ReportStyles />
+      </div>
+    );
+  }
+
+  return (
+    <div className="report">
+      {/* 屏幕上的操作条，打印时隐藏 */}
+      {controls}
 
       {/* ── 封面 ── */}
       <section className="page">
@@ -169,7 +235,7 @@ export default function ReportPage() {
 
       {/* ── 一、总述 ── */}
       <section className="page">
-        <h2>一、总述</h2>
+        <h2>{no('summary')}、总述</h2>
         <p className="lead">{result.summary}</p>
 
         <h3>置信度与依据</h3>
@@ -192,7 +258,7 @@ export default function ReportPage() {
 
       {/* ── 二、九宫全盘 ── */}
       <section className="page">
-        <h2>二、九宫全盘</h2>
+        <h2>{no('grid')}、九宫全盘</h2>
         <div className="grid9">
           {GRID_LAYOUT.map((p) => {
             const a = result.palaces[p];
@@ -226,7 +292,7 @@ export default function ReportPage() {
 
       {/* ── 三、逐宫分析 ── */}
       <section className="page">
-        <h2>三、逐宫分析</h2>
+        <h2>{no('palaces')}、逐宫分析</h2>
         {PALACE_INDEXES.map((p) => {
           const a = result.palaces[p];
           return (
@@ -258,12 +324,13 @@ export default function ReportPage() {
       {/* ── 四、本年预测 ── */}
       {result.predictions.length > 0 && (
         <section className="page">
-          <h2>四、{result.year} 年概率预测</h2>
+          <h2>{no('predictions')}、{result.year} 年概率预测</h2>
           <table className="tbl">
             <thead>
               <tr>
                 <th>维度</th>
                 <th>方位 · 房间</th>
+                <th>涉及</th>
                 <th>概率</th>
                 <th>评级</th>
                 <th>置信度</th>
@@ -273,10 +340,15 @@ export default function ReportPage() {
             <tbody>
               {result.predictions.map((p) => (
                 <tr key={p.id}>
-                  <td>{p.domain}</td>
+                  <td>{p.domainLabel}</td>
                   <td>
                     {p.direction}
                     {p.room && ` · ${p.room}`}
+                  </td>
+                  <td className="small">
+                    {p.perMember.length === 0
+                      ? '未落到人'
+                      : p.perMember.map((m) => `${m.name} ${Math.round(m.probability * 100)}%`).join('、')}
                   </td>
                   <td className="num">{Math.round(p.probability * 100)}%</td>
                   <td style={{ color: RISK_COLOR[p.riskLevel] }}>{p.riskLevel}</td>
@@ -294,7 +366,7 @@ export default function ReportPage() {
 
       {/* ── 五、化解清单 ── */}
       <section className="page">
-        <h2>五、化解建议（按优先级）</h2>
+        <h2>{no('cures')}、化解建议（按优先级）</h2>
         <ol className="cures">
           {result.prioritisedCures.map((c) => (
             <li key={`${c.palace}-${c.priority}`}>
@@ -317,7 +389,7 @@ export default function ReportPage() {
       {/* ── 六、成员 ── */}
       {members.length > 0 && (
         <section className="page">
-          <h2>六、成员与宅命交叉</h2>
+          <h2>{no('members')}、成员与宅命交叉</h2>
           <table className="tbl">
             <thead>
               <tr>
@@ -374,9 +446,22 @@ export default function ReportPage() {
         </section>
       )}
 
-      {/* ── 七、多年时间轴 ── */}
+      {/* ── 每人一页 ── */}
+      {people.map((v, i) => (
+        <PersonReportPage
+          key={v.memberId}
+          view={v}
+          months={monthsOf(v.memberId)}
+          year={result.year}
+          propertyName={property.name}
+          today={today}
+          kicker={`${no('people')}、每人一页（${i + 1}/${people.length}）`}
+        />
+      ))}
+
+      {/* ── 多年时间轴 ── */}
       <section className="page">
-        <h2>{members.length > 0 ? '七' : '六'}、宅运时间轴（{timeline.startYear}–{timeline.endYear}）</h2>
+        <h2>{no('timeline')}、宅运时间轴（{timeline.startYear}–{timeline.endYear}）</h2>
         <p className="lead">{timeline.summary}</p>
         <table className="tbl">
           <thead>
@@ -449,7 +534,15 @@ export default function ReportPage() {
         </p>
       </section>
 
-      <style jsx global>{`
+      <ReportStyles />
+    </div>
+  );
+}
+
+/** 报告的排版与打印样式（完整报告与单人页共用）。 */
+function ReportStyles() {
+  return (
+  <style jsx global>{`
         .report {
           max-width: 48rem;
           margin: 0 auto;
@@ -677,7 +770,9 @@ export default function ReportPage() {
             background: #fff !important;
           }
           header,
-          footer {
+          footer,
+          nav {
+            /* 底部导航是 position: fixed，不藏会被印在每一页底部 */
             display: none !important;
           }
           main {
@@ -705,7 +800,39 @@ export default function ReportPage() {
             margin: 16mm 14mm;
           }
         }
+      
+        /* 每人一页 */
+        .kicker {
+          font-size: 11px;
+          letter-spacing: 0.2em;
+          color: #a8352a;
+          margin: 0 0 4px;
+        }
+        .person-tags {
+          color: #6b625c;
+          margin: -6px 0 4px;
+        }
+        .person-summary {
+          border-left: 3px solid #a8352a;
+          padding-left: 10px;
+          font-size: 13.5px;
+        }
+        .two-col {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 18px;
+        }
+        .months td,
+        .months th {
+          padding: 3px 6px;
+        }
+        .months th,
+        .months td:nth-child(-n + 5) {
+          white-space: nowrap;
+        }
+        .person-page {
+          break-inside: auto;
+        }
       `}</style>
-    </div>
   );
 }
