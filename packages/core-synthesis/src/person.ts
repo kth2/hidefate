@@ -16,20 +16,23 @@ import {
   type YouNianStar,
 } from '@hidefate/core-fengshui';
 import {
+  ASPECTS,
   ROLE_LABEL,
   ROLE_PALACE,
+  aspectApplies,
   assignFamilyRoles,
-  domainReading,
   lifeStageOf,
+  type Aspect,
   type FamilyRoleInfo,
   type LifeStage,
 } from './family.js';
+import { buildAspectAdvice, type AspectAdvice } from './advice.js';
 import { probabilityFor } from './predict.js';
 import { isElevated, relativeDelta, type RelativeLevel } from './relative.js';
 import type { Cure, Member, Prediction, RiskLevel, SynthesisResult } from './types.js';
 
-/** 总览固定列。孩子的「事业」读作「学业」。 */
-export const OVERVIEW_DOMAINS: readonly RiskDomain[] = ['健康', '意外', '事业', '财运', '感情'] as const;
+/** 总览固定列：人生八个方面。 */
+export const OVERVIEW_ASPECTS: readonly Aspect[] = ASPECTS;
 
 /*
  * 「今年最该留意」看的是**比平常高出多少**（这间房子带来的影响），不是绝对百分比：
@@ -38,9 +41,10 @@ export const OVERVIEW_DOMAINS: readonly RiskDomain[] = ['健康', '意外', '事
  */
 
 export interface PersonDomainCell {
-  readonly domain: RiskDomain;
-  /** 对此人的叫法；不适用（孩子的财运）为 null。 */
-  readonly label: string | null;
+  /** 八个方面之一。 */
+  readonly domain: Aspect;
+  /** 适用时与 domain 相同；不适用（孩子的财运、长者的学业）为 null。 */
+  readonly label: Aspect | null;
   /** 此人此维度今年的最高个人概率；无相关预测为 null。 */
   readonly probability: number | null;
   /** 同一条的「平常」概率。 */
@@ -92,25 +96,25 @@ export interface PersonView {
   readonly todo: readonly Cure[];
   /** 一句话。 */
   readonly summary: string;
+  /** 风水师建言：人生八个方面（只含适用于此人的），逐项给现状、宜、忌、依据。 */
+  readonly advice: readonly AspectAdvice[];
 }
 
 function cellsFor(s: SynthesisResult, m: Member, stage: LifeStage): PersonDomainCell[] {
-  return OVERVIEW_DOMAINS.map((domain) => {
-    const reading = domainReading(domain, stage);
-    if (!reading) return { domain, label: null, probability: null, neutral: null, relative: null, top: null };
+  return ASPECTS.map((domain) => {
+    if (!aspectApplies(domain, stage)) return { domain, label: null, probability: null, neutral: null, relative: null, top: null };
     // 取比平常高出最多的一条 —— 那才是「房子对此人此事的影响」最大的地方
     let best: { p: Prediction; prob: number; neutral: number; relative: RelativeLevel; d: number } | null = null;
     for (const p of s.predictions) {
-      if (p.domain !== domain) continue;
       const prob = probabilityFor(p, m.id);
       const pm = p.perMember.find((x) => x.memberId === m.id);
-      if (prob == null || !pm) continue;
+      if (prob == null || !pm || pm.domainLabel !== domain) continue;
       const d = relativeDelta(prob, pm.neutral);
       if (!best || d > best.d) best = { p, prob, neutral: pm.neutral, relative: pm.relative, d };
     }
     return {
       domain,
-      label: reading.label,
+      label: domain,
       probability: best?.prob ?? null,
       neutral: best?.neutral ?? null,
       relative: best?.relative ?? null,
@@ -187,6 +191,7 @@ export function buildPersonView(s: SynthesisResult, members: readonly Member[], 
   for (const it of items.slice(0, 4)) for (const c of it.prediction.cures) if (!c.memberId) push(c);
 
   const dirs = personalDirections(m.mingGua.gua as never);
+  const aspectCells = cellsFor(s, m, stage);
   const top = items[0];
   const parts: string[] = [];
   if (top && isElevated(top.relative)) {
@@ -216,10 +221,11 @@ export function buildPersonView(s: SynthesisResult, members: readonly Member[], 
     unassigned: rooms.length === 0,
     bestDirections: dirs.best.map((d) => ({ star: d.star, direction: PALACE_DIRECTION[d.palace] })),
     worstDirections: dirs.worst.map((d) => ({ star: d.star, direction: PALACE_DIRECTION[d.palace] })),
-    domains: cellsFor(s, m, stage),
+    domains: aspectCells,
     items,
     todo,
     summary: parts.join(''),
+    advice: buildAspectAdvice(s, members, m.id, aspectCells),
   };
 }
 

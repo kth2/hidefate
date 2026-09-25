@@ -138,41 +138,66 @@ export function lifeStageOf(m: Member, year: number): LifeStage {
   return '成人';
 }
 
+/**
+ * 人生八个方面 —— 风水师看一个人时逐项过的那几件事。
+ *
+ * 引擎内部的维度（RiskDomain）是古法的应事分类；这里是给人看的叫法：
+ * 「人丁」读作子女、「官非」读作人际（口舌是非、官司都在其中）。
+ * 孩子没有事业财运感情可言，也不谈子女；长者不谈学业。
+ */
+export type Aspect = '健康' | '意外' | '感情' | '子女' | '学业' | '事业' | '财运' | '人际';
+
+export const ASPECTS: readonly Aspect[] = ['健康', '意外', '感情', '子女', '学业', '事业', '财运', '人际'] as const;
+
 /** 某个风险维度对某阶段的人意味着什么；null = 不适用，不该报给此人。 */
 export interface DomainReading {
-  /** 显示用的名目，如孩子的「事业」显示为「学业」。 */
-  readonly label: string;
+  /** 显示用的名目，即八个方面之一（孩子的「事业」读作「学业」）。 */
+  readonly label: Aspect;
   /** 对此人具体会是什么样的事。 */
   readonly text: string;
 }
 
-const ADULT_TEXT: Readonly<Record<RiskDomain, string>> = {
-  健康: '出现相关症状或需要就医',
-  财运: '破财、投资失利或收入停滞',
-  感情: '争执、疏离或第三者困扰',
-  事业: '升迁受阻或职务动荡',
-  人丁: '家中添丁、子女相关的波折',
-  意外: '跌碰、器械伤或突发事故',
-  官非: '卷入争讼、合约纠纷',
+const ADULT: Readonly<Record<RiskDomain, DomainReading>> = {
+  健康: { label: '健康', text: '出现相关症状或需要就医' },
+  意外: { label: '意外', text: '跌碰、器械伤或突发事故' },
+  感情: { label: '感情', text: '争执、疏离或第三者困扰' },
+  人丁: { label: '子女', text: '求子不顺、子女操心或亲子不和' },
+  学业: { label: '学业', text: '进修、考证或资格审核受阻' },
+  事业: { label: '事业', text: '升迁受阻或职务动荡' },
+  财运: { label: '财运', text: '破财、投资失利或收入停滞' },
+  官非: { label: '人际', text: '口舌是非、合约纠纷或卷入官司' },
 };
 
 const MINOR: Readonly<Partial<Record<RiskDomain, DomainReading>>> = {
   健康: { label: '健康', text: '生病、体弱或需要就医' },
   意外: { label: '意外', text: '跌碰、烫伤或运动受伤' },
-  事业: { label: '学业', text: '学业受阻、考试失常或注意力难集中' },
+  学业: { label: '学业', text: '读书不专心、考试失常或成绩下滑' },
+  // 官星压力对孩子即课业压力
+  事业: { label: '学业', text: '课业压力大、考试失常或注意力难集中' },
   官非: { label: '人际', text: '与同学、师长起口角，被误会或受欺负' },
 };
 
 const ELDER: Readonly<Partial<Record<RiskDomain, DomainReading>>> = {
   健康: { label: '健康', text: '慢性病反复、体力下滑，宜定期检查' },
   意外: { label: '意外', text: '跌倒碰伤，尤其夜间起身与浴室' },
+  人丁: { label: '子女', text: '为儿孙之事操心' },
+  感情: ADULT.感情,
+  事业: ADULT.事业,
+  财运: ADULT.财运,
+  官非: ADULT.官非,
 };
 
-/** 此维度对此阶段的人意味着什么。孩子不报财运、感情、人丁。 */
+/** 此维度对此阶段的人意味着什么。孩子不报财运、感情、子女；长者不报学业。 */
 export function domainReading(domain: RiskDomain, stage: LifeStage): DomainReading | null {
   if (stage === '儿童' || stage === '少年') return MINOR[domain] ?? null;
-  if (stage === '长者') return ELDER[domain] ?? { label: domain, text: ADULT_TEXT[domain] };
-  return { label: domain, text: ADULT_TEXT[domain] };
+  if (stage === '长者') return ELDER[domain] ?? null;
+  return ADULT[domain];
+}
+
+/** 此方面对此阶段的人适不适用。 */
+export function aspectApplies(aspect: Aspect, stage: LifeStage): boolean {
+  const table = stage === '儿童' || stage === '少年' ? MINOR : stage === '长者' ? ELDER : ADULT;
+  return Object.values(table).some((r) => r?.label === aspect);
 }
 
 /**

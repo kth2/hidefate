@@ -5,7 +5,7 @@
 import Link from 'next/link';
 import { STAR_NAME, annualStar, periodOfYear, roomExposure } from '@hidefate/core-fengshui';
 import {
-  OVERVIEW_DOMAINS,
+  OVERVIEW_ASPECTS,
   RELATIVE_NOTE,
   RELATIVE_SHORT,
   RISK_COLOR,
@@ -290,10 +290,10 @@ export default function HomePage() {
                 {span === 'month' && monthly && <MonthlyGrid outlook={monthly} />}
                 {span === 'year' && (
                 <>
-                <div className="mt-3 grid grid-cols-[4.5rem_repeat(5,1fr)] items-center gap-1 text-center text-[0.6875rem] text-ink-mute">
+                <div className="mt-3 grid grid-cols-[3.75rem_repeat(8,1fr)] items-center gap-[3px] text-center text-[0.625rem] text-ink-mute">
                   <span />
-                  {OVERVIEW_DOMAINS.map((d) => (
-                    <span key={d}>{d === '事业' ? '事业/学业' : d}</span>
+                  {OVERVIEW_ASPECTS.map((d) => (
+                    <span key={d}>{d}</span>
                   ))}
                   {overview.map((row) => (
                     <FamilyRow key={row.memberId} row={row} />

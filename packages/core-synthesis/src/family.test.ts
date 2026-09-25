@@ -162,7 +162,11 @@ describe('这屋对我', () => {
     expect(v.rooms.map((r) => r.label)).toEqual(['小明房']);
     expect(v.bestDirections).toHaveLength(4);
     expect(v.domains.find((d) => d.domain === '财运')?.label).toBeNull();
-    expect(v.domains.find((d) => d.domain === '事业')?.label).toBe('学业');
+    // 孩子：学业是独立的一个方面；事业、感情、子女不适用
+    expect(v.domains.find((d) => d.domain === '学业')?.label).toBe('学业');
+    expect(v.domains.find((d) => d.domain === '事业')?.label).toBeNull();
+    expect(v.domains.find((d) => d.domain === '子女')?.label).toBeNull();
+    expect(v.domains.map((d) => d.domain)).toEqual(['健康', '意外', '感情', '子女', '学业', '事业', '财运', '人际']);
     expect(v.summary).toContain('小明');
     for (const it of v.items) expect(it.probability).toBe(probabilityFor(it.prediction, 'm-son'));
     // 按「比平常高出多少」排，而不是绝对百分比

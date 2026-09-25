@@ -39,7 +39,12 @@ export interface StarMeta {
   readonly riskDomains: readonly RiskDomain[];
 }
 
-export type RiskDomain = '健康' | '财运' | '感情' | '事业' | '人丁' | '意外' | '官非';
+/**
+ * 风险／应事维度。
+ * 「学业」原本并在事业、感情里 —— 一白四绿是文昌星，主读书考试，却被当成事业星用，
+ * 于是孩子与考生永远只看到事业。「人丁」即子女、添丁。
+ */
+export type RiskDomain = '健康' | '财运' | '感情' | '事业' | '人丁' | '意外' | '官非' | '学业';
 
 export const STAR_META: Record<PalaceIndex, StarMeta> = {
   1: {
@@ -48,7 +53,7 @@ export const STAR_META: Record<PalaceIndex, StarMeta> = {
     whenDeclining: '主漂泊、肾虚、耳疾、酒色、水厄与刑妻',
     organs: ['肾', '膀胱', '耳', '血液', '泌尿生殖'],
     ailments: ['肾虚', '泌尿系统炎症', '耳鸣耳聋', '贫血', '妇科', '寒湿'],
-    person: '中男', riskDomains: ['事业', '健康', '感情'],
+    person: '中男', riskDomains: ['学业', '事业', '健康', '感情'],
   },
   2: {
     star: 2, name: '二黑', alias: '巨门', wuXing: '土', nature: '凶',
@@ -72,7 +77,7 @@ export const STAR_META: Record<PalaceIndex, StarMeta> = {
     whenDeclining: '主淫荡桃花、精神耗弱、自缢漂流、股疾',
     organs: ['胆', '股', '呼吸道', '神经', '毛发'],
     ailments: ['神经衰弱', '抑郁焦虑', '哮喘', '肩颈', '风湿'],
-    person: '长女', riskDomains: ['事业', '感情', '健康'],
+    person: '长女', riskDomains: ['学业', '感情', '事业', '健康'],
   },
   5: {
     star: 5, name: '五黄', alias: '廉贞', wuXing: '土', nature: '凶',
@@ -112,7 +117,7 @@ export const STAR_META: Record<PalaceIndex, StarMeta> = {
     whenDeclining: '主火灾目疾、心血管、性急争讼、血光',
     organs: ['心', '眼', '血液循环', '小肠'],
     ailments: ['心脏病', '高血压', '眼疾', '烧烫伤', '失眠心悸'],
-    person: '中女', riskDomains: ['感情', '事业', '健康', '意外'],
+    person: '中女', riskDomains: ['感情', '人丁', '事业', '健康', '意外'],
   },
 };
 
@@ -203,11 +208,11 @@ export const COMBINATIONS: readonly Combination[] = [
     meaning: '七赤金克三碧木，主口舌升级为官非诉讼，亦主被盗、被诈与突发破财。',
     classical: '《玄空秘旨》：「蚩尤破军，同宫劫盗更凶。」',
     cures: ['以水通关，忌火忌利器。', '慎签合约、慎作担保。'] },
-  { key: '1-4', name: '文昌局', nature: '吉', magnitude: 0.9, domains: ['事业'],
+  { key: '1-4', name: '文昌局', nature: '吉', magnitude: 0.9, domains: ['学业', '事业'],
     meaning: '一四同宫，水木相生，主科名文章、考试升迁、创作灵感，为读书人第一吉方。',
     classical: '《玄机赋》：「一四同宫，准发科名之显。」',
     cures: ['宜设书桌、书房、办公位；置四支富贵竹于清水中催文昌。', '保持整洁明亮，忌堆杂物与厕所。'] },
-  { key: '4-1', name: '文昌局', nature: '吉', magnitude: 0.9, domains: ['事业', '感情'],
+  { key: '4-1', name: '文昌局', nature: '吉', magnitude: 0.9, domains: ['学业', '事业', '感情'],
     meaning: '四绿文曲与一白贪狼同宫，主科名文章、考试得中；向星一白兼主人缘桃花，未婚者可于此方催正缘。',
     classical: '《玄机赋》：「一四同宫，准发科名之显。」',
     cures: ['书桌、办公位首选；置文昌塔或富贵竹。'] },
@@ -235,7 +240,7 @@ export const COMBINATIONS: readonly Combination[] = [
     meaning: '山星六白主男主人得权，向星一白主智慧财，合作与仕途皆利。',
     classical: '《玄机赋》：「金水多情。」',
     cures: ['宜作男主人卧房或办公位。'] },
-  { key: '8-9', name: '紫辅同宫', nature: '吉', magnitude: 0.9, domains: ['财运', '感情'],
+  { key: '8-9', name: '紫辅同宫', nature: '吉', magnitude: 0.9, domains: ['财运', '感情', '人丁'],
     meaning: '九紫火生八白土，当元财星得生，主婚喜连连、置业添丁、名利双收。',
     classical: '《紫白诀》：「八逢紫曜，婚喜重来。」',
     cures: ['宜设大门、主卧、客厅；置红色或紫色饰物助火生土。'] },
@@ -279,7 +284,7 @@ export const COMBINATIONS: readonly Combination[] = [
     meaning: '五黄重叠，最凶之局，主重大伤亡、破产、急症手术。',
     classical: '《紫白诀》：「五黄正煞，不拘临方到向，人口常损。」',
     cures: ['封闭化静，最好作储藏或完全不使用。', '成串六帝钱 + 铜铃 + 铜葫芦；全年禁动土。'] },
-  { key: '1-1', name: '双白同宫', nature: '吉', magnitude: 0.7, domains: ['事业', '感情'],
+  { key: '1-1', name: '双白同宫', nature: '吉', magnitude: 0.7, domains: ['学业', '事业', '感情'],
     meaning: '一白重叠，主智慧与桃花皆盛；当运利名利，失运则易溺于情色。',
     classical: '《玄机赋》：「坎宫高塞而耳聋。」',
     cures: ['宜书房与谈判位；置清水与金属摆件。'] },
@@ -299,7 +304,7 @@ export const COMBINATIONS: readonly Combination[] = [
     meaning: '七赤与六白双金相击，是为交剑，主血光刀伤、盗劫、官非与正面冲突。',
     classical: '《紫白诀》：「交剑煞兴，多劫掠。」',
     cures: ['以水泄金；收好刀具利器。'] },
-  { key: '4-4', name: '双绿同宫', nature: '中', magnitude: 0.5, domains: ['事业', '感情'],
+  { key: '4-4', name: '双绿同宫', nature: '中', magnitude: 0.5, domains: ['学业', '事业', '感情'],
     meaning: '四绿重叠，当运主文名远播、桃花旺；失运则主神经衰弱、烂桃花、优柔寡断。',
     classical: '《玄空秘旨》：「同来震巽，昧事无常。」',
     cures: ['当运置文昌塔催名；失运则以火（红色）泄木定神。'] },

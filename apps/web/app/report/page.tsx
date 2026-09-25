@@ -833,6 +833,25 @@ function ReportStyles() {
         .person-page {
           break-inside: auto;
         }
+        .advice-item {
+          margin-bottom: 6px;
+          break-inside: avoid;
+        }
+        .advice .yi,
+        .advice .ji {
+          display: inline-block;
+          font-size: 10px;
+          padding: 0 5px;
+          border-radius: 6px;
+          color: #fff;
+          margin-right: 4px;
+        }
+        .advice .yi {
+          background: #2e7d32;
+        }
+        .advice .ji {
+          background: #a8352a;
+        }
       `}</style>
   );
 }

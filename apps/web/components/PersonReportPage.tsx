@@ -81,7 +81,7 @@ export function PersonReportPage({
       </table>
       <p className="cap">
         和「平常」比：{RELATIVE_NOTE}括号里的「指数」是模型给{view.name}个人的原始分数。
-        {view.stage === '儿童' || view.stage === '少年' ? '孩子不看财运与感情；「事业」按学业看。' : ''}
+        {view.stage === '儿童' || view.stage === '少年' ? '孩子不看感情、子女、事业、财运。' : view.stage === '长者' ? '长者不看学业。' : ''}
       </p>
 
       <div className="two-col">
@@ -117,6 +117,29 @@ export function PersonReportPage({
           </p>
         </div>
       </div>
+
+      {view.advice.length > 0 && (
+        <>
+          <h3>风水师建言 · {view.advice.length} 个方面</h3>
+          <div className="advice small">
+            {view.advice.map((a) => (
+              <div key={a.aspect} className="advice-item">
+                <b>
+                  {a.aspect}
+                  <span className="dim">（{a.status == null ? '平稳' : a.status === '与平常相当' ? '如常' : a.status}）</span>
+                </b>
+                ：{a.focus}
+                <div>
+                  <span className="yi">宜</span> {a.yi.join('；')}
+                </div>
+                <div>
+                  <span className="ji">忌</span> {a.ji.join('；')}
+                </div>
+              </div>
+            ))}
+          </div>
+        </>
+      )}
 
       {view.todo.length > 0 && (
         <>
