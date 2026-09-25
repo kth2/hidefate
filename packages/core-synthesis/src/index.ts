@@ -12,6 +12,7 @@ export * from './family.js';
 export * from './relative.js';
 export * from './person.js';
 export * from './monthly.js';
+export * from './roomPlan.js';
 export * from './matrix.js';
 export * from './timeline.js';
 export * from './residence.js';
