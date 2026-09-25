@@ -138,6 +138,13 @@ export default function MePage() {
           <section>
             <h2 className="section-title">看分析</h2>
             <div className="overflow-hidden rounded-2xl border border-rice-line bg-white">
+              <Link href="/plan" className="row">
+                <span className="flex-1">
+                  怎么分房最好
+                  <span className="block text-[0.75rem] text-ink-mute">试遍卧房分法，找出对全家影响最小的一种，一键套用</span>
+                </span>
+                <Chevron />
+              </Link>
               <Link href="/analysis/fusion" className="row">
                 <span className="flex-1">
                   家庭融合报告

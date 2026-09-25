@@ -53,3 +53,21 @@ export async function ensureResidence(member: Pick<StoredMember, 'id' | 'year'>,
   });
   return true;
 }
+
+/**
+ * 套用分房方案：把给出的卧房的使用者整体换成方案里的人。
+ *
+ * 只动方案里列出的房间（都是卧房）；书房、座位等其它房间的使用者原样保留。
+ */
+export async function applyBedroomPlan(
+  propertyId: string,
+  assignment: Readonly<Record<string, readonly string[]>>,
+): Promise<void> {
+  const d = db();
+  await d.transaction('rw', d.properties, async () => {
+    const p = await d.properties.get(propertyId);
+    if (!p) return;
+    const rooms = p.rooms.map((r) => (r.id in assignment ? { ...r, occupants: [...assignment[r.id]!] } : r));
+    await d.properties.put({ ...p, rooms, updatedAt: new Date().toISOString() });
+  });
+}

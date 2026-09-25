@@ -255,6 +255,16 @@ function PersonInner() {
           )}
         </section>
 
+        {view.rooms.some((r) => r.auspicious === false) && (
+          <Link
+            href="/plan"
+            className="block rounded-xl border border-cinnabar/30 bg-cinnabar/[0.05] p-3 text-[0.875rem] leading-relaxed text-ink-soft"
+          >
+            {view.name}的房间落在其凶方。看看全家换个分法会不会更好
+            <span className="text-cinnabar"> 怎么分房最好 ›</span>
+          </Link>
+        )}
+
         {/* 六亲之宫 */}
         {view.rolePalace && (
           <section className="card">

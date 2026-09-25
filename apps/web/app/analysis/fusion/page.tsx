@@ -2,6 +2,7 @@
 
 /** 家庭融合报告 —— 谁最受益、谁最受克、各自最宜与最忌的房间。 */
 
+import Link from 'next/link';
 import { useMemo } from 'react';
 import { buildFamilyFusionReport } from '@hidefate/core-synthesis';
 import { AppBar, Empty, Expandable, Skeleton } from '../../../components/mobile/ui';
@@ -97,6 +98,9 @@ export default function FusionPage() {
                 <li key={i}>{a}</li>
               ))}
             </ul>
+            <Link href="/plan" className="btn btn-block mt-3">
+              算一算怎么分房最好，一键套用
+            </Link>
           </section>
         )}
 
