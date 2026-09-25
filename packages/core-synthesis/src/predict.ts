@@ -48,6 +48,7 @@ import {
   stageVulnerability,
   type FamilyRoleInfo,
 } from './family.js';
+import { relativeLevel, type RelativeLevel } from './relative.js';
 import {
   riskLevelOf,
   type AnalysisInput,
@@ -299,15 +300,21 @@ function buildPrediction(
 
   // 3. 建筑类别维度权重
   const bw = (buildingWeight as Record<string, number>)[domain] ?? 1;
+  const buildingContribution = (bw - 1) * 1.2;
   common.push({
     factor: '建筑类别侧重',
-    contribution: (bw - 1) * 1.2,
+    contribution: buildingContribution,
     note: `${input.profile.buildingType}在「${domain}」维度权重 ${bw.toFixed(2)}：${BUILDING_PROFILES[input.profile.buildingType].note}`,
   });
 
   const commonSum = common.reduce((s, c) => s + c.contribution, 0);
   /** 按宅论（没有具体的人）时的 logit。 */
   const placeLogit = BASE_LOGIT + commonSum + extraLogit;
+  /**
+   * 「平常」：同一处换成吉凶平和的位置 —— 宫位、房间、命卦、八字都归零，
+   * 只留与房子无关的部分（建筑类别；逐人时再加人生阶段易感度）。见 relative.ts。
+   */
+  const placeNeutral = squash(BASE_LOGIT + buildingContribution);
 
   // 4. 逐人：命卦 × 八字 × 受影响程度，各算各的
   const hostile: WuXing[] = [];
@@ -349,10 +356,14 @@ function buildPrediction(
       });
       const logit =
         BASE_LOGIT + (commonSum + extraLogit + b.contribution + g.contribution + (vul?.add ?? 0)) * e.exposure;
+      const probability = squash(logit);
+      const neutral = squash(BASE_LOGIT + (buildingContribution + (vul?.add ?? 0)) * e.exposure);
       return {
         memberId: e.member.id,
         name: e.member.name,
-        probability: squash(logit),
+        probability,
+        neutral,
+        relative: relativeLevel(probability, neutral),
         exposure: e.exposure,
         via: e.via,
         breakdown: personal,
@@ -422,7 +433,16 @@ function buildPrediction(
     memberIds: perMember.filter((m) => m.probability >= REPORT_THRESHOLD || mandatory).map((m) => m.memberId),
     perMember,
     domainLabel: sharedLabel(domain, perMember),
-    headline: headlineFor(domain, assessment, topRoom?.kind ?? null, probability, perMember),
+    relative: perMember[0]?.relative ?? relativeLevel(probability, placeNeutral),
+    neutral: perMember[0]?.neutral ?? placeNeutral,
+    headline: headlineFor(
+      domain,
+      assessment,
+      topRoom?.kind ?? null,
+      probability,
+      perMember,
+      perMember[0]?.relative ?? relativeLevel(probability, placeNeutral),
+    ),
     findings: [...assessment.findings.filter((f) => f.domains.some((d) => d === domain)), ...findings],
     cures,
     confidence,
@@ -442,25 +462,34 @@ function headlineFor(
   roomKind: RoomKind | null,
   prob: number,
   perMember: readonly MemberExposure[],
+  placeRelative: RelativeLevel,
 ): string {
   const shown = perMember.filter((m) => m.probability >= REPORT_THRESHOLD).slice(0, 3);
   const who = shown.length === 0 ? '住在这一带的人' : shown.map((m) => m.name).join('、');
   const where = roomKind ? `${a.direction}的${roomKind}` : a.direction;
   const pct = (x: number) => `${Math.round(x * 100)}%`;
-  const odds = shown.length > 1 ? `：${shown.map((m) => `${m.name} ${pct(m.probability)}`).join('、')}` : `约 ${pct(prob)}`;
+  /**
+   * 先说「比平常高还是低」，百分比退居括号里当指数。
+   * 孩子一年里本来就常看病，「就医 87%」单独摆出来，读的人分不清是房子的问题还是本来如此。
+   */
+  const rel = (r: RelativeLevel) => (r === '与平常相当' ? '与平常相当' : `比平常${r}`);
+  const odds =
+    shown.length > 1
+      ? `：${shown.map((m) => `${m.name}${rel(m.relative)}（指数 ${pct(m.probability)}）`).join('、')}`
+      : `${rel(shown[0]?.relative ?? placeRelative)}（指数 ${pct(prob)}）`;
   // 全是孩子、或全是长者时，按其阶段的说法讲（孩子的「事业」是学业）
   const readings = new Set(shown.map((m) => m.reading));
   if (shown.length > 0 && readings.size === 1 && shown[0]!.stage !== '成人') {
-    return `${where}牵动${who}的${shown[0]!.domainLabel}，本年${shown[0]!.reading}的机率${odds}`;
+    return `${where}牵动${who}的${shown[0]!.domainLabel}，本年${shown[0]!.reading}的可能${odds}`;
   }
   const map: Record<RiskDomain, string> = {
-    健康: `${where}对${who}的健康构成压力，本年出现相关症状或就医的机率${odds}`,
-    财运: `${where}影响${who}的财路，本年出现破财、投资失利或收入停滞的机率${odds}`,
-    感情: `${where}不利${who}的感情，本年出现争执、疏离或第三者困扰的机率${odds}`,
-    事业: `${where}牵动${who}的事业，本年出现升迁受阻或职务动荡的机率${odds}`,
-    人丁: `${where}关乎${who}的人丁与家运，本年相关波折机率${odds}`,
-    意外: `${where}有意外之虞，${who}本年发生跌碰、器械伤或突发事故的机率${odds}`,
-    官非: `${where}主口舌官非，${who}本年卷入争讼、合约纠纷的机率${odds}`,
+    健康: `${where}对${who}的健康构成压力，本年出现相关症状或就医的可能${odds}`,
+    财运: `${where}影响${who}的财路，本年出现破财、投资失利或收入停滞的可能${odds}`,
+    感情: `${where}不利${who}的感情，本年出现争执、疏离或第三者困扰的可能${odds}`,
+    事业: `${where}牵动${who}的事业，本年出现升迁受阻或职务动荡的可能${odds}`,
+    人丁: `${where}关乎${who}的人丁与家运，本年相关波折的可能${odds}`,
+    意外: `${where}有意外之虞，${who}本年发生跌碰、器械伤或突发事故的可能${odds}`,
+    官非: `${where}主口舌官非，${who}本年卷入争讼、合约纠纷的可能${odds}`,
   };
   return map[domain];
 }

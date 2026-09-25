@@ -12,7 +12,13 @@
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { Suspense, useMemo } from 'react';
-import { RISK_COLOR, buildPersonView, monthlyOutlook, type PersonDomainCell } from '@hidefate/core-synthesis';
+import {
+  RELATIVE_NOTE,
+  RISK_COLOR,
+  buildPersonView,
+  monthlyOutlook,
+  type PersonDomainCell,
+} from '@hidefate/core-synthesis';
 import { currentFengShuiTime } from '../../lib/useAnalysis';
 import { AppBar, Empty, Expandable, Skeleton } from '../../components/mobile/ui';
 import { useProperty } from '../../lib/PropertyContext';
@@ -33,25 +39,32 @@ const TREND_TONE: Record<string, string> = {
 };
 
 /** 概率 → 底色深浅；未达门槛的淡显，不适用的留白。 */
-function tone(p: number | null): { bg: string; fg: string } {
-  if (p == null) return { bg: 'transparent', fg: '#9b928a' };
-  const a = Math.max(0.08, Math.min(0.85, (p - 0.1) * 1.1));
-  return { bg: `rgba(168,53,42,${a.toFixed(2)})`, fg: a > 0.45 ? 'white' : '#3d3733' };
-}
+/** 相对档位 → 底色：看的是比平常高出多少，而不是绝对百分比。 */
+const REL_BG: Record<string, { bg: string; fg: string }> = {
+  明显偏高: { bg: 'rgba(168,53,42,0.82)', fg: 'white' },
+  偏高: { bg: 'rgba(168,53,42,0.38)', fg: '#3d3733' },
+  与平常相当: { bg: 'rgba(0,0,0,0.03)', fg: '#3d3733' },
+  偏低: { bg: 'rgba(46,125,50,0.16)', fg: '#2e5d32' },
+  明显偏低: { bg: 'rgba(46,125,50,0.32)', fg: '#1f4a22' },
+};
 
+/** 一格：先说比平常高还是低，百分比退居小字当指数。 */
 function DomainTile({ c }: { c: PersonDomainCell }) {
-  const t = tone(c.probability);
+  const t = c.relative ? REL_BG[c.relative]! : { bg: 'transparent', fg: '#9b928a' };
   return (
     <div
-      className={`flex min-h-[4rem] flex-col items-center justify-center rounded-xl border px-1 ${
+      className={`flex min-h-[4.5rem] flex-col items-center justify-center gap-0.5 rounded-xl border px-1 text-center ${
         c.label ? 'border-rice-line' : 'border-dashed border-rice-line'
       }`}
       style={{ background: t.bg, color: t.fg }}
     >
       <span className="text-[0.75rem] leading-tight">{c.label ?? c.domain}</span>
-      <span className="font-serif text-[1.125rem] font-bold leading-none">
-        {!c.label ? '不适用' : c.probability == null ? '—' : `${Math.round(c.probability * 100)}%`}
+      <span className="text-[0.8125rem] font-bold leading-tight">
+        {!c.label ? '不适用' : c.relative == null ? '—' : c.relative === '与平常相当' ? '如常' : c.relative}
       </span>
+      {c.probability != null && (
+        <span className="text-[0.625rem] leading-none opacity-80">指数 {Math.round(c.probability * 100)}</span>
+      )}
     </div>
   );
 }
@@ -148,7 +161,7 @@ function PersonInner() {
             ))}
           </div>
           <p className="mt-2 px-1 text-[0.75rem] leading-relaxed text-ink-mute">
-            数字是{view.name}个人的机率（不是全家的），取这间房子里对其影响最大的一处。
+            和「平常」比：{RELATIVE_NOTE}小字「指数」是模型给的原始分数（{view.name}个人的，不是全家的）。
             {view.stage === '儿童' || view.stage === '少年' ? '孩子不看财运与感情；「事业」按学业看。' : ''}
           </p>
         </section>
@@ -319,7 +332,12 @@ function PersonInner() {
                   key={it.prediction.id}
                   title={
                     <span className="flex items-center gap-2">
-                      <b className="font-serif text-lg">{Math.round(it.probability * 100)}%</b>
+                      <span
+                        className="shrink-0 rounded-md px-1.5 py-0.5 text-[0.75rem] font-bold"
+                        style={{ background: REL_BG[it.relative]!.bg, color: REL_BG[it.relative]!.fg }}
+                      >
+                        {it.relative === '与平常相当' ? '如常' : it.relative}
+                      </span>
                       <span className="min-w-0 flex-1 truncate text-[0.875rem]">
                         {it.prediction.direction}
                         {it.prediction.room && ` · ${it.prediction.room}`}
@@ -329,6 +347,10 @@ function PersonInner() {
                   badge={<span className="tag shrink-0 border-cinnabar/40 bg-cinnabar/10 text-cinnabar">{it.label}</span>}
                 >
                   <p className="text-[0.9375rem] leading-relaxed">可能的事：{it.reading}。</p>
+                  <p className="mt-1 text-[0.8125rem] leading-relaxed text-ink-mute">
+                    比平常{it.relative === '与平常相当' ? '差不多' : it.relative.replace('偏', '')}：指数 {Math.round(it.probability * 100)}，
+                    住在吉凶平和的位置时约 {Math.round(it.neutral * 100)}。
+                  </p>
                   <p className="mt-1.5 text-[0.8125rem] leading-relaxed text-ink-mute">为何涉及{view.name}：{it.via}。</p>
                 </Expandable>
               ))}

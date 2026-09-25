@@ -300,7 +300,8 @@ export function buildAnswerContext(
   if (s.predictions.length) {
     lines.push(`\n# 本年预测（概率已由确定性模型算出）`);
     for (const pr of s.predictions.slice(0, 12)) {
-      lines.push(`- [${pr.domain}] ${pr.direction}${pr.room ? `·${pr.room}` : ''}：${(pr.probability * 100).toFixed(0)}%（${pr.riskLevel}，置信度${pr.confidence}）— ${pr.headline}`);
+      // 先给「比平常」再给指数 —— 让模型转述时也以相对说法为主，不把指数当统计概率讲
+      lines.push(`- [${pr.domainLabel}] ${pr.direction}${pr.room ? `·${pr.room}` : ''}：比平常${pr.relative}（指数 ${(pr.probability * 100).toFixed(0)}%，平常约 ${(pr.neutral * 100).toFixed(0)}%；${pr.riskLevel}，置信度${pr.confidence}）— ${pr.headline}`);
     }
   }
 

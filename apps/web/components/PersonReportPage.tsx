@@ -7,7 +7,7 @@
  * 逐月、方位。所有数字都来自同一套引擎（buildPersonView / monthlyOutlook），本组件不算任何东西。
  */
 
-import type { MemberMonthly, PersonView } from '@hidefate/core-synthesis';
+import { RELATIVE_NOTE, type MemberMonthly, type PersonView } from '@hidefate/core-synthesis';
 
 const TREND_COLOR: Record<string, string> = { 加重: '#a8352a', 如常: '#6b625c', 缓和: '#2e7d32' };
 
@@ -54,8 +54,19 @@ export function PersonReportPage({
         <tbody>
           <tr>
             {view.domains.map((d) => (
-              <td key={d.domain} className="num">
-                {!d.label ? <span className="dim">不适用</span> : d.probability == null ? <span className="dim">—</span> : <b>{pct(d.probability)}</b>}
+              <td key={d.domain}>
+                {!d.label ? (
+                  <span className="dim">不适用</span>
+                ) : d.relative == null ? (
+                  <span className="dim">—</span>
+                ) : (
+                  <>
+                    <b style={{ color: d.relative.includes('偏高') ? '#a8352a' : d.relative.includes('偏低') ? '#2e7d32' : undefined }}>
+                      {d.relative === '与平常相当' ? '如常' : d.relative}
+                    </b>
+                    <span className="dim small">（指数 {pct(d.probability!)}）</span>
+                  </>
+                )}
               </td>
             ))}
           </tr>
@@ -69,7 +80,7 @@ export function PersonReportPage({
         </tbody>
       </table>
       <p className="cap">
-        数字是{view.name}个人的机率（不是全家的），取这间房子里对其影响最大的一处。
+        和「平常」比：{RELATIVE_NOTE}括号里的「指数」是模型给{view.name}个人的原始分数。
         {view.stage === '儿童' || view.stage === '少年' ? '孩子不看财运与感情；「事业」按学业看。' : ''}
       </p>
 

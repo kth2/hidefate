@@ -613,6 +613,7 @@ export default function HousePage() {
             ) : (
               shownPredictions.map((p) => {
                 const pct = who === 'all' ? p.probability : (probabilityFor(p, who) ?? p.probability);
+                const rel = who === 'all' ? p.relative : (p.perMember.find((m) => m.memberId === who)?.relative ?? p.relative);
                 const mine = p.cures.filter((c) => c.memberId && (who === 'all' || c.memberId === who));
                 const general = p.cures.filter((c) => !c.memberId);
                 return (
@@ -620,7 +621,14 @@ export default function HousePage() {
                   key={p.id}
                   title={
                     <span className="flex items-center gap-2">
-                      <b className="font-serif text-lg">{Math.round(pct * 100)}%</b>
+                      <span
+                        className={`shrink-0 rounded-md px-1.5 py-0.5 text-[0.75rem] font-bold ${
+                          rel === '明显偏高' ? 'bg-cinnabar text-white' : rel === '偏高' ? 'bg-cinnabar/20 text-cinnabar' : rel.includes('偏低') ? 'bg-jade/15 text-jade' : 'bg-rice-deep text-ink-mute'
+                        }`}
+                      >
+                        {rel === '与平常相当' ? '如常' : rel}
+                      </span>
+                      <span className="text-[0.75rem] text-ink-mute">{Math.round(pct * 100)}</span>
                       <span className="min-w-0 flex-1 truncate text-[0.875rem]">
                         {p.direction}
                         {p.room && ` · ${p.room}`}
@@ -643,9 +651,10 @@ export default function HousePage() {
                     <ul className="mt-3 space-y-1.5">
                       {p.perMember.map((m) => (
                         <li key={m.memberId} className="flex items-baseline gap-2 text-[0.8125rem]">
-                          <b className="w-10 shrink-0 font-serif text-[0.9375rem]">{Math.round(m.probability * 100)}%</b>
+                          <b className="w-[4.5rem] shrink-0 text-[0.8125rem]">{m.relative === '与平常相当' ? '如常' : m.relative}</b>
                           <span className="min-w-0 flex-1 leading-relaxed">
                             <b>{m.name}</b>
+                            <span className="text-ink-mute">（指数 {Math.round(m.probability * 100)}，平常约 {Math.round(m.neutral * 100)}）</span>
                             {m.domainLabel !== p.domain && <span className="text-cinnabar">（{m.domainLabel}）</span>}
                             <span className="text-ink-mute"> · {m.via}</span>
                           </span>
@@ -670,7 +679,7 @@ export default function HousePage() {
 
                   <details className="mt-3">
                     <summary className="min-h-[2.5rem] cursor-pointer text-[0.8125rem] text-cinnabar">
-                      这个百分比怎么算的？
+                      这个指数怎么算的？
                     </summary>
                     <ul className="mt-2 space-y-1.5 border-l-2 border-rice-line pl-3 text-[0.75rem] leading-relaxed text-ink-mute">
                       {p.breakdown.map((b, i) => (
