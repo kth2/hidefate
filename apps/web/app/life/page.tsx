@@ -42,6 +42,9 @@ const DOMAIN_TONE: Record<string, string> = {
 const tone = (d: string) => DOMAIN_TONE[d] ?? 'bg-rice-deep/50 text-ink-mute border-rice-line';
 
 const VALENCE_MARK: Record<string, string> = { 吉: '○', 凶: '⚠', 中: '·' };
+/** 与「这屋对我」的人生八个方面同一套叫法。 */
+const DOMAIN_SHOWN: Record<string, string> = { 人丁: '子女', 官非: '人际' };
+const shown = (d: string) => DOMAIN_SHOWN[d] ?? d;
 
 /**
  * 一件具体的事。
@@ -118,7 +121,7 @@ function EventCard({ e }: { e: PredictedEvent }) {
   return (
     <div className={`rounded-xl border bg-white p-3 ${e.valence === '凶' ? 'border-cinnabar/35' : 'border-rice-line'}`}>
       <div className="flex items-center gap-2">
-        <span className={`rounded-md border px-1.5 py-0.5 text-[0.6875rem] ${tone(e.domain)}`}>{e.domain}</span>
+        <span className={`rounded-md border px-1.5 py-0.5 text-[0.6875rem] ${tone(e.domain)}`}>{shown(e.domain)}</span>
         <span className="text-[0.6875rem] text-ink-mute">{e.whenLabel}</span>
         <span className="ml-auto text-[0.875rem] font-medium tabular-nums">{Math.round(e.probability * 100)}%</span>
       </div>
@@ -623,7 +626,7 @@ export default function LifePage() {
                 {folded.recurring.map((r) => (
                   <div key={r.templateId} className={`rounded-xl border bg-white p-3 ${r.valence === '凶' ? 'border-cinnabar/35' : 'border-rice-line'}`}>
                     <div className="flex items-center gap-2">
-                      <span className={`rounded-md border px-1.5 py-0.5 text-[0.6875rem] ${tone(r.domain)}`}>{r.domain}</span>
+                      <span className={`rounded-md border px-1.5 py-0.5 text-[0.6875rem] ${tone(r.domain)}`}>{shown(r.domain)}</span>
                       <span className="text-[0.6875rem] text-ink-mute">{new Set(r.occurrences.map((o) => o.year)).size} 年出现</span>
                       <span className="ml-auto text-[0.875rem] font-medium tabular-nums">最高 {Math.round(r.maxProbability * 100)}%</span>
                     </div>

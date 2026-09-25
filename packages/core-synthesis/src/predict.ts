@@ -490,6 +490,7 @@ function headlineFor(
     人丁: `${where}关乎${who}的人丁与家运，本年相关波折的可能${odds}`,
     意外: `${where}有意外之虞，${who}本年发生跌碰、器械伤或突发事故的可能${odds}`,
     官非: `${where}主口舌官非，${who}本年卷入争讼、合约纠纷的可能${odds}`,
+    学业: `${where}牵动${who}的学业，本年进修、考证或考试受阻的可能${odds}`,
   };
   return map[domain];
 }
@@ -558,7 +559,10 @@ export function predict(input: AnalysisInput, synthesis: SynthesisResult): Predi
     const domains = new Set<RiskDomain>();
     for (const f of a.findings) for (const d of f.domains) domains.add(d);
     for (const d of domains) {
-      if (d === '健康' || d === '感情') continue; // 上面已专门处理
+      // 健康与感情有专门的引擎（脏腑映射、主卧红线）；只有它们在此宫出过报才跳过。
+      // 早先无条件跳过，于是桃花、夫妻这类感情断语只要主卧不见五鬼六煞就永远出不来，
+      // 使用者看到的几乎全是事业财运。
+      if (out.some((x) => x.id === `${d === '健康' ? 'health' : 'relation'}-${p}`)) continue;
       const pred = buildPrediction(`${d}-${p}`, d, a, input, synthesis, exposed);
       if (pred) out.push(pred);
     }

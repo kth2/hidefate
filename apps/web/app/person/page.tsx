@@ -155,16 +155,73 @@ function PersonInner() {
         {/* 今年各领域 */}
         <section>
           <h2 className="section-title">{result!.year} 年各方面</h2>
-          <div className="grid grid-cols-5 gap-1.5">
-            {view.domains.map((c) => (
-              <DomainTile key={c.domain} c={c} />
-            ))}
+          <div className="grid grid-cols-4 gap-1.5">
+            {view.domains
+              .filter((c) => c.label != null)
+              .map((c) => (
+                <DomainTile key={c.domain} c={c} />
+              ))}
           </div>
           <p className="mt-2 px-1 text-[0.75rem] leading-relaxed text-ink-mute">
             和「平常」比：{RELATIVE_NOTE}小字「指数」是模型给的原始分数（{view.name}个人的，不是全家的）。
-            {view.stage === '儿童' || view.stage === '少年' ? '孩子不看财运与感情；「事业」按学业看。' : ''}
+            {view.stage === '儿童' || view.stage === '少年'
+              ? '孩子不看感情、子女、事业、财运，只看健康、意外、学业、人际。'
+              : view.stage === '长者'
+                ? '长者不看学业。'
+                : ''}
           </p>
         </section>
+
+        {/* 风水师建言 —— 人生八个方面，逐项现状、宜、忌、依据 */}
+        {view.advice.length > 0 && (
+          <section>
+            <h2 className="section-title">风水师建言 · {view.advice.length} 个方面</h2>
+            <div className="space-y-1.5">
+              {view.advice.map((a) => {
+                const t = a.status ? REL_BG[a.status]! : null;
+                const hot = a.status === '偏高' || a.status === '明显偏高';
+                return (
+                  <Expandable
+                    key={a.aspect}
+                    defaultOpen={hot}
+                    title={
+                      <span className="flex items-center gap-2">
+                        <b className="w-9 shrink-0 font-serif text-[1rem]">{a.aspect}</b>
+                        <span className="min-w-0 flex-1 truncate text-[0.8125rem] text-ink-soft">{a.focus}</span>
+                      </span>
+                    }
+                    badge={
+                      <span
+                        className="shrink-0 rounded-md px-1.5 py-0.5 text-[0.6875rem] font-bold"
+                        style={t ? { background: t.bg, color: t.fg } : { color: '#9b928a' }}
+                      >
+                        {a.status == null ? '平稳' : a.status === '与平常相当' ? '如常' : a.status}
+                      </span>
+                    }
+                  >
+                    <p className="text-[0.8125rem] text-ink-mute">现在：{a.statusNote}</p>
+                    <p className="mt-1.5 text-[0.9375rem] leading-relaxed">{a.focus}</p>
+                    <p className="mt-2 text-[0.75rem] font-medium text-jade">宜</p>
+                    <ul className="list-disc space-y-1 pl-4 text-[0.875rem] leading-relaxed">
+                      {a.yi.map((x, i) => (
+                        <li key={i}>{x}</li>
+                      ))}
+                    </ul>
+                    <p className="mt-2 text-[0.75rem] font-medium text-cinnabar">忌</p>
+                    <ul className="list-disc space-y-1 pl-4 text-[0.875rem] leading-relaxed">
+                      {a.ji.map((x, i) => (
+                        <li key={i}>{x}</li>
+                      ))}
+                    </ul>
+                    <p className="mt-2 border-l-2 border-rice-line pl-2.5 text-[0.75rem] leading-relaxed text-ink-mute">
+                      依据：{a.basis.join(' ')}
+                    </p>
+                  </Expandable>
+                );
+              })}
+            </div>
+          </section>
+        )}
 
         {/* 逐月 */}
         {months && (

@@ -69,7 +69,7 @@ function domainIntensity(
   const a = s.palaces[palace];
   const base = Math.max(0, -a.score); // 0–1
   const out: Record<RiskDomain, number> = {
-    健康: 0, 财运: 0, 感情: 0, 事业: 0, 人丁: 0, 意外: 0, 官非: 0,
+    健康: 0, 财运: 0, 感情: 0, 事业: 0, 人丁: 0, 意外: 0, 官非: 0, 学业: 0,
   };
 
   // 厕所、储藏落在凶方是「以凶制凶」的正解 —— 凶气被压住，宫位部分大幅打折

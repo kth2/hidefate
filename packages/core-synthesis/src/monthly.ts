@@ -24,7 +24,6 @@ import {
   type RiskDomain,
 } from '@hidefate/core-fengshui';
 import { synthesise } from './assess.js';
-import { OVERVIEW_DOMAINS } from './person.js';
 import { PROB_CEIL, PROB_FLOOR, predict, probabilityFor } from './predict.js';
 import type { AnalysisInput, Member, Prediction } from './types.js';
 
@@ -179,13 +178,13 @@ export function monthlyOutlook(
     name: m.name,
     months: slots.map((slot) => {
       const { preds, period } = yearly.get(slot.year)!;
-      const best = new Map<RiskDomain, MonthDomain>();
+      const best = new Map<string, MonthDomain>();
       for (const p of preds) {
-        if (!OVERVIEW_DOMAINS.includes(p.domain) && p.domain !== '官非') continue;
         const d = monthProbability(p, m.id, slot, period);
         if (!d) continue;
-        const cur = best.get(d.domain);
-        if (!cur || d.probability > cur.probability) best.set(d.domain, d);
+        // 按人生方面归并（孩子的「事业」与「学业」都读作学业，只留一条）
+        const cur = best.get(d.label);
+        if (!cur || d.probability > cur.probability) best.set(d.label, d);
       }
       const domains = [...best.values()].sort((a, b) => b.probability - a.probability);
       const top = domains[0] ?? null;
