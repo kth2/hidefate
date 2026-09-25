@@ -4,10 +4,40 @@
 
 import Link from 'next/link';
 import { STAR_NAME, annualStar, periodOfYear, roomExposure } from '@hidefate/core-fengshui';
-import { RISK_COLOR, buildAlerts, yearGlance } from '@hidefate/core-synthesis';
+import { OVERVIEW_DOMAINS, RISK_COLOR, buildAlerts, familyOverview, yearGlance } from '@hidefate/core-synthesis';
 import { useMemo } from 'react';
 import { AppBar, Empty, Expandable, Meter, Skeleton } from '../components/mobile/ui';
 import { useProperty } from '../lib/PropertyContext';
+
+function FamilyRow({ row }: { row: ReturnType<typeof familyOverview>[number] }) {
+  return (
+    <>
+      <Link
+        href={`/person?id=${encodeURIComponent(row.memberId)}`}
+        className="flex min-h-[2.75rem] flex-col items-start justify-center truncate text-left text-[0.875rem] text-ink active:text-cinnabar"
+      >
+        <span className="w-full truncate font-medium">{row.name}</span>
+        {row.roleLabel && <span className="w-full truncate text-[0.625rem] text-ink-mute">{row.roleLabel}</span>}
+      </Link>
+      {row.cells.map((c) => {
+        const p = c.probability;
+        const a = p == null ? 0 : Math.max(0.08, Math.min(0.85, (p - 0.1) * 1.1));
+        return (
+          <span
+            key={c.domain}
+            className={`flex min-h-[2.75rem] items-center justify-center rounded-lg border font-serif text-[0.875rem] ${
+              c.label ? 'border-rice-line' : 'border-dashed border-rice-line'
+            }`}
+            style={{ background: p == null ? 'transparent' : `rgba(168,53,42,${a.toFixed(2)})`, color: a > 0.45 ? 'white' : '#3d3733' }}
+            title={c.label ?? '不适用'}
+          >
+            {!c.label ? '·' : p == null ? '—' : Math.round(p * 100)}
+          </span>
+        );
+      })}
+    </>
+  );
+}
 
 export default function HomePage() {
   const { property, result, members, cures, year, monthIndex, loading, properties } = useProperty();
@@ -27,6 +57,9 @@ export default function HomePage() {
       return true;
     }).slice(0, 3);
   }, [result]);
+
+  /** 全家今年：成员 × 领域，每格是此人个人的最高机率。 */
+  const overview = useMemo(() => (result && members.length ? familyOverview(result, members) : []), [result, members]);
 
   /** 还没指定谁住的卧房、书房 —— 不指定，预测就落不到人身上。 */
   const unassigned = useMemo(
@@ -111,6 +144,33 @@ export default function HomePage() {
                 查看九宫盘
               </Link>
             </section>
+
+            {/* 全家今年 —— 这房子对每个人分别有什么影响 */}
+            {overview.length > 0 && (
+              <section className="card">
+                <h2 className="card-title">全家 {year} 年</h2>
+                <p className="mt-0.5 text-[0.75rem] text-ink-mute">每格是此人个人的机率；点名字看这屋对其的影响。</p>
+                <div className="mt-3 grid grid-cols-[4.5rem_repeat(5,1fr)] items-center gap-1 text-center text-[0.6875rem] text-ink-mute">
+                  <span />
+                  {OVERVIEW_DOMAINS.map((d) => (
+                    <span key={d}>{d === '事业' ? '事业/学业' : d}</span>
+                  ))}
+                  {overview.map((row) => (
+                    <FamilyRow key={row.memberId} row={row} />
+                  ))}
+                </div>
+                <ul className="mt-3 space-y-1 text-[0.8125rem] leading-relaxed text-ink-soft">
+                  {overview.map((row) => (
+                    <li key={row.memberId}>
+                      <b>{row.name}</b>：
+                      {row.worst
+                        ? `最该留意${row.worst.label}（${Math.round(row.worst.probability * 100)}%）`
+                        : '今年没有达到留意门槛的风险'}
+                    </li>
+                  ))}
+                </ul>
+              </section>
+            )}
 
             {/* 谁住哪间 —— 预测落到人身上的前提 */}
             {members.length > 0 && unassigned.length > 0 && (

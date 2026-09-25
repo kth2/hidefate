@@ -79,10 +79,11 @@ describe('预测按人算', () => {
   });
 
   it('未指定住户的卧房按宅论：不点名，并提示去指定', () => {
+    // 小明房在正西（兑，少女之位）；这家没有女儿，六亲也点不到人
     const preds = run(unassigned);
-    const master = preds.filter((p) => p.room === '主卧' && !p.id.startsWith('relation-'));
-    expect(master.length).toBeGreaterThan(0);
-    for (const p of master) {
+    const kid = preds.filter((p) => p.room === '小明房');
+    expect(kid.length).toBeGreaterThan(0);
+    for (const p of kid) {
       expect(p.memberIds).toEqual([]);
       expect(p.perMember).toEqual([]);
       expect(p.breakdown.map((b) => b.note).join('')).toContain('指定');

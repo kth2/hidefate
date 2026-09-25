@@ -40,6 +40,15 @@ import {
   type WuXing,
 } from '@hidefate/core-fengshui';
 import {
+  ROLE_LABEL,
+  ROLE_PALACE,
+  assignFamilyRoles,
+  domainReading,
+  lifeStageOf,
+  stageVulnerability,
+  type FamilyRoleInfo,
+} from './family.js';
+import {
   riskLevelOf,
   type AnalysisInput,
   type ConfidenceLevel,
@@ -87,17 +96,39 @@ interface Exposed {
   readonly member: Member;
   readonly exposure: number;
   readonly via: string;
-  readonly room: RoomPlacement;
+  /** 经由哪间房；仅因六亲应象而受影响时为 null。 */
+  readonly room: RoomPlacement | null;
+  /** 此宫恰为此人的六亲之宫。 */
+  readonly liuQin: FamilyRoleInfo | null;
 }
 
-/** 这一宫影响到哪些人、影响多深。取该宫内对此人影响最大的那间房。 */
-export function exposuresFor(a: PalaceAssessment, members: readonly Member[]): Exposed[] {
+/**
+ * 六亲应象的受影响程度：此宫所主之人，即便不用这里的房间，也按五成计。
+ * 古法「缺角／凶星临某宫，应在某人」本就不看他睡在哪。
+ */
+export const LIU_QIN_EXPOSURE = 0.5;
+
+/** 这一宫影响到哪些人、影响多深。取该宫内对此人影响最大的那间房，再与六亲应象取大。 */
+export function exposuresFor(
+  a: PalaceAssessment,
+  members: readonly Member[],
+  roles: ReadonlyMap<string, FamilyRoleInfo> = new Map(),
+): Exposed[] {
   const out: Exposed[] = [];
   for (const m of members) {
     let best: Exposed | null = null;
     for (const r of a.rooms) {
       const e = exposureOf(r, m.id);
-      if (e > 0 && (!best || e > best.exposure)) best = { member: m, exposure: e, via: viaText(r, m, e), room: r };
+      if (e > 0 && (!best || e > best.exposure)) {
+        best = { member: m, exposure: e, via: viaText(r, m, e), room: r, liuQin: null };
+      }
+    }
+    const role = roles.get(m.id);
+    if (role && a.palace !== 5 && ROLE_PALACE[role.role] === a.palace) {
+      const note = `${a.direction}属后天八卦${ROLE_LABEL[role.role]}之位，应在${m.name}（${role.reason}）`;
+      best = best
+        ? { ...best, exposure: Math.max(best.exposure, LIU_QIN_EXPOSURE), via: `${best.via}；${note}`, liuQin: role }
+        : { member: m, exposure: LIU_QIN_EXPOSURE, via: note, room: null, liuQin: role };
     }
     if (best) out.push(best);
   }
@@ -173,21 +204,22 @@ function personalCures(a: PalaceAssessment, exposed: readonly Exposed[], houseGu
   if (a.palace === 5) return [];
   const out: Cure[] = [];
   for (const e of exposed) {
-    if (e.exposure < 1 || roomExposure(e.room.kind) !== '专属') continue;
+    if (!e.room || e.exposure < 1 || roomExposure(e.room.kind) !== '专属') continue;
     const cell = crossPersonHouse(houseGua as never, e.member.mingGua.gua as never)[a.palace as Exclude<PalaceIndex, 5>];
     const meta = YOU_NIAN_META[cell.personStar];
     if (meta.auspicious) continue;
     const best = personalDirections(e.member.mingGua.gua as never).best.slice(0, 2);
     const facing = best.map((b) => `${PALACE_DIRECTION[b.palace]}（${b.star}）`).join('或');
-    const isBed = e.room.kind.includes('卧') || e.room.kind === '儿童房' || e.room.kind === '老人房' || e.room.kind === '客房';
+    const room = e.room;
+    const isBed = room.kind.includes('卧') || room.kind === '儿童房' || room.kind === '老人房' || room.kind === '客房';
     out.push({
       priority: 2,
       palace: a.palace,
       direction: a.direction,
-      room: label(e.room),
+      room: label(room),
       action:
         `${e.member.name}：${isBed ? '床头' : '座位'}改朝${facing}。` +
-        `${label(e.room)}落在其「${cell.personStar}」方，房间挪不动时，把${isBed ? '床头' : '座位'}转向自己的吉方最省事。`,
+        `${label(room)}落在其「${cell.personStar}」方，房间挪不动时，把${isBed ? '床头' : '座位'}转向自己的吉方最省事。`,
       rationale: `八宅以命卦定个人吉凶方：「${cell.personStar}」主${meta.governs}；坐凶向吉，可挽回大半。`,
       avoid: ['床头靠窗或悬梁', `${isBed ? '床头' : '座位'}朝向其四凶方`],
       domains: [domain],
@@ -284,7 +316,12 @@ function buildPrediction(
   }
   const findings: Finding[] = [...extraFindings];
   const perMember: MemberExposure[] = exposed
+    // 孩子不报财运、感情、人丁 —— 这些对他没有意义
+    .filter((e) => domainReading(domain, lifeStageOf(e.member, synthesis.year)) != null)
     .map((e) => {
+      const stage = lifeStageOf(e.member, synthesis.year);
+      const reading = domainReading(domain, stage)!;
+      const vul = stageVulnerability(domain, stage);
       const b = baziAffinity(e.member, hostile, assessment.direction);
       const g = mingGuaAffinity(e.member, synthesis.baZhai.houseGua, p);
       const scale = (c: Contribution): Contribution => ({ ...c, contribution: c.contribution * e.exposure });
@@ -300,6 +337,7 @@ function buildPrediction(
         },
         scale(g),
         scale(b),
+        ...(vul ? [{ factor: '人生阶段', contribution: vul.add * e.exposure, note: `${e.member.name}为${stage}：${vul.note}` }] : []),
       ];
       findings.push({
         schools: ['八宅', '八字命理'],
@@ -309,7 +347,8 @@ function buildPrediction(
         impact: -(b.contribution + g.contribution) / 3,
         domains: [domain],
       });
-      const logit = BASE_LOGIT + (commonSum + extraLogit + b.contribution + g.contribution) * e.exposure;
+      const logit =
+        BASE_LOGIT + (commonSum + extraLogit + b.contribution + g.contribution + (vul?.add ?? 0)) * e.exposure;
       return {
         memberId: e.member.id,
         name: e.member.name,
@@ -317,10 +356,16 @@ function buildPrediction(
         exposure: e.exposure,
         via: e.via,
         breakdown: personal,
+        stage,
+        domainLabel: reading.label,
+        reading: reading.text,
+        liuQin: e.liuQin ? ROLE_LABEL[e.liuQin.role] : null,
       };
     })
     .sort((x, y) => y.probability - x.probability);
 
+  // 原本有人受影响、却都不适用此维度（例如只有孩子住，却是财运）—— 不出报
+  if (exposed.length > 0 && perMember.length === 0 && !mandatory) return null;
   const probability = perMember[0]?.probability ?? squash(placeLogit);
   if (probability < REPORT_THRESHOLD && !mandatory) return null;
 
@@ -376,12 +421,19 @@ function buildPrediction(
     roomKind: topRoom?.kind ?? null,
     memberIds: perMember.filter((m) => m.probability >= REPORT_THRESHOLD || mandatory).map((m) => m.memberId),
     perMember,
+    domainLabel: sharedLabel(domain, perMember),
     headline: headlineFor(domain, assessment, topRoom?.kind ?? null, probability, perMember),
     findings: [...assessment.findings.filter((f) => f.domains.some((d) => d === domain)), ...findings],
     cures,
     confidence,
     breakdown,
   };
+}
+
+/** 受影响的人对此维度的叫法一致时（例如都是孩子 → 学业）用它，否则用原名。 */
+function sharedLabel(domain: RiskDomain, perMember: readonly MemberExposure[]): string {
+  const labels = new Set(perMember.map((m) => m.domainLabel));
+  return labels.size === 1 ? [...labels][0]! : domain;
 }
 
 function headlineFor(
@@ -396,6 +448,11 @@ function headlineFor(
   const where = roomKind ? `${a.direction}的${roomKind}` : a.direction;
   const pct = (x: number) => `${Math.round(x * 100)}%`;
   const odds = shown.length > 1 ? `：${shown.map((m) => `${m.name} ${pct(m.probability)}`).join('、')}` : `约 ${pct(prob)}`;
+  // 全是孩子、或全是长者时，按其阶段的说法讲（孩子的「事业」是学业）
+  const readings = new Set(shown.map((m) => m.reading));
+  if (shown.length > 0 && readings.size === 1 && shown[0]!.stage !== '成人') {
+    return `${where}牵动${who}的${shown[0]!.domainLabel}，本年${shown[0]!.reading}的机率${odds}`;
+  }
   const map: Record<RiskDomain, string> = {
     健康: `${where}对${who}的健康构成压力，本年出现相关症状或就医的机率${odds}`,
     财运: `${where}影响${who}的财路，本年出现破财、投资失利或收入停滞的机率${odds}`,
@@ -419,10 +476,11 @@ function headlineFor(
 export function predict(input: AnalysisInput, synthesis: SynthesisResult): Prediction[] {
   const out: Prediction[] = [];
   const period = synthesis.flyingStar.period.period;
+  const roles = assignFamilyRoles(input.members, synthesis.year);
 
   for (const p of Object.keys(synthesis.palaces).map(Number) as PalaceIndex[]) {
     const a = synthesis.palaces[p];
-    const exposed = exposuresFor(a, input.members);
+    const exposed = exposuresFor(a, input.members, roles);
 
     // --- 健康风险引擎（脏腑映射）---
     const organRisks = organRisksOf([a.stars.shan, a.stars.xiang, a.stars.annual], period);
@@ -461,7 +519,7 @@ export function predict(input: AnalysisInput, synthesis: SynthesisResult): Predi
         domains: ['感情'],
       };
       // 感情预警只落在睡主卧的人身上 —— 孩子不因父母的卧房吉凶而「感情受压」。
-      const couple = exposed.filter((e) => e.room.kind === '主卧' && e.exposure >= 1);
+      const couple = exposed.filter((e) => e.room?.kind === '主卧' && e.exposure >= 1);
       // mandatory = true：此为古法红线，无论算出概率高低都必须出报。
       const pred = buildPrediction(`relation-${p}`, '感情', a, input, synthesis, couple, [f], 0.5, true);
       if (pred) out.push(pred);

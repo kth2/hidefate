@@ -155,6 +155,8 @@ export interface Prediction {
   readonly memberIds: readonly string[];
   /** 每位受影响成员各自的概率与个人因素 —— 同一处房间对不同的人轻重不同。 */
   readonly perMember: readonly MemberExposure[];
+  /** 显示用的维度名：受影响者都是孩子时，「事业」显示为「学业」。 */
+  readonly domainLabel: string;
   readonly headline: string;
   readonly findings: readonly Finding[];
   readonly cures: readonly Cure[];
@@ -174,6 +176,14 @@ export interface MemberExposure {
   readonly via: string;
   /** 个人因素（命卦、八字）的加权明细。 */
   readonly breakdown: readonly { factor: string; contribution: number; note: string }[];
+  /** 人生阶段：儿童／少年／成人／长者。 */
+  readonly stage: '儿童' | '少年' | '成人' | '长者';
+  /** 此维度对此人的叫法（孩子的「事业」是「学业」）。 */
+  readonly domainLabel: string;
+  /** 对此人具体会是什么样的事。 */
+  readonly reading: string;
+  /** 此宫恰为此人的六亲之宫时，其六亲称谓（如「长子」）。 */
+  readonly liuQin: string | null;
 }
 
 /** 合参输入。 */
