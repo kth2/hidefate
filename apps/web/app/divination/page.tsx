@@ -18,6 +18,8 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import {
   castDivination,
   listQuestionCategories,
+  readDivination,
+  type Tendency,
   type Divination,
   type OpenDivination,
   type YongShenRule,
@@ -39,6 +41,24 @@ const GAN = ['甲', '乙', '丙', '丁', '戊', '己', '庚', '辛', '壬', '癸
 
 /** 九宫按洛书方位排布：4 9 2 / 3 5 7 / 8 1 6。 */
 const GRID: readonly string[] = ['4', '9', '2', '3', '5', '7', '8', '1', '6'];
+
+/** 结论倾向的颜色。 */
+const TENDENCY_TONE: Record<Tendency, string> = {
+  有利: 'border-jade/50 bg-jade/15 text-jade',
+  偏有利: 'border-jade/40 bg-jade/10 text-jade',
+  难定: 'border-rice-line bg-rice-deep text-ink-soft',
+  偏不利: 'border-risk-warn/40 bg-risk-warn/10 text-risk-warn',
+  不利: 'border-risk-high/50 bg-risk-high/15 text-risk-high',
+};
+
+/** 存档的盘面 JSON 还原成 Divination；损坏就当没有。 */
+function parseChart(json: string): Divination | null {
+  try {
+    return JSON.parse(json) as Divination;
+  } catch {
+    return null;
+  }
+}
 
 /** 作废的常见缘由 —— 给按钮而不是空白输入框，单手也能点完。 */
 const VOID_REASONS = ['误占 / 手滑', '测试用', '重复记录', '判据写错'] as const;
@@ -178,7 +198,7 @@ export default function DivinationPage() {
                 onClick={() => setPicking(true)}
                 className="min-h-11 w-full rounded-lg border border-rice-line bg-white px-3 text-left text-[0.9375rem] active:bg-rice-deep/40"
               >
-                {category || '按关键词自动判断（认不出会拒绝起局）'}
+                {category || '按问题自动判断（换工作、投资、复合等日常说法都认）'}
               </button>
               {selectedRule && (
                 <p className="mt-1.5 text-[0.75rem] leading-relaxed text-ink-mute">
@@ -203,6 +223,17 @@ export default function DivinationPage() {
               <span className="mt-1 block text-[0.6875rem] text-ink-mute">
                 「顺不顺利」「有起伏」这类写法会被拒收 —— 它们永远为真，记下来也没用。
               </span>
+              {question.trim() && !criterion.trim() && (
+                <button
+                  type="button"
+                  className="mt-1.5 min-h-[2.5rem] text-[0.8125rem] text-cinnabar active:opacity-60"
+                  onClick={() =>
+                    setCriterion(`${windowDays} 天内，「${question.trim().replace(/[？?吗呢]+$/, '')}」是否如愿，以实际结果（通知、成交、结果单等）为准`)
+                  }
+                >
+                  帮我写判据 ›
+                </button>
+              )}
             </label>
 
             <div className="flex gap-2">
@@ -295,6 +326,23 @@ export default function DivinationPage() {
                       {r.outcome && ` · ${r.outcome}`}
                     </span>
                   </div>
+                  {(() => {
+                    const d = parseChart(r.chartJson);
+                    if (!d) return null;
+                    const rd = readDivination(d);
+                    return (
+                      <div className="mt-1.5 flex items-center gap-2">
+                        <span className={`tag shrink-0 ${TENDENCY_TONE[rd.tendency]}`}>{rd.tendency}</span>
+                        <button
+                          type="button"
+                          className="min-h-[2.5rem] text-[0.8125rem] text-cinnabar active:opacity-60"
+                          onClick={() => setOpened(d)}
+                        >
+                          看结论与盘面 ›
+                        </button>
+                      </div>
+                    );
+                  })()}
                   <p className="mt-1.5 text-[0.9375rem]">
                     {r.sequence > 1 && (
                       <span className="mr-1.5 rounded bg-rice-deep px-1.5 py-0.5 text-[0.6875rem] text-ink-mute">
@@ -398,6 +446,59 @@ export default function DivinationPage() {
       <Sheet open={opened != null} onClose={() => setOpened(null)} title={opened?.category ?? '盘'}>
         {opened && (
           <div className="space-y-4 pb-2">
+            {(() => {
+              const r = readDivination(opened);
+              return (
+                <section className="space-y-3 rounded-2xl border border-cinnabar/20 bg-gradient-to-br from-cinnabar/[0.05] to-transparent p-3.5">
+                  <div className="flex items-center gap-2">
+                    <span className={`tag shrink-0 text-[0.875rem] font-bold ${TENDENCY_TONE[r.tendency]}`}>{r.tendency}</span>
+                    <p className="min-w-0 flex-1 text-[0.9375rem] font-medium leading-snug">{r.headline}</p>
+                  </div>
+                  <div className="grid grid-cols-3 gap-1.5 text-center">
+                    {r.phases.map((ph) => (
+                      <div key={ph.label} className="rounded-lg border border-rice-line bg-white px-1 py-1.5">
+                        <p className="text-[0.6875rem] text-ink-mute">{ph.label}</p>
+                        <p className="text-[0.75rem] leading-snug">{ph.text}</p>
+                      </div>
+                    ))}
+                  </div>
+                  {r.reasons.length > 0 && (
+                    <div>
+                      <p className="text-[0.75rem] font-medium text-ink-mute">凭什么这么说</p>
+                      <ul className="mt-0.5 list-disc space-y-0.5 pl-4 text-[0.8125rem] leading-relaxed">
+                        {r.reasons.map((x, i) => (
+                          <li key={i}>{x}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+                  <div>
+                    <p className="text-[0.75rem] font-medium text-jade">怎么做</p>
+                    <ul className="mt-0.5 list-disc space-y-0.5 pl-4 text-[0.8125rem] leading-relaxed">
+                      {r.advice.map((x, i) => (
+                        <li key={i}>{x}</li>
+                      ))}
+                    </ul>
+                  </div>
+                  <div>
+                    <p className="text-[0.75rem] font-medium text-ink-mute">何时应</p>
+                    <ul className="mt-0.5 list-disc space-y-0.5 pl-4 text-[0.8125rem] leading-relaxed">
+                      {r.timing.map((x, i) => (
+                        <li key={i}>{x}</li>
+                      ))}
+                    </ul>
+                  </div>
+                  {r.caveats.length > 0 && (
+                    <p className="text-[0.75rem] leading-relaxed text-risk-warn">{r.caveats.join(' ')}</p>
+                  )}
+                  <p className="border-l-2 border-rice-line pl-2.5 text-[0.6875rem] leading-relaxed text-ink-mute">
+                    断法纲要：{r.classicNote}　结论只由盘上已有的用神宫吉凶、用神与年命的生克、三乙、空亡马星推出；
+                    它是解读，不是定数，到期请回来结算。
+                  </p>
+                </section>
+              );
+            })()}
+            <p className="text-[0.75rem] font-medium text-ink-mute">以下是盘面，懂奇门的可以细看：</p>
             {opened.repeatNote && (
               <p className="rounded-lg border border-gold/40 bg-gold/5 p-2.5 text-[0.75rem] leading-relaxed">
                 {opened.repeatNote}
