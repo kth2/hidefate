@@ -286,6 +286,14 @@ function PersonInner() {
           <span className="shrink-0 text-cinnabar" aria-hidden>›</span>
         </Link>
 
+        {/* 打印这一页 —— 交给本人看 */}
+        <Link
+          href={`/report?person=${encodeURIComponent(view.memberId)}`}
+          className="btn btn-block"
+        >
+          打印 / 存成 PDF（只印{view.name}这一页）
+        </Link>
+
         {/* 吉方 */}
         <section className="card">
           <h2 className="card-title">{view.name}的方位</h2>
