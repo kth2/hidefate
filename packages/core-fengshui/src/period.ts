@@ -167,6 +167,30 @@ function jieQiDate(year: number, name: string): Date | null {
   return null;
 }
 
+/** 十二节（每个节气月的起点），序 1 = 寅月（立春）。 */
+const MONTH_JIE: readonly string[] = ['立春', '惊蛰', '清明', '立夏', '芒种', '小暑', '立秋', '白露', '寒露', '立冬', '大雪', '小寒'];
+
+/** 节气月的习惯叫法，序 1 = 正月（寅月）。 */
+export const SOLAR_MONTH_LABEL: readonly string[] = ['正月', '二月', '三月', '四月', '五月', '六月', '七月', '八月', '九月', '十月', '冬月', '腊月'];
+
+/**
+ * 某立春年第 N 个节气月的公历起讫（含首尾两日）。
+ *
+ * 流月紫白按节换月，不按公历月 —— 「八月」是白露到寒露前一天，
+ * 不告诉使用者具体哪几天，他就只能拿公历八月去对，整整差了一个月。
+ * 腊月（小寒）落在次年公历一月。
+ */
+export function solarMonthRange(year: number, monthIndex: number): { start: Date; end: Date } {
+  if (!Number.isInteger(monthIndex) || monthIndex < 1 || monthIndex > 12) {
+    throw new Error(`节气月序须为 1–12，收到 ${monthIndex}`);
+  }
+  const startYear = monthIndex === 12 ? year + 1 : year;
+  const start = jieQiDate(startYear, MONTH_JIE[monthIndex - 1]!);
+  const next = monthIndex === 12 ? jieQiDate(year + 1, '立春') : jieQiDate(monthIndex === 11 ? year + 1 : year, MONTH_JIE[monthIndex]!);
+  if (!start || !next) throw new Error(`无法求得 ${year} 年第 ${monthIndex} 个节气月的起讫`);
+  return { start, end: new Date(midnight(next) - DAY_MS) };
+}
+
 /** 某节气之后（含当日）的第一个甲子日。 */
 function firstJiaZiOnOrAfter(from: Date): Date {
   const idx = dayGanZhiIndex(from);

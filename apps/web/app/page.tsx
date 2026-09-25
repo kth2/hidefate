@@ -4,10 +4,100 @@
 
 import Link from 'next/link';
 import { STAR_NAME, annualStar, periodOfYear, roomExposure } from '@hidefate/core-fengshui';
-import { OVERVIEW_DOMAINS, RISK_COLOR, buildAlerts, familyOverview, yearGlance } from '@hidefate/core-synthesis';
-import { useMemo } from 'react';
-import { AppBar, Empty, Expandable, Meter, Skeleton } from '../components/mobile/ui';
+import {
+  OVERVIEW_DOMAINS,
+  RISK_COLOR,
+  buildAlerts,
+  familyOverview,
+  monthlyOutlook,
+  yearGlance,
+  type MonthlyOutlook,
+} from '@hidefate/core-synthesis';
+import { useMemo, useState } from 'react';
+import { AppBar, Empty, Expandable, Meter, SegRow, Skeleton } from '../components/mobile/ui';
+import { currentFengShuiTime } from '../lib/useAnalysis';
 import { useProperty } from '../lib/PropertyContext';
+
+const MONTH_SHORT = ['正', '二', '三', '四', '五', '六', '七', '八', '九', '十', '冬', '腊'];
+
+/** 全家逐月：成员 × 十二个节气月的色块，外加接下来三个月里值得留意的事。 */
+function MonthlyGrid({ outlook }: { outlook: MonthlyOutlook }) {
+  const upcoming = outlook.slots.slice(0, 3).map((slot, i) => ({
+    slot,
+    items: outlook.rows
+      .map((r) => ({ name: r.name, cell: r.months[i]! }))
+      // 只列比平时更要紧、且本身已达留意门槛的 —— 全年都差的人不必月月上榜
+      .filter((x) => x.cell.trend === '加重' && x.cell.level !== '平' && x.cell.top),
+  }));
+  return (
+    <>
+      <div className="mt-3 grid grid-cols-[4rem_repeat(12,1fr)] items-center gap-[3px] text-center text-[0.625rem] text-ink-mute">
+        <span />
+        {outlook.slots.map((s, i) => (
+          <span key={`${s.year}-${s.monthIndex}`} className={i === 0 ? 'font-bold text-cinnabar' : ''}>
+            {MONTH_SHORT[s.monthIndex - 1]}
+          </span>
+        ))}
+        {outlook.rows.map((r) => (
+          <MonthRow key={r.memberId} row={r} />
+        ))}
+      </div>
+      <p className="mt-1.5 text-[0.6875rem] leading-relaxed text-ink-mute">
+        色越深机率越高；粗框为比此人平时更要紧的月份。首列为本月，月份按节气换（如八月是白露至寒露前一天）。
+      </p>
+      <div className="mt-3 space-y-2">
+        {upcoming.map(({ slot, items }) => (
+          <div key={`${slot.year}-${slot.monthIndex}`} className="rounded-xl border border-rice-line p-2.5">
+            <p className="text-[0.8125rem] font-medium">
+              {slot.label}
+              <span className="ml-1.5 text-[0.6875rem] font-normal text-ink-mute">{slot.range}</span>
+            </p>
+            {items.length === 0 ? (
+              <p className="mt-0.5 text-[0.75rem] text-ink-mute">没有人比平时更要紧。</p>
+            ) : (
+              <ul className="mt-0.5 space-y-0.5 text-[0.75rem] leading-relaxed text-ink-soft">
+                {items.map((x) => (
+                  <li key={x.name}>
+                    <b>{x.name}</b>：{x.cell.top!.label}加重（{Math.round(x.cell.top!.baseline * 100)}% → {Math.round(x.cell.top!.probability * 100)}%）· {x.cell.top!.reason}
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+        ))}
+      </div>
+    </>
+  );
+}
+
+function MonthRow({ row }: { row: MonthlyOutlook['rows'][number] }) {
+  return (
+    <>
+      <Link
+        href={`/person?id=${encodeURIComponent(row.memberId)}`}
+        className="flex min-h-[2.5rem] items-center truncate text-left text-[0.8125rem] font-medium text-ink active:text-cinnabar"
+      >
+        {row.name}
+      </Link>
+      {row.months.map((c) => {
+        const p = c.top?.probability ?? null;
+        const a = p == null ? 0 : Math.max(0.06, Math.min(0.85, (p - 0.1) * 1.1));
+        return (
+          <span
+            key={`${c.slot.year}-${c.slot.monthIndex}`}
+            className={`flex h-7 items-center justify-center rounded-[4px] border font-serif text-[0.625rem] ${
+              c.trend === '加重' ? 'border-ink border-[1.5px]' : 'border-rice-line'
+            }`}
+            style={{ background: p == null ? 'transparent' : `rgba(168,53,42,${a.toFixed(2)})`, color: a > 0.45 ? 'white' : '#3d3733' }}
+            title={c.top ? `${c.slot.label} ${c.top.label} ${Math.round(c.top.probability * 100)}% · ${c.top.reason}` : c.slot.label}
+          >
+            {p == null ? '' : Math.round(p * 100)}
+          </span>
+        );
+      })}
+    </>
+  );
+}
 
 function FamilyRow({ row }: { row: ReturnType<typeof familyOverview>[number] }) {
   return (
@@ -40,7 +130,8 @@ function FamilyRow({ row }: { row: ReturnType<typeof familyOverview>[number] }) 
 }
 
 export default function HomePage() {
-  const { property, result, members, cures, year, monthIndex, loading, properties } = useProperty();
+  const { property, result, members, cures, qiMen, year, monthIndex, loading, properties } = useProperty();
+  const [span, setSpan] = useState<'year' | 'month'>('year');
 
   const glance = useMemo(() => yearGlance(year), [year]);
 
@@ -60,6 +151,22 @@ export default function HomePage() {
 
   /** 全家今年：成员 × 领域，每格是此人个人的最高机率。 */
   const overview = useMemo(() => (result && members.length ? familyOverview(result, members) : []), [result, members]);
+
+  /** 全家逐月 —— 只在切到「逐月」时才算（要多算一到两年的全年预测）。 */
+  const monthly = useMemo<MonthlyOutlook | null>(() => {
+    if (span !== 'month' || !property || members.length === 0) return null;
+    const now = currentFengShuiTime();
+    try {
+      return monthlyOutlook(
+        { profile: property, members, qiMen: result?.qiMenEnabled ? qiMen : null, appliedCures: cures },
+        year,
+        year === now.year ? now.monthIndex : 1,
+        12,
+      );
+    } catch {
+      return null;
+    }
+  }, [span, property, members, cures, qiMen, result, year]);
 
   /** 还没指定谁住的卧房、书房 —— 不指定，预测就落不到人身上。 */
   const unassigned = useMemo(
@@ -148,8 +255,21 @@ export default function HomePage() {
             {/* 全家今年 —— 这房子对每个人分别有什么影响 */}
             {overview.length > 0 && (
               <section className="card">
-                <h2 className="card-title">全家 {year} 年</h2>
+                <h2 className="card-title">全家 {span === 'year' ? `${year} 年` : '逐月'}</h2>
                 <p className="mt-0.5 text-[0.75rem] text-ink-mute">每格是此人个人的机率；点名字看这屋对其的影响。</p>
+                <div className="mt-2">
+                  <SegRow
+                    value={span}
+                    onChange={setSpan}
+                    options={[
+                      { value: 'year', label: '今年各方面' },
+                      { value: 'month', label: '逐月' },
+                    ]}
+                  />
+                </div>
+                {span === 'month' && monthly && <MonthlyGrid outlook={monthly} />}
+                {span === 'year' && (
+                <>
                 <div className="mt-3 grid grid-cols-[4.5rem_repeat(5,1fr)] items-center gap-1 text-center text-[0.6875rem] text-ink-mute">
                   <span />
                   {OVERVIEW_DOMAINS.map((d) => (
@@ -169,6 +289,8 @@ export default function HomePage() {
                     </li>
                   ))}
                 </ul>
+                </>
+                )}
               </section>
             )}
 
