@@ -1,0 +1,34 @@
+{
+ "id": "T-012",
+ "title": "门派差异：大玄空只用下卦、不用替卦",
+ "source": {
+  "type": "web",
+  "title": "李炎宸教风水第三章 熟悉九星飞星 掌握挨星排盘",
+  "publisher": "搜狐",
+  "url": "https://m.sohu.com/n/485037481/",
+  "accessed": "2026-10-16",
+  "edition": null,
+  "page": null,
+  "passage": "该文称大玄空用下卦（每山中间 9 度），不用替卦；并以「子山午向、子山兼壬山5分」为属替卦而不用之例。"
+ },
+ "input": {},
+ "expected": {
+  "schoolNote": {
+   "school": "大玄空（该文作者所述）",
+   "usesTiXing": false,
+   "xiaGuaHalfWidth": 4.5
+  }
+ },
+ "covers": [
+  "替卦门派差异"
+ ],
+ "review": {
+  "status": "unreviewed",
+  "reviewer": null,
+  "notes": "经网页抓取工具转录（工具会做摘录），须人工对照原网页逐字复核后方可改为 reviewed。"
+ },
+ "ambiguities": [
+  "该文对「大玄空」的界定未展开"
+ ],
+ "kind": "transcribed"
+}

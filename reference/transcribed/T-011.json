@@ -1,0 +1,33 @@
+{
+ "id": "T-011",
+ "title": "2024 年立春日期",
+ "source": {
+  "type": "web",
+  "title": "HKO Almanac 2024",
+  "publisher": "香港天文台",
+  "url": "https://www.hko.gov.hk/tc/gts/astron2024/files/HKO_almanac_2024.pdf",
+  "accessed": "2026-10-16",
+  "edition": "2024",
+  "page": "一至三月页",
+  "passage": "「立春 Spring commences 4/2」；引言：「the time scale used is eight hours ahead of Co-ordinated Universal Time」"
+ },
+ "input": {
+  "year": 2024
+ },
+ "expected": {
+  "liChunDateUtc8": "2024-02-04"
+ },
+ "covers": [
+  "立春日期",
+  "换运年"
+ ],
+ "review": {
+  "status": "unreviewed",
+  "reviewer": null,
+  "notes": "经网页抓取工具转录（工具会做摘录），须人工对照原网页逐字复核后方可改为 reviewed。"
+ },
+ "ambiguities": [
+  "年历未给时刻"
+ ],
+ "kind": "transcribed"
+}

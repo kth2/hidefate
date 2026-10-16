@@ -1,0 +1,50 @@
+{
+ "id": "T-004",
+ "title": "九运 壬山丙向 替卦（部分断言）",
+ "source": {
+  "type": "web",
+  "title": "玄空飞星壬山丙向九运挨星下卦以及替卦图",
+  "publisher": "搜狐",
+  "url": "https://www.sohu.com/a/247243130_488508",
+  "accessed": "2026-10-16",
+  "edition": null,
+  "page": null,
+  "passage": "替卦图原注：「全局犯：[伏吟]。坤方为当元旺水。辰、未两方可用[城门诀]。」（盘面本身为图片）"
+ },
+ "input": {
+  "period": 9,
+  "sitting": "壬",
+  "facing": "丙",
+  "useTiXing": true,
+  "assumptions": [
+   "未注明兼向度数"
+  ]
+ },
+ "expected": {
+  "assertions": [
+   {
+    "path": "geju:全盘伏吟",
+    "equals": true,
+    "quote": "全局犯：[伏吟]"
+   },
+   {
+    "path": "xiang.2",
+    "equals": 9,
+    "quote": "坤方为当元旺水"
+   }
+  ]
+ },
+ "covers": [
+  "替卦",
+  "五入中逢替卦"
+ ],
+ "review": {
+  "status": "unreviewed",
+  "reviewer": null,
+  "notes": "经网页抓取工具转录（工具会做摘录），须人工对照原网页逐字复核后方可改为 reviewed。"
+ },
+ "ambiguities": [
+  "坐山运星为五，五入中逢替卦如何取替星，原文未说明；「全局伏吟」暗示五不替"
+ ],
+ "kind": "transcribed"
+}

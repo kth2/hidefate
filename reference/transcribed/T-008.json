@@ -1,0 +1,39 @@
+{
+ "id": "T-008",
+ "title": "年星与月星起例",
+ "source": {
+  "type": "web",
+  "title": "李炎宸教风水第三章 熟悉九星飞星 掌握挨星排盘",
+  "publisher": "搜狐",
+  "url": "https://m.sohu.com/n/485037481/",
+  "accessed": "2026-10-16",
+  "edition": null,
+  "page": null,
+  "passage": "「2008年以1入中顺；2009年以9入中顺；2010年以8入中顺；2011年以7入中顺」；年星诀「上元甲子一宫起，中元四绿推甲子。下元七赤兑位寻，逐年星逆中宫始。」；月星诀「子午卯酉八白宫，辰戌丑未五黄中。寅申巳亥居何位，逆寻二黑是其宗。」"
+ },
+ "input": {},
+ "expected": {
+  "annual": {
+   "2008": 1,
+   "2009": 9,
+   "2010": 8,
+   "2011": 7
+  },
+  "monthlyFirstByZhi": {
+   "子午卯酉": 8,
+   "辰戌丑未": 5,
+   "寅申巳亥": 2
+  }
+ },
+ "covers": [
+  "年星（R8）",
+  "月星（R9）"
+ ],
+ "review": {
+  "status": "unreviewed",
+  "reviewer": null,
+  "notes": "经网页抓取工具转录（工具会做摘录），须人工对照原网页逐字复核后方可改为 reviewed。"
+ },
+ "ambiguities": [],
+ "kind": "transcribed"
+}

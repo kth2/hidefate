@@ -1,0 +1,32 @@
+{
+ "id": "T-010",
+ "title": "2027 年立春时刻",
+ "source": {
+  "type": "web",
+  "title": "令和 9年 (2027) 暦要項",
+  "publisher": "日本国立天文台 暦計算室",
+  "url": "https://eco.mtk.nao.ac.jp/koyomi/yoko/2027/rekiyou272.html",
+  "accessed": "2026-10-16",
+  "edition": null,
+  "page": null,
+  "passage": "「立春 | 315度 | 2月04日 | 10時46分」（中央標準時，UTC+9）"
+ },
+ "input": {
+  "year": 2027
+ },
+ "expected": {
+  "liChunUtcMinute": "2027-02-04T01:46Z"
+ },
+ "covers": [
+  "立春时刻（时区）"
+ ],
+ "review": {
+  "status": "unreviewed",
+  "reviewer": null,
+  "notes": "经网页抓取工具转录（工具会做摘录），须人工对照原网页逐字复核后方可改为 reviewed。"
+ },
+ "ambiguities": [
+  "只精确到分"
+ ],
+ "kind": "transcribed"
+}
