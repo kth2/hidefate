@@ -20,6 +20,9 @@ import type {
   RoomPlacement,
   YouNianStar,
   CureIntent,
+  SchoolSettings,
+  ChartYearResolution,
+  GeJuReport,
 } from '@hidefate/core-fengshui';
 import type { ShanXiangResult } from '@hidefate/core-qimen';
 import type { RelativeLevel } from './relative.js';
@@ -207,6 +210,8 @@ export interface AnalysisInput {
   readonly appliedCures?: readonly AppliedCure[];
   /** 山向奇门盘；未启用或未载入则不传。 */
   readonly qiMen?: ShanXiangResult | null;
+  /** 风水师的门派设置；不传则全取默认（与旧行为一致）。 */
+  readonly school?: Partial<SchoolSettings>;
 }
 
 /** 已实施的化解记录。 */
@@ -245,4 +250,17 @@ export interface SynthesisResult {
   /** 整体置信度与其成因。 */
   readonly confidence: { level: ConfidenceLevel; reasons: readonly string[] };
   readonly summary: string;
+  /** 本次实际采用的门派设置（报告页脚须印出）。 */
+  readonly school?: SchoolSettings;
+  /** 运盘取了哪一年、是否回退。 */
+  readonly chartYear?: ChartYearResolution;
+  /** 玄空格局体检（伏吟反吟、合十、三般卦、入囚、失运）。 */
+  readonly geju?: GeJuReport;
+  /** 论星曜旺衰所用之运：门派选「宅运」即宅之元运，选「时运」即看盘当年之元运。 */
+  readonly phasePeriod?: PalaceIndex;
+}
+
+/** 论旺衰所用之运。旧结果无此字段时退回宅之元运（与旧行为一致）。 */
+export function phasePeriodOf(s: Pick<SynthesisResult, 'flyingStar' | 'phasePeriod'>): PalaceIndex {
+  return s.phasePeriod ?? s.flyingStar.period.period;
 }

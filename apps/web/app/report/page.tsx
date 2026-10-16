@@ -18,6 +18,7 @@ import {
   PALACE_INDEXES,
   STAR_NAME,
   type PalaceIndex,
+  describeSchool,
 } from '@hidefate/core-fengshui';
 import {
   RISK_COLOR,
@@ -32,6 +33,7 @@ import {
 import { PersonReportPage } from '../../components/PersonReportPage';
 import { computeShanXiang, type ShanXiangResult } from '@hidefate/core-qimen';
 import { currentFengShuiTime } from '../../lib/useAnalysis';
+import { loadSchool } from '../../lib/schoolStore';
 import { useProperty } from '../../lib/PropertyContext';
 
 export default function ReportPage() {
@@ -70,6 +72,7 @@ export default function ReportPage() {
       monthIndex: now.monthIndex,
       appliedCures: cures,
       qiMen,
+      school: loadSchool(),
     };
     try {
       const result = analyse(input, synthesise(input));
@@ -497,7 +500,7 @@ export default function ReportPage() {
         <ul>
           <li>
             <b>玄空飞星</b> —— 以元运数入中排运盘，取坐山与向首所在宫之运星分别入中排山盘与向盘，
-            阴阳依该运星本宫中与坐山同元龙之山而定；兼向逾 3° 起替卦（二十四山起星诀）。
+            阴阳依该运星本宫中与坐山同元龙之山而定；兼向逾 {result.school?.jianThreshold ?? 3}° 起替卦（二十四山起星诀）。
           </li>
           <li>
             <b>八宅派</b> —— 以坐山所属卦宫为宅卦，依翻卦掌次第布游年八星；
@@ -512,6 +515,11 @@ export default function ReportPage() {
             <b>八字命理</b> —— 四柱五行力量加权判身强弱与喜忌；资料残缺时按精度分级降权，
             命卦部分只需出生年与性别，故不受影响。
           </li>
+          {result.school && (
+            <li>
+              <b>本案门派设置</b> —— {describeSchool(result.school).join('；')}。{result.chartYear?.note}
+            </li>
+          )}
         </ul>
 
         <h3>置信度如何判定</h3>

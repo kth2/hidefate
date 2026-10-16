@@ -19,6 +19,7 @@ import {
   type RoomKind,
   type RoomPlacement,
 } from '@hidefate/core-fengshui';
+import { phasePeriodOf } from './types.js';
 import type { Cure, Finding, SynthesisResult } from './types.js';
 
 export interface LayoutIssue {
@@ -54,7 +55,7 @@ export function judgeRoomPlacement(
   kind: RoomKind,
 ): PlacementJudgement {
   const a = s.palaces[palace];
-  const period = s.flyingStar.period.period;
+  const period = phasePeriodOf(s);
   const bz = a.baZhaiStar;
   const auspiciousBaZhai = bz != null && YOU_NIAN_META[bz].auspicious;
   const prosperousStar = a.stars.shan === period || a.stars.xiang === period;
@@ -186,7 +187,7 @@ export function checkLayout(s: SynthesisResult): LayoutIssue[] {
 
     const bz = a.baZhaiStar;
     const isAuspiciousBaZhai = bz != null && YOU_NIAN_META[bz].auspicious;
-    const period = s.flyingStar.period.period;
+    const period = phasePeriodOf(s);
     const isProsperousStar = a.stars.xiang === period || a.stars.shan === period;
 
     const why: string[] = [];

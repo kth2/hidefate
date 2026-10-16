@@ -411,6 +411,10 @@ export interface PropertyProfile {
   readonly facing?: string | number;
   /** 入住 / 落成年（立春年）。 */
   readonly moveInYear: number;
+  /** 建成年（立春年）。门派设置选「建成年」立运盘时使用。 */
+  readonly builtYear?: number;
+  /** 大装修（换天心）完工年。门派设置选「换天心年」时使用。 */
+  readonly renovatedYear?: number;
   /** 元运；省略则由 moveInYear 推。 */
   readonly period?: PalaceIndex;
   readonly missingCorners: readonly MissingCorner[];

@@ -18,6 +18,7 @@ import {
 } from '@hidefate/core-fengshui';
 import { synthesise } from './assess.js';
 import { predict } from './predict.js';
+import { phasePeriodOf } from './types.js';
 import type { AnalysisInput, RiskLevel } from './types.js';
 
 export type AlertKind = '流月凶星' | '流年凶星' | '换运' | '感情预警' | '健康预警' | '化解回访';
@@ -92,7 +93,7 @@ export function buildAlerts(
   const yearInput: AnalysisInput = { ...input, year: fromYear };
   const s = synthesise(yearInput);
   const preds = predict(yearInput, s);
-  const period = s.flyingStar.period.period;
+  const period = phasePeriodOf(s);
 
   if (allow('流年凶星')) {
     for (const pr of preds) {

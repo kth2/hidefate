@@ -22,6 +22,7 @@ import {
   type SynthesisResult,
 } from '@hidefate/core-synthesis';
 import type { StoredCure, StoredMember } from './db';
+import { useSchool } from './schoolStore';
 
 export function toMembers(rows: readonly StoredMember[]): Member[] {
   return rows.map((r) => {
@@ -84,6 +85,7 @@ export interface UseAnalysisResult {
 
 export function useAnalysis(args: UseAnalysisArgs): UseAnalysisResult {
   const { profile, members, cures, year, monthIndex, enableQiMen } = args;
+  const [school] = useSchool();
 
   const [qiMen, setQiMen] = useState<ShanXiangResult | null>(null);
   const [qiMenLoading, setQiMenLoading] = useState(false);
@@ -131,13 +133,14 @@ export function useAnalysis(args: UseAnalysisArgs): UseAnalysisResult {
       monthIndex,
       appliedCures: cures,
       qiMen: enableQiMen ? qiMen : null,
+      school,
     };
     try {
       return analyse(input, synthesise(input));
     } catch {
       return null;
     }
-  }, [profile, members, cures, year, monthIndex, enableQiMen, qiMen]);
+  }, [profile, members, cures, year, monthIndex, enableQiMen, qiMen, school]);
 
   const retryQiMen = useCallback(() => setRetryToken((t) => t + 1), []);
 

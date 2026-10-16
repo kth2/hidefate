@@ -59,8 +59,7 @@ import {
   type MemberExposure,
   type PalaceAssessment,
   type Prediction,
-  type SynthesisResult,
-} from './types.js';
+  type SynthesisResult, phasePeriodOf } from './types.js';
 
 /** 概率上下限 —— 永不输出确定性断言。 */
 export const PROB_FLOOR = 0.03;
@@ -319,7 +318,7 @@ function buildPrediction(
   // 4. 逐人：命卦 × 八字 × 受影响程度，各算各的
   const hostile: WuXing[] = [];
   for (const s of [assessment.stars.shan, assessment.stars.xiang, assessment.stars.annual]) {
-    if (starScore(s, synthesis.flyingStar.period.period) < -0.2) hostile.push(STAR_WUXING[s]);
+    if (starScore(s, phasePeriodOf(synthesis)) < -0.2) hostile.push(STAR_WUXING[s]);
   }
   const findings: Finding[] = [...extraFindings];
   const perMember: MemberExposure[] = exposed
@@ -505,7 +504,7 @@ function headlineFor(
  */
 export function predict(input: AnalysisInput, synthesis: SynthesisResult): Prediction[] {
   const out: Prediction[] = [];
-  const period = synthesis.flyingStar.period.period;
+  const period = phasePeriodOf(synthesis);
   const roles = assignFamilyRoles(input.members, synthesis.year);
 
   for (const p of Object.keys(synthesis.palaces).map(Number) as PalaceIndex[]) {

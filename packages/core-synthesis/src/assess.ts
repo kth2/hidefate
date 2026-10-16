@@ -22,6 +22,7 @@ import {
   YOU_NIAN_META,
   annualPlate,
   annualStar,
+  assessGeJu,
   assessMissingCorner,
   buildFlyingStarChart,
   buildHouseBaZhai,
@@ -32,6 +33,8 @@ import {
   monthlyPlate,
   periodOfYear,
   profileCompleteness,
+  resolveChartYear,
+  resolveSchool,
   reverseGenerate,
   roomsInPalace,
   starPhase,
@@ -201,14 +204,24 @@ export function synthesise(input: AnalysisInput): SynthesisResult {
   const applied = input.appliedCures ?? [];
 
   // ---- 1. 三派排盘 ----
+  // 门派设置：不传则全为默认，与旧行为逐字节一致。
+  const school = resolveSchool(input.school);
+  const chartYear = resolveChartYear(
+    { moveInYear: profile.moveInYear, builtYear: profile.builtYear, renovatedYear: profile.renovatedYear },
+    school.periodBasis,
+  );
   const flyingStar = buildFlyingStarChart({
     sitting: profile.sitting,
     facing: profile.facing,
     period: profile.period,
-    moveInYear: profile.moveInYear,
+    moveInYear: chartYear.year,
+    centerFiveRule: school.centerFiveRule,
+    jianThreshold: school.jianThreshold,
   });
+  const geju = assessGeJu(flyingStar, year);
   const baZhai = buildHouseBaZhai(profile.sitting);
-  const period = flyingStar.period.period;
+  // 旺衰以宅运还是时运论，由门派定（默认宅运，与旧行为一致）。
+  const period = school.phaseBasis === '时运' ? periodOfYear(year).period : flyingStar.period.period;
   const yearPlate = annualPlate(year);
   const monthPlate = monthIndex != null ? monthlyPlate(year, monthIndex) : null;
   const qiMenEnabled = Boolean(profile.enableQiMen && qiMen);
@@ -508,6 +521,10 @@ export function synthesise(input: AnalysisInput): SynthesisResult {
     prioritisedCures,
     confidence,
     summary,
+    school,
+    chartYear,
+    geju,
+    phasePeriod: period,
   };
 }
 

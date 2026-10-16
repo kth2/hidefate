@@ -213,6 +213,15 @@ export default function HomePage() {
           <p className="mt-2 text-[0.875rem] leading-relaxed text-ink-soft">{glance.note}</p>
         </section>
 
+        {/* 风水师入口：不建档，只要坐向与年份 */}
+        <Link href="/quick" className="card flex items-center gap-3 active:bg-rice-deep/40">
+          <div className="min-w-0 flex-1">
+            <p className="font-serif text-[1rem] font-semibold">十秒起盘</p>
+            <p className="mt-0.5 text-[0.75rem] text-ink-mute">只要坐向度数与年份：飞星、格局、煞方、先做什么</p>
+          </div>
+          <span className="text-ink-mute">→</span>
+        </Link>
+
         {loading && <Skeleton lines={4} />}
 
         {!loading && properties.length === 0 && (

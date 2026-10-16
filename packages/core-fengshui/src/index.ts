@@ -14,3 +14,6 @@ export * from './starMeta.js';
 export * from './dongQi.js';
 export * from './xingShi.js';
 export * from './scenario.js';
+export * from './geju.js';
+export * from './annualSha.js';
+export * from './school.js';

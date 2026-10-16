@@ -24,6 +24,7 @@ import {
   type PalaceIndex,
   type RiskDomain,
 } from '@hidefate/core-fengshui';
+import { phasePeriodOf } from './types.js';
 import type { Finding, Member, SynthesisResult } from './types.js';
 
 /** 吉位类别。 */
@@ -67,7 +68,7 @@ export function findOpportunities(
   members: readonly Member[] = [],
 ): Opportunity[] {
   const out: Opportunity[] = [];
-  const period = s.flyingStar.period.period;
+  const period = phasePeriodOf(s);
 
   /** 以命卦起盘，看该宫是否落在此人的四吉方。 */
   const membersFavouring = (p: PalaceIndex): string[] => {
