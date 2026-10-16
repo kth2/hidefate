@@ -33,7 +33,8 @@ import {
   monthlyPlate,
   periodOfYear,
   profileCompleteness,
-  resolveChartYear,
+  chartOptionsFor,
+  phasePeriodFor,
   resolveSchool,
   reverseGenerate,
   roomsInPalace,
@@ -108,7 +109,7 @@ function annualOverlay(
       delta -= s === 5 ? 0.3 : 0.22;
       notes.push(
         `流年${STAR_NAME[annual]}属${annualWx}，${annualWx}生${shaWx}，正助本宫${label}${STAR_NAME[s]}之凶 ——` +
-        `${s === 5 ? '「五黄最忌火来生」，今年此方尤须静置，切忌红色、明火与强光。' : '病符得生，今年慢性病与妇疾之应加重。'}`,
+        `${s === 5 ? '「五黄最忌火来生」，今年此方尤须静置，切忌红色、明火与强光。' : '病符得生，今年健康方面（尤其女性长辈）宜多留意。'}`,
       );
     } else if (GENERATES[shaWx] === annualWx) {
       delta += 0.12;
@@ -123,7 +124,7 @@ function annualOverlay(
   const trio = [annual, shan, xiang];
   if (trio.includes(2) && trio.includes(5)) {
     delta -= 0.35;
-    notes.push('本宫今年二黑与五黄并见，《飞星赋》「二五交加，罹死亡并生疾病」，属全屋最须回避之方。');
+    notes.push('本宫今年二黑与五黄并见（二五交加），为全屋最须回避之方。');
   }
   if (trio.filter((s) => s === 5).length >= 2) {
     delta -= 0.3;
@@ -206,22 +207,12 @@ export function synthesise(input: AnalysisInput): SynthesisResult {
   // ---- 1. 三派排盘 ----
   // 门派设置：不传则全为默认，与旧行为逐字节一致。
   const school = resolveSchool(input.school);
-  const chartYear = resolveChartYear(
-    { moveInYear: profile.moveInYear, builtYear: profile.builtYear, renovatedYear: profile.renovatedYear },
-    school.periodBasis,
-  );
-  const flyingStar = buildFlyingStarChart({
-    sitting: profile.sitting,
-    facing: profile.facing,
-    period: profile.period,
-    moveInYear: chartYear.year,
-    centerFiveRule: school.centerFiveRule,
-    jianThreshold: school.jianThreshold,
-  });
+  const { chartYear, ...chartOpts } = chartOptionsFor(profile, school);
+  const flyingStar = buildFlyingStarChart(chartOpts);
   const geju = assessGeJu(flyingStar, year);
   const baZhai = buildHouseBaZhai(profile.sitting);
   // 旺衰以宅运还是时运论，由门派定（默认宅运，与旧行为一致）。
-  const period = school.phaseBasis === '时运' ? periodOfYear(year).period : flyingStar.period.period;
+  const period = phasePeriodFor(flyingStar.period.period, year, school);
   const yearPlate = annualPlate(year);
   const monthPlate = monthIndex != null ? monthlyPlate(year, monthIndex) : null;
   const qiMenEnabled = Boolean(profile.enableQiMen && qiMen);

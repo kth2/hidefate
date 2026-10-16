@@ -141,7 +141,7 @@ export const PALACE_FAMILY: Record<PalaceIndex, { member: string; body: string; 
   6: { member: '父亲（男主人）', body: '头、肺、骨、大肠', organ: '肺·大肠' },
   7: { member: '少女（幼女）', body: '口、舌、肺、齿', organ: '肺·口腔' },
   8: { member: '少男（幼子）', body: '手、背、脾胃、关节', organ: '脾·关节' },
-  9: { member: '中女（次女）', body: '目、心、血压', organ: '心·小肠' },
+  9: { member: '中女（次女）', body: '目、心、血液循环', organ: '心·小肠' },
 };
 
 export interface MissingCornerImpact {
@@ -200,7 +200,7 @@ function cornerCures(p: PalaceIndex): string[] {
     6: ['西北缺角：置铜制或金属圆器（如铜葫芦、金属摆钟）补乾金。', '男主人办公位改设于延年/生气方，忌久坐西北。'],
     7: ['正西缺角：置白色金属摆件或白水晶补兑金。', '幼女房间避开正西，注意口腔呼吸系统检查。'],
     8: ['东北缺角：置泰山石敢当或陶瓷方器补艮土。', '幼子房间改设，注意关节与脾胃调理。'],
-    9: ['正南缺角：置红色系装饰或长明灯补离火。', '次女房间改设，注意心血管与视力检查。'],
+    9: ['正南缺角：置红色系装饰或长明灯补离火。', '次女房间改设，宜定期体检（心脏与视力）。'],
   };
   return base[p];
 }

@@ -9,16 +9,16 @@ import { AppBar, Empty, Expandable, Skeleton } from '../../../components/mobile/
 import { useProperty } from '../../../lib/PropertyContext';
 
 export default function FusionPage() {
-  const { property, members, year, loading } = useProperty();
+  const { property, members, year, loading, school } = useProperty();
 
   const report = useMemo(() => {
     if (!property || members.length === 0) return null;
     try {
-      return buildFamilyFusionReport({ profile: property, members, qiMen: null }, year, 10);
+      return buildFamilyFusionReport({ profile: property, members, qiMen: null, school }, year, 10);
     } catch {
       return null;
     }
-  }, [property, members, year]);
+  }, [property, members, year, school]);
 
   if (loading) return <><AppBar title="家庭融合报告" back="/me" /><div className="px-4 py-4"><Skeleton lines={5} /></div></>;
 

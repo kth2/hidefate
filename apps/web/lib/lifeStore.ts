@@ -28,7 +28,12 @@ import {
   STAR_NAME,
   annualStar,
   buildFlyingStarChart,
+  chartOptionsFor,
   deriveCombination,
+  phasePeriodFor,
+  resolveSchool,
+  schoolHashPart,
+  type SchoolSettings,
   dongQiOf,
   monthlyStar,
   periodOfYear,
@@ -73,6 +78,8 @@ export interface LifeInput {
   readonly thisYear: number;
   /** 未来看几年，默认 10。 */
   readonly futureSpan?: number;
+  /** 门派设置；不给则取默认。由页面从 PropertyContext 传入，与其它页面一致。 */
+  readonly school?: Partial<SchoolSettings>;
 }
 
 /** 一段大运（或十年段）的概览。 */
@@ -274,6 +281,7 @@ function annualStarAt(year: number, palace: PalaceIndex): number {
 export function palaceSnapshots(
   timeline: LifeTimeline,
   year: number,
+  school: SchoolSettings = resolveSchool(),
 ): PalaceSnapshot[] {
   const y = timeline.years.find((x) => x.year === year);
   if (!y || !y.fengShui.evidenceUsable) return [];
@@ -281,12 +289,9 @@ export function palaceSnapshots(
   for (const r of y.fengShui.residences) {
     if (!r.profile || !r.capability.flyingStar) continue;
     try {
-      const chart = buildFlyingStarChart({
-        sitting: r.profile.sitting,
-        ...(r.profile.facing != null ? { facing: r.profile.facing } : {}),
-        moveInYear: r.profile.moveInYear,
-      });
-      const period = chart.period.period;
+      const { chartYear: _cy, ...opts } = chartOptionsFor(r.profile, school);
+      const chart = buildFlyingStarChart(opts);
+      const period = phasePeriodFor(chart.period.period, year, school);
       return ([1, 2, 3, 4, 5, 6, 7, 8, 9] as const).map((p) => {
         const cell = chart.palaces[p];
         const combo = deriveCombination(cell.shan, cell.xiang, period);
@@ -332,9 +337,9 @@ export function palaceSnapshots(
  *    是两回事。无动气之宫的星象照算不误（宅盘分析里仍会报），
  *    但它不该成为「今年会出事」的触发依据 —— 古法「不动不应」。
  */
-function fengShuiTokensOf(timeline: LifeTimeline, year: number): TaggedToken[] {
+function fengShuiTokensOf(timeline: LifeTimeline, year: number, school: SchoolSettings): TaggedToken[] {
   const out: TaggedToken[] = [];
-  for (const s of palaceSnapshots(timeline, year)) {
+  for (const s of palaceSnapshots(timeline, year, school)) {
     if (s.dongQi <= 0) continue; // 不动不应
     out.push({ token: STAR_NAME[s.shan as PalaceIndex], layer: '风水' });
     out.push({ token: STAR_NAME[s.xiang as PalaceIndex], layer: '风水' });
@@ -369,7 +374,7 @@ function outlookFor(
   const tagged = [
     ...mingTokensOf(chart, zw, year),
     ...yunTokensOf(chart, zw, year),
-    ...fengShuiTokensOf(timeline, year),
+    ...fengShuiTokensOf(timeline, year, resolveSchool(input.school)),
   ];
   const resonance = analyseResonanceTagged(DICTIONARY, tagged);
 
@@ -429,7 +434,7 @@ function outlookFor(
     breakpoints: bps,
     resonance,
     events,
-    palaces: palaceSnapshots(timeline, year),
+    palaces: palaceSnapshots(timeline, year, resolveSchool(input.school)),
     drafts,
     /**
      * 「留意」只标**这一年独有**的事：个人断点（换大运、搬家、施做化解）。
@@ -503,6 +508,8 @@ export function buildLifeView(input: LifeInput): LifeView {
     residences: input.residences.map((r) => ({
       propertyId: r.propertyId, fromYear: r.fromYear, toYear: r.toYear, role: r.role, fidelity: r.fidelity,
     })),
+    // 只有改过门派才进哈希 —— 全默认时旧记录的哈希不变（第零期审计 D6）。
+    ...(schoolHashPart(resolveSchool(input.school)) ? { school: schoolHashPart(resolveSchool(input.school)) } : {}),
   });
 
   // ---- 分段 ----
@@ -521,7 +528,7 @@ export function buildLifeView(input: LifeInput): LifeView {
     const mid = Math.min(Math.max(era.fromYear, person.year), era.toYear);
     const tagged = [
       ...mingTokensOf(chart, zw, mid),
-      ...fengShuiTokensOf(timeline, mid),
+      ...fengShuiTokensOf(timeline, mid, resolveSchool(input.school)),
     ];
     const res = analyseResonanceTagged(DICTIONARY, tagged);
     const top = res

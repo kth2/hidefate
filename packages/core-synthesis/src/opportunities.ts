@@ -239,7 +239,7 @@ export function findOpportunities(
         palace: p,
         direction: dir,
         strength: 0.7,
-        headline: `${dir}是天医方 —— 主健康、病去身安，久病者宜居此`,
+        headline: `${dir}是天医方 —— 主健康、病去身安，正在调养者宜居此`,
         finding: NEUTRAL_FINDING(
           `${dir}为本宅八宅「天医」方（巨门土），主健康、食禄与贵人相助。`,
           '八宅四吉之一，天医主病去身安。《八宅明镜》以天医方为养病、进食之吉方。',
@@ -247,7 +247,7 @@ export function findOpportunities(
         ),
         howToUse: [
           `${dir}宜设：老人房、病人静养之处、餐厅（主食禄）。`,
-          '长期体弱或久病未愈者，卧床移至此方。',
+          '长期体弱或正在调养者，卧床移至此方。',
           '厨房设于天医方亦佳，主一家饮食康健。',
         ],
         avoid: ['此方设厕所或垃圾区', '长期阴暗潮湿'],

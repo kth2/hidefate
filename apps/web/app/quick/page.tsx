@@ -39,10 +39,10 @@ const VALENCE_TONE: Record<GeJu['valence'], string> = {
   中: 'border-rice-line bg-rice-deep/40 text-ink-soft',
 };
 
-const PRIORITY_TONE: Record<Action['priority'], string> = {
-  必做: 'bg-cinnabar text-white',
-  宜做: 'bg-cinnabar/15 text-cinnabar',
-  可选: 'bg-rice-deep text-ink-soft',
+const CATEGORY_TONE: Record<Action['category'], string> = {
+  安全须知: 'bg-risk-warn text-white',
+  本派建议: 'bg-cinnabar/15 text-cinnabar',
+  可选传统做法: 'bg-rice-deep text-ink-soft',
 };
 
 const BUILDING_QUICK: readonly BuildingType[] = ['公寓', '高层单位', '排屋', '半独立式', '独立屋', '店铺零售', '办公室'];
@@ -157,6 +157,15 @@ export default function QuickChartPage() {
 
         {data && !('error' in data) && (
           <>
+            {/* 评估级别 —— 十秒起盘永远只是初步 */}
+            <section className="rounded-2xl border border-risk-warn/50 bg-risk-warn/5 p-3.5 text-[0.8125rem] leading-relaxed">
+              <p className="font-semibold">初步盘 · 未经实地核实</p>
+              <p className="mt-0.5 text-ink-soft">
+                坐向、立盘年份与物业类别都是你填的假设，尚未核对罗盘、户型与外局。
+                以下格局与行动只供风水师参考，<b>未经确认不宜直接交给客户</b>。
+              </p>
+            </section>
+
             {/* 立线 */}
             <section
               className={`rounded-2xl border p-3.5 text-[0.875rem] leading-relaxed ${
@@ -238,6 +247,17 @@ export default function QuickChartPage() {
                   <ActionCard key={a.id} a={a} />
                 ))}
               </div>
+              {data.plan.needsReview.length > 0 && (
+                <div className="mt-3">
+                  <Expandable title={`互相矛盾、待风水师裁量（${data.plan.needsReview.length} 项，未列入上方）`}>
+                    <div className="space-y-2">
+                      {data.plan.needsReview.map((a) => (
+                        <ActionCard key={a.id} a={a} />
+                      ))}
+                    </div>
+                  </Expandable>
+                </div>
+              )}
               {data.plan.enhancements.length > 0 && (
                 <div className="mt-3">
                   <Expandable title={`催吉（另列，${data.plan.enhancements.length} 项）`}>
@@ -316,15 +336,19 @@ function ActionCard({ a }: { a: Action }) {
   return (
     <div className="rounded-2xl border border-rice-line bg-white p-3">
       <div className="flex items-center gap-1.5 text-[0.6875rem]">
-        <span className={`rounded-md px-1.5 py-0.5 font-medium ${PRIORITY_TONE[a.priority]}`}>{a.priority}</span>
-        <span className="rounded-md border border-rice-line px-1.5 py-0.5 text-ink-soft">{a.tier}</span>
+        <span className={`rounded-md px-1.5 py-0.5 font-medium ${CATEGORY_TONE[a.category]}`}>{a.category}</span>
+        {a.evidence === '初步' && <span className="rounded-md border border-risk-warn/60 px-1.5 py-0.5 text-risk-warn">初步</span>}
         <span className="text-ink-mute">{a.where.direction}{a.where.room ? ` · ${a.where.room}` : ''}</span>
-        <span className="ml-auto text-ink-mute">{a.effort}</span>
+        <span className="ml-auto text-ink-mute">{a.reversibility} · {a.effort}</span>
       </div>
       <p className="mt-1.5 text-[0.875rem] leading-relaxed">{a.title}</p>
       <p className="mt-1 text-[0.75rem] text-ink-mute">⏱ {a.when.label}</p>
       {a.avoid.length > 0 && <p className="mt-0.5 text-[0.75rem] text-ink-mute">忌：{a.avoid.join('；')}</p>}
       <p className="mt-0.5 text-[0.75rem] text-ink-mute">因：{a.because.map((b) => b.summary).join('；')}</p>
+      <p className="mt-0.5 text-[0.6875rem] text-ink-mute">
+        传统层级：{a.tier}
+        {a.needsOwnerApproval ? ' · 须屋主同意' : ''} · {a.approval}
+      </p>
     </div>
   );
 }

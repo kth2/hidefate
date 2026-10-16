@@ -11,7 +11,7 @@
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { computeBaziChart } from '@hidefate/core-bazi';
-import { fengShuiYearOf, solarMonthIndexOf, type PropertyProfile } from '@hidefate/core-fengshui';
+import { fengShuiYearOf, solarMonthIndexOf, type PropertyProfile, type SchoolSettings } from '@hidefate/core-fengshui';
 import { computeShanXiang, type ShanXiangResult } from '@hidefate/core-qimen';
 import {
   analyse,
@@ -72,6 +72,8 @@ export interface UseAnalysisArgs {
   monthIndex?: number;
   /** 是否启用山向奇门层。 */
   enableQiMen: boolean;
+  /** 门派设置；不给则自行读本机设置。 */
+  school?: SchoolSettings;
 }
 
 export interface UseAnalysisResult {
@@ -85,7 +87,8 @@ export interface UseAnalysisResult {
 
 export function useAnalysis(args: UseAnalysisArgs): UseAnalysisResult {
   const { profile, members, cures, year, monthIndex, enableQiMen } = args;
-  const [school] = useSchool();
+  const [ownSchool] = useSchool();
+  const school = args.school ?? ownSchool;
 
   const [qiMen, setQiMen] = useState<ShanXiangResult | null>(null);
   const [qiMenLoading, setQiMenLoading] = useState(false);

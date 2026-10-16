@@ -10,7 +10,9 @@
  *   3. 资料缺失时的回退（如选了「建成年」却没填建成年）必须明说回退到了什么。
  */
 
-import type { CenterFiveRule } from './flyingStar.js';
+import type { PalaceIndex } from './constants.js';
+import type { CenterFiveRule, FlyingStarOptions } from './flyingStar.js';
+import { periodOfYear } from './period.js';
 
 /** 运盘取哪一年。 */
 export type PeriodBasis = '入住年' | '建成年' | '换天心年';
@@ -127,4 +129,53 @@ export function describeSchool(s: SchoolSettings): string[] {
 /** 与默认不同的项。 */
 export function schoolDeviations(s: SchoolSettings): (keyof SchoolSettings)[] {
   return (Object.keys(DEFAULT_SCHOOL) as (keyof SchoolSettings)[]).filter((k) => s[k] !== DEFAULT_SCHOOL[k]);
+}
+
+/** 立盘所需的物业字段（PropertyProfile 的子集，居住史里的物业也能用）。 */
+export interface ChartProfileLike {
+  readonly sitting: string | number;
+  readonly facing?: string | number;
+  readonly moveInYear: number;
+  readonly builtYear?: number;
+  readonly renovatedYear?: number;
+  readonly period?: PalaceIndex;
+}
+
+/**
+ * 依门派设置组出排盘参数。**所有排盘入口都应走这里**，
+ * 否则同一处房子在不同页面会按两套门派排盘（第零期审计 D3）。
+ */
+export function chartOptionsFor(
+  p: ChartProfileLike,
+  school: SchoolSettings,
+): FlyingStarOptions & { readonly chartYear: ChartYearResolution } {
+  const chartYear = resolveChartYear(
+    { moveInYear: p.moveInYear, builtYear: p.builtYear, renovatedYear: p.renovatedYear },
+    school.periodBasis,
+  );
+  return {
+    sitting: p.sitting,
+    ...(p.facing != null && p.facing !== '' ? { facing: p.facing } : {}),
+    ...(p.period != null ? { period: p.period } : {}),
+    moveInYear: chartYear.year,
+    centerFiveRule: school.centerFiveRule,
+    jianThreshold: school.jianThreshold,
+    chartYear,
+  };
+}
+
+/** 论星曜旺衰所用之运。 */
+export function phasePeriodFor(chartPeriod: PalaceIndex, lookYear: number, school: SchoolSettings): PalaceIndex {
+  return school.phaseBasis === '时运' ? periodOfYear(lookYear).period : chartPeriod;
+}
+
+/**
+ * 写进账本 inputHash 的门派部分：**只放与默认不同的项**。
+ * 全默认时返回 undefined —— 这样旧记录的哈希不变，重放校验不会无故失败；
+ * 一旦改过门派，哈希随之改变，日后重放能分辨是哪套门派算的。
+ */
+export function schoolHashPart(s: SchoolSettings): Partial<SchoolSettings> | undefined {
+  const dev = schoolDeviations(s);
+  if (dev.length === 0) return undefined;
+  return Object.fromEntries(dev.map((k) => [k, s[k]])) as Partial<SchoolSettings>;
 }

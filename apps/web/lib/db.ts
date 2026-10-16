@@ -8,7 +8,8 @@
  */
 
 import Dexie, { type Table } from 'dexie';
-import type { PropertyProfile } from '@hidefate/core-fengshui';
+import { resolveSchool, type PropertyProfile, type SchoolSettings } from '@hidefate/core-fengshui';
+import { loadSchool, saveSchool } from './schoolStore';
 import type { AppliedCure, ResidencePeriod } from '@hidefate/core-synthesis';
 import type { BirthInput } from '@hidefate/core-bazi';
 import type { PredictionRecord, QuietRecord } from '@hidefate/core-ledger';
@@ -169,31 +170,8 @@ export function newId(prefix: string): string {
   return `${prefix}-${rand}`;
 }
 
-/** 导出全部资料为 JSON（用户主动触发）。 */
-export async function exportAll(): Promise<string> {
-  const d = db();
-  const [properties, members, cures, scenarios, residences, predictions, quiets] = await Promise.all([
-    d.properties.toArray(),
-    d.members.toArray(),
-    d.cures.toArray(),
-    d.scenarios.toArray(),
-    d.residences.toArray(),
-    d.predictions.toArray(),
-    d.quiets.toArray(),
-  ]);
-  // 后验（posteriors）刻意不导出 —— 它随时可由账本重算，
-  // 导出它只会在导入后与账本不一致，且不一致时没人看得出来。
-  return JSON.stringify(
-    {
-      version: 2,
-      exportedAt: new Date().toISOString(),
-      properties, members, cures, scenarios,
-      residences, predictions, quiets,
-    },
-    null,
-    2,
-  );
-}
+/** 导出文件格式版本。v3：补上占局盘面与门派设置（第零期审计 D5）。 */
+export const EXPORT_VERSION = 3;
 
 export interface ExportShape {
   version?: number;
@@ -205,17 +183,67 @@ export interface ExportShape {
   residences?: StoredResidence[];
   predictions?: StoredPrediction[];
   quiets?: StoredQuiet[];
+  /** v3 起：占局盘面。账本里的占局预测要靠它回看盘面。 */
+  divinations?: StoredDivinationRow[];
+  /** v3 起：门派设置。 */
+  school?: Partial<SchoolSettings>;
+}
+
+/**
+ * 组出导出内容（纯函数，便于测试）。
+ *
+ * 刻意**不导出**：
+ *   - `posteriors` —— 随时可由账本重算；导出它只会在导入后与账本不一致，且不一致时没人看得出来。
+ *   - `settings` —— 内含 AI 供应商的 API Key。导出文件常被转发、存云盘，Key 不该跟着走。
+ */
+export function buildExport(
+  tables: Required<Omit<ExportShape, 'version' | 'exportedAt' | 'school'>>,
+  school: SchoolSettings,
+  now: Date,
+): ExportShape {
+  return { version: EXPORT_VERSION, exportedAt: now.toISOString(), ...tables, school };
+}
+
+/** 解析导入文件；v2 及更早的文件照样可读（缺的表视为空）。 */
+export function parseImport(json: string): ExportShape {
+  const data = JSON.parse(json) as ExportShape;
+  if (data == null || typeof data !== 'object') throw new Error('不是有效的备份文件。');
+  if (data.version != null && data.version > EXPORT_VERSION) {
+    throw new Error(`备份文件版本 v${data.version} 比本 App 新（v${EXPORT_VERSION}），请先更新 App。`);
+  }
+  return data;
+}
+
+/** 导出全部资料为 JSON（用户主动触发）。 */
+export async function exportAll(): Promise<string> {
+  const d = db();
+  const [properties, members, cures, scenarios, residences, predictions, quiets, divinations] = await Promise.all([
+    d.properties.toArray(),
+    d.members.toArray(),
+    d.cures.toArray(),
+    d.scenarios.toArray(),
+    d.residences.toArray(),
+    d.predictions.toArray(),
+    d.quiets.toArray(),
+    d.divinations.toArray(),
+  ]);
+  const out = buildExport(
+    { properties, members, cures, scenarios, residences, predictions, quiets, divinations },
+    loadSchool(),
+    new Date(),
+  );
+  return JSON.stringify(out, null, 2);
 }
 
 /** 导入 JSON（覆盖同 id 记录）。 */
 export async function importAll(
   json: string,
-): Promise<{ properties: number; members: number; predictions: number }> {
-  const data = JSON.parse(json) as ExportShape;
+): Promise<{ properties: number; members: number; predictions: number; divinations: number }> {
+  const data = parseImport(json);
   const d = db();
   await d.transaction(
     'rw',
-    [d.properties, d.members, d.cures, d.scenarios, d.residences, d.predictions, d.quiets],
+    [d.properties, d.members, d.cures, d.scenarios, d.residences, d.predictions, d.quiets, d.divinations],
     async () => {
       if (data.properties?.length) await d.properties.bulkPut(data.properties);
       if (data.members?.length) await d.members.bulkPut(data.members);
@@ -224,11 +252,14 @@ export async function importAll(
       if (data.residences?.length) await d.residences.bulkPut(data.residences);
       if (data.predictions?.length) await d.predictions.bulkPut(data.predictions);
       if (data.quiets?.length) await d.quiets.bulkPut(data.quiets);
+      if (data.divinations?.length) await d.divinations.bulkPut(data.divinations);
     },
   );
+  if (data.school) saveSchool(resolveSchool(data.school));
   return {
     properties: data.properties?.length ?? 0,
     members: data.members?.length ?? 0,
     predictions: data.predictions?.length ?? 0,
+    divinations: data.divinations?.length ?? 0,
   };
 }

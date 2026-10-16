@@ -33,13 +33,12 @@ import {
 import { PersonReportPage } from '../../components/PersonReportPage';
 import { computeShanXiang, type ShanXiangResult } from '@hidefate/core-qimen';
 import { currentFengShuiTime } from '../../lib/useAnalysis';
-import { loadSchool } from '../../lib/schoolStore';
 import { useProperty } from '../../lib/PropertyContext';
 
 export default function ReportPage() {
   // 取「当前房屋」而非路由参数：静态导出没有服务器，动态段 [id] 无法预渲染，
   // 且报告本来就只会针对当前选中的那处房屋出具。
-  const { property, members, cures, loading } = useProperty();
+  const { property, members, cures, loading, school } = useProperty();
   const [now] = useState(() => currentFengShuiTime());
   const [qiMen, setQiMen] = useState<ShanXiangResult | null>(null);
   const [qiMenPending, setQiMenPending] = useState(false);
@@ -72,28 +71,28 @@ export default function ReportPage() {
       monthIndex: now.monthIndex,
       appliedCures: cures,
       qiMen,
-      school: loadSchool(),
+      school,
     };
     try {
       const result = analyse(input, synthesise(input));
-      const timeline = buildTimeline({ profile: property, members, qiMen: null, appliedCures: cures }, {
+      const timeline = buildTimeline({ profile: property, members, qiMen: null, appliedCures: cures, school }, {
         startYear: now.year,
         span: 12,
       });
       const fusion = members.length
-        ? buildFamilyFusionReport({ profile: property, members, qiMen: null }, now.year, 10)
+        ? buildFamilyFusionReport({ profile: property, members, qiMen: null, school }, now.year, 10)
         : null;
       const people = members
         .map((m) => buildPersonView(result, members, m.id))
         .filter((v): v is NonNullable<typeof v> => v != null);
       const monthly = members.length
-        ? monthlyOutlook({ profile: property, members, qiMen: result.qiMenEnabled ? qiMen : null, appliedCures: cures }, now.year, now.monthIndex, 12)
+        ? monthlyOutlook({ profile: property, members, qiMen: result.qiMenEnabled ? qiMen : null, appliedCures: cures, school }, now.year, now.monthIndex, 12)
         : null;
       return { result, timeline, fusion, people, monthly };
     } catch {
       return null;
     }
-  }, [property, members, cures, now, qiMen]);
+  }, [property, members, cures, now, qiMen, school]);
 
   if (loading) return <p className="px-4 py-6 text-sm text-ink-mute">读取中…</p>;
   if (qiMenPending) {

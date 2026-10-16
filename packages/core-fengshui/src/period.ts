@@ -8,6 +8,9 @@
 import { Solar } from 'lunar-typescript';
 import type { PalaceIndex } from './constants.js';
 
+/** lunar-typescript 节气时刻所用时区：北京时间 UTC+8。 */
+export const BEIJING_OFFSET_HOURS = 8;
+
 /** 三元九运起点：上元一运始于 1864 年（甲子）立春。 */
 export const YUAN_YUN_EPOCH = 1864;
 
@@ -49,8 +52,12 @@ const CN_NUM: Record<number, string> = {
 export { CN_NUM };
 
 /**
- * 立春时刻。返回该公历年立春的 Date（本地时区解读，精确到分）。
- * lunar-typescript 的节气表基于寿星万年历，离线且确定。
+ * 立春时刻。返回该公历年立春的**绝对时刻**（Date）。
+ * lunar-typescript 的节气表基于寿星万年历，离线且确定，给出的是**北京时间（UTC+8）墙钟**。
+ *
+ * 早先把这个墙钟当作「设备本地时间」构造 Date，结果设备在纽约时立春晚了 13 小时、
+ * 在伦敦晚了 8 小时（第零期审计 D4）。现以 UTC+8 明确换算成绝对时刻，与设备时区无关；
+ * 在 UTC+8 地区（马来西亚、新加坡、中港台）结果与旧版完全相同。
  */
 export function liChunOf(year: number): Date {
   // 取该年 2 月 10 日回推：该日必在立春之后、雨水之前。
@@ -58,7 +65,9 @@ export function liChunOf(year: number): Date {
   const table = solar.getLunar().getJieQiTable();
   const lc = table['立春'];
   if (!lc) throw new Error(`无法求得 ${year} 年立春`);
-  return new Date(lc.getYear(), lc.getMonth() - 1, lc.getDay(), lc.getHour(), lc.getMinute(), lc.getSecond());
+  return new Date(
+    Date.UTC(lc.getYear(), lc.getMonth() - 1, lc.getDay(), lc.getHour() - BEIJING_OFFSET_HOURS, lc.getMinute(), lc.getSecond()),
+  );
 }
 
 /** 把任意时刻归入「立春年」。立春前算上一年。 */
@@ -270,4 +279,18 @@ export function solarMonthIndexOf(date: Date): number {
   if (idx < 0) throw new Error(`无法解析月支：${gz}`);
   // 寅 = 索引 2 → 月序 1
   return ((idx - 2 + 12) % 12) + 1;
+}
+
+/**
+ * 换运年提示。元运以立春交接，换运那一年（如 2024）立春前入住者仍属上一运，
+ * 但使用者通常只填年份。是换运年就返回一句提示，否则 null（第零期审计 D7）。
+ */
+export function periodTransitionNote(year: number): string | null {
+  if (!Number.isInteger(year)) return null;
+  const info = periodOfYear(year);
+  if (info.startYear !== year) return null;
+  const lc = liChunOf(year);
+  const md = `${lc.getUTCMonth() + 1} 月 ${new Date(lc.getTime() + BEIJING_OFFSET_HOURS * 3600_000).getUTCDate()} 日`;
+  const prev = periodOfYear(year - 1);
+  return `${year} 年是换运年：若在 ${md}立春之前入住，仍属${prev.label}，请改填 ${year - 1}。`;
 }

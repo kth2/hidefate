@@ -120,7 +120,7 @@ describe('风水层由 core-fengshui 推导，不手写', () => {
 
   it('改上游知识库，象意自动跟上（断语取自 STAR_META 而非另抄一份）', () => {
     const erhei = buildFlyingStarXiangYi().find((x) => x.id === 'fengshui.star2.health.organ')!;
-    expect(erhei.statement).toContain(STAR_META[2].ailments[0]!);
+    expect(erhei.statement).toContain(STAR_META[2].organs[0]!);
     expect(erhei.source.token).toBe(STAR_META[2].name);
   });
 

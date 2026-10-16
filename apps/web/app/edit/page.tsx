@@ -20,6 +20,7 @@ import {
   degreeToMountain,
   facingOf,
   periodOfYear,
+  periodTransitionNote,
   requiresFloor,
   requiresStoreys,
   resolveMountain,
@@ -200,6 +201,9 @@ export default function EditPage() {
               onChange={(e) => setMoveInYear(Number(e.target.value))}
             />
             <p className="mt-1 text-[0.8125rem] text-ink-mute">{periodOfYear(moveInYear).label}</p>
+            {periodTransitionNote(moveInYear) && (
+              <p className="mt-1 text-[0.8125rem] font-medium text-cinnabar">{periodTransitionNote(moveInYear)}</p>
+            )}
           </div>
         </section>
 

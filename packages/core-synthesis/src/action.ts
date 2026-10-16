@@ -9,11 +9,19 @@
  *   2. 玄空格局体检（伏反吟、入囚、失运……）
  *   3. 流年煞方（太岁、岁破、三煞、五黄 —— 动土禁方）
  *
- * ## 排序（与 PRACTITIONER-PLAN §2 一致）
+ * ## 排序（第零期审计 P0-8，采纳外部审阅）
  *
- *   优先级（必做 > 宜做 > 可选）→ 层级（移形易位最先）→ 受影响人数 → 功夫（同效取省事）
+ *   类别（安全须知 > 本派建议 > 可选传统做法）
+ *   → 依据（完整 > 初步）
+ *   → 可逆性（可逆 > 部分可逆 > 不可逆）
+ *   → 功夫（不花钱 > 小改 > 装修级）
+ *   → 受影响人数
  *
- * 能改格局就不靠摆件 —— 这是传统化煞的通则，也是风水师最常被客户质疑「是不是要我买东西」时的底气。
+ * 早先以「必做／宜做／可选」排序、并把「移形易位」放第一。两处都改了：
+ *   - 「必做」把门派建议说成了义务。传统建议永远是「本派建议」，只有安全问题才是「须知」。
+ *   - 移形易位是传统化煞的**层级**，不等于**实务上最先做**：搬床容易，移灶、改门是装修。
+ *     层级仍保留为 `tier` 字段供风水师参考，排序改看可逆性与成本。
+ * 装修级或不可逆的行动一律 `needsOwnerApproval`，须屋主明确同意。
  *
  * ## 纪律
  *
@@ -23,6 +31,7 @@
  */
 
 import {
+  BEIJING_OFFSET_HOURS,
   PALACE_DIRECTION,
   annualSha,
   liChunOf,
@@ -44,9 +53,24 @@ export const TIER_ORDER: readonly ActionTier[] = [
   '留意观察',
 ] as const;
 
-export type ActionPriority = '必做' | '宜做' | '可选';
+/**
+ * 行动类别 —— 三者不可互换：
+ *   安全须知     与风水无关的实际安全（电线、燃气、消防、通道）；任何门派都该做
+ *   本派建议     依所选门派规则得出、且有明确时限或凶象依据的建议
+ *   可选传统做法 催吉、长期布局、或门派间说法不一的做法
+ */
+export type ActionCategory = '安全须知' | '本派建议' | '可选传统做法';
 
-const PRIORITY_ORDER: readonly ActionPriority[] = ['必做', '宜做', '可选'] as const;
+export const CATEGORY_ORDER: readonly ActionCategory[] = ['安全须知', '本派建议', '可选传统做法'] as const;
+
+/** 依据完整度：「初步」= 缺实地资料（房间、家人、罗盘读数）或规则本身有待核例外。 */
+export type ActionEvidence = '完整' | '初步';
+
+const EVIDENCE_ORDER: readonly ActionEvidence[] = ['完整', '初步'] as const;
+
+export type ActionReversibility = '可逆' | '部分可逆' | '不可逆';
+
+const REVERSIBILITY_ORDER: readonly ActionReversibility[] = ['可逆', '部分可逆', '不可逆'] as const;
 
 export type ActionEffort = '不花钱' | '小改' | '装修级';
 
@@ -73,8 +97,14 @@ export interface Action {
     readonly label: string;
   };
   readonly forMembers: readonly string[];
-  readonly priority: ActionPriority;
+  readonly category: ActionCategory;
+  readonly evidence: ActionEvidence;
+  readonly reversibility: ActionReversibility;
   readonly effort: ActionEffort;
+  /** 装修级或不可逆 → 须屋主明确同意后才可执行。 */
+  readonly needsOwnerApproval: boolean;
+  /** 引擎生成的行动一律「待审」，风水师确认后方可交给客户。 */
+  readonly approval: '待审' | '已确认' | '已拒绝';
   readonly intent: '化凶' | '催吉' | '避忌';
   readonly domains: readonly RiskDomain[];
   readonly because: readonly ActionReason[];
@@ -102,6 +132,18 @@ export function inferTier(text: string): ActionTier {
   return '留意观察';
 }
 
+const REVERSIBILITY_OF: Readonly<Record<ActionTier, ActionReversibility>> = {
+  移形易位: '可逆',
+  改房间用途: '可逆',
+  调整动线门窗: '不可逆',
+  物件化解: '可逆',
+  择时避让: '可逆',
+  留意观察: '可逆',
+};
+
+/** 与风水无关的实际安全事项。 */
+const SAFETY_RE = /消防|烟感|电线|燃气|线路|漏电|防滑|扶手|逃生|通风/;
+
 const EFFORT_OF: Readonly<Record<ActionTier, ActionEffort>> = {
   移形易位: '小改',
   改房间用途: '小改',
@@ -111,9 +153,28 @@ const EFFORT_OF: Readonly<Record<ActionTier, ActionEffort>> = {
   留意观察: '不花钱',
 };
 
+/** 以北京时间（节气所用时区）取日期，与设备时区无关。 */
 function isoDate(d: Date): string {
+  const b = new Date(d.getTime() + BEIJING_OFFSET_HOURS * 3600_000);
   const p = (n: number) => String(n).padStart(2, '0');
-  return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}`;
+  return `${b.getUTCFullYear()}-${p(b.getUTCMonth() + 1)}-${p(b.getUTCDate())}`;
+}
+
+/** 合参结果是否缺实地资料：没标房间、没有家人、坐向只给了山名。 */
+function isPreliminary(s: SynthesisResult): boolean {
+  const p = s.profile;
+  return p.rooms.length === 0 || (typeof p.sitting === 'string' && !/^\d/.test(p.sitting));
+}
+
+function base(tier: ActionTier, effort: ActionEffort = EFFORT_OF[tier]) {
+  const reversibility = REVERSIBILITY_OF[tier];
+  return {
+    tier,
+    effort,
+    reversibility,
+    needsOwnerApproval: effort === '装修级' || reversibility === '不可逆',
+    approval: '待审' as const,
+  };
 }
 
 /** 「今年」系列化解：流年星所致，明年立春后应撤除或改换。 */
@@ -136,8 +197,11 @@ export function actionFromCure(cure: Cure, s: SynthesisResult, idx: number): Act
   const nextLiChun = isoDate(liChunOf(s.year + 1));
   const annual = isAnnual(cure.action);
   const tier = inferTier(cure.action);
-  const priority: ActionPriority =
-    cure.urgency === '立即' ? '必做' : cure.urgency === '本年内' ? '宜做' : '可选';
+  const category: ActionCategory = SAFETY_RE.test(cure.action)
+    ? '安全须知'
+    : cure.intent === '催吉' || cure.urgency === '可从容安排'
+      ? '可选传统做法'
+      : '本派建议';
   const when =
     cure.urgency === '立即'
       ? { doBy: undefined, label: '尽快' }
@@ -147,14 +211,14 @@ export function actionFromCure(cure: Cure, s: SynthesisResult, idx: number): Act
   return {
     id: `cure-${cure.palace}-${idx}`,
     title: cure.action,
-    tier,
+    ...base(tier),
     where: { palace: cure.palace, direction: cure.direction, room: cure.room ?? undefined },
     when: annual
       ? { ...when, undoAfter: nextLiChun, label: `${when.label}；${s.year + 1} 年立春后撤除或按新年飞星重排` }
       : when,
     forMembers: cure.memberId ? [cure.memberId] : occupantsOf(s, cure.palace),
-    priority,
-    effort: EFFORT_OF[tier],
+    category,
+    evidence: isPreliminary(s) ? '初步' : '完整',
     intent: cure.intent === '催吉' ? '催吉' : '化凶',
     domains: cure.domains,
     because: [{ summary: cure.rationale, principle: cure.rationale, source: '合参化解' }],
@@ -176,13 +240,14 @@ export function actionsFromGeJu(geju: GeJuReport, s: SynthesisResult): Action[] 
     if (g.kind === '向星入囚') {
       out.push({
         id: `geju-${g.kind}`,
-        title: '向首或中宫引入真水（水池、水景）以出囚；或议换天心重立运盘',
-        tier: '调整动线门窗',
+        title: '先实地核查向首与中宫有无真水；若无，再议引入水景或换天心重立运盘',
+        ...base('调整动线门窗', '装修级'),
         where: { palace: facP, direction: PALACE_DIRECTION[facP] },
         when: { label: g.window ? `入囚期 ${g.window.startYear}–${g.window.endYear}` : '入囚期内' },
         forMembers: [],
-        priority: g.valence === '凶' ? '宜做' : '可选',
-        effort: '装修级',
+        category: g.valence === '凶' ? '本派建议' : '可选传统做法',
+        // 「见真水不囚」须实地核，故永远是初步
+        evidence: '初步',
         intent: '化凶',
         domains: ['财运'],
         because: [reason],
@@ -193,12 +258,12 @@ export function actionsFromGeJu(geju: GeJuReport, s: SynthesisResult): Action[] 
       out.push({
         id: `geju-${g.kind}`,
         title: '评估是否换天心：大装修（换门、揭顶、全屋翻新）后以当运重立运盘',
-        tier: '调整动线门窗',
+        ...base('调整动线门窗', '装修级'),
         where: { palace: 5, direction: PALACE_DIRECTION[5] },
         when: { label: '下次装修时一并考虑' },
         forMembers: [],
-        priority: '可选',
-        effort: '装修级',
+        category: '可选传统做法',
+        evidence: isPreliminary(s) ? '初步' : '完整',
         intent: '化凶',
         domains: ['财运', '健康'],
         because: [reason],
@@ -213,12 +278,12 @@ export function actionsFromGeJu(geju: GeJuReport, s: SynthesisResult): Action[] 
           g.scope === '全盘'
             ? `全盘${g.kind}：议以替卦微调门向、或换天心重立运盘；未改之前，${g.governs === '财' ? '大额投资与开业' : '安床、添丁、就医等大事'}宜择日`
             : `${PALACE_DIRECTION[p]}${g.kind}：此宫宜静，减少开门进出与动土`,
-        tier: g.scope === '全盘' ? '调整动线门窗' : '择时避让',
+        ...(g.scope === '全盘' ? base('调整动线门窗', '装修级') : base('择时避让', '不花钱')),
         where: { palace: p, direction: PALACE_DIRECTION[p] },
         when: { label: '长期' },
         forMembers: [],
-        priority: g.scope === '全盘' ? '宜做' : '可选',
-        effort: g.scope === '全盘' ? '装修级' : '不花钱',
+        category: g.scope === '全盘' ? '本派建议' : '可选传统做法',
+        evidence: isPreliminary(s) ? '初步' : '完整',
         intent: '化凶',
         domains: g.governs === '财' ? ['财运'] : g.governs === '丁' ? ['健康', '人丁'] : ['财运', '健康'],
         because: [reason],
@@ -234,7 +299,7 @@ export function actionsFromGeJu(geju: GeJuReport, s: SynthesisResult): Action[] 
 // 来源三：流年煞方（动土禁方）
 // ---------------------------------------------------------------------------
 
-export function actionsFromAnnualSha(sha: AnnualSha): Action[] {
+export function actionsFromAnnualSha(sha: AnnualSha, evidence: ActionEvidence = '完整'): Action[] {
   const start = isoDate(liChunOf(sha.year));
   const end = isoDate(liChunOf(sha.year + 1));
   const reasonsByPalace = new Map<PalaceIndex, string[]>();
@@ -250,12 +315,13 @@ export function actionsFromAnnualSha(sha: AnnualSha): Action[] {
   return [...reasonsByPalace.entries()].map(([p, why]) => ({
     id: `sha-${sha.year}-${p}`,
     title: `${PALACE_DIRECTION[p]}今年勿动土、勿大装修、勿打墙钻孔`,
-    tier: '择时避让' as const,
+    ...base('择时避让', '不花钱'),
     where: { palace: p, direction: PALACE_DIRECTION[p] },
     when: { doBy: start, undoAfter: end, label: `${start} 立春起至 ${end} 立春前` },
     forMembers: [],
-    priority: why.some((w) => w.startsWith('岁破') || w.startsWith('五黄')) ? ('必做' as const) : ('宜做' as const),
-    effort: '不花钱' as const,
+    category: '本派建议' as const,
+    // 煞方只看年份与方位；坐向未实测时方位本身就可能差一宫
+    evidence,
     intent: '避忌' as const,
     domains: ['健康', '意外'] as RiskDomain[],
     because: [{ summary: [...new Set(why)].join('、'), principle: '流年太岁、岁破、三煞、五黄之方忌动土修造', source: '流年煞方' as const }],
@@ -276,14 +342,15 @@ function rank<T>(order: readonly T[], v: T): number {
 export function sortActions(actions: readonly Action[]): Action[] {
   return [...actions].sort(
     (a, b) =>
-      rank(PRIORITY_ORDER, a.priority) - rank(PRIORITY_ORDER, b.priority) ||
-      rank(TIER_ORDER, a.tier) - rank(TIER_ORDER, b.tier) ||
-      b.forMembers.length - a.forMembers.length ||
-      rank(EFFORT_ORDER, a.effort) - rank(EFFORT_ORDER, b.effort),
+      rank(CATEGORY_ORDER, a.category) - rank(CATEGORY_ORDER, b.category) ||
+      rank(EVIDENCE_ORDER, a.evidence) - rank(EVIDENCE_ORDER, b.evidence) ||
+      rank(REVERSIBILITY_ORDER, a.reversibility) - rank(REVERSIBILITY_ORDER, b.reversibility) ||
+      rank(EFFORT_ORDER, a.effort) - rank(EFFORT_ORDER, b.effort) ||
+      b.forMembers.length - a.forMembers.length,
   );
 }
 
-/** 同宫同文合并：成员取并集、理由取并集、优先级取高者。 */
+/** 同宫同文合并：成员取并集、理由取并集、类别取较前者。 */
 function dedupe(actions: readonly Action[]): Action[] {
   const map = new Map<string, Action>();
   for (const a of actions) {
@@ -295,7 +362,7 @@ function dedupe(actions: readonly Action[]): Action[] {
     }
     map.set(key, {
       ...prev,
-      priority: rank(PRIORITY_ORDER, a.priority) < rank(PRIORITY_ORDER, prev.priority) ? a.priority : prev.priority,
+      category: rank(CATEGORY_ORDER, a.category) < rank(CATEGORY_ORDER, prev.category) ? a.category : prev.category,
       forMembers: [...new Set([...prev.forMembers, ...a.forMembers])],
       because: [...prev.because, ...a.because.filter((r) => !prev.because.some((x) => x.summary === r.summary))],
     });
@@ -307,6 +374,8 @@ function dedupe(actions: readonly Action[]): Action[] {
 export interface ActionConflict {
   readonly palace: PalaceIndex;
   readonly direction: string;
+  readonly recommendsId: string;
+  readonly forbidsId: string;
   /** 建议摆放的那条。 */
   readonly recommends: string;
   /** 把它列为禁忌的那条。 */
@@ -329,7 +398,15 @@ export function findConflicts(actions: readonly Action[]): ActionConflict[] {
       for (const term of b.avoid) {
         const t = term.trim();
         if (t.length >= 2 && t.length <= 8 && a.title.includes(t)) {
-          out.push({ palace: a.where.palace, direction: a.where.direction, recommends: a.title, forbids: b.title, term: t });
+          out.push({
+            palace: a.where.palace,
+            direction: a.where.direction,
+            recommendsId: a.id,
+            forbidsId: b.id,
+            recommends: a.title,
+            forbids: b.title,
+            term: t,
+          });
         }
       }
     }
@@ -349,7 +426,12 @@ export interface ActionPlan {
   readonly actions: readonly Action[];
   /** 同宫互相矛盾的化解 —— 须风水师裁量。 */
   readonly conflicts: readonly ActionConflict[];
-  /** 化凶与避忌（客户报告第一页）。 */
+  /**
+   * 卷入矛盾的行动。**不进 mustAddress**：互相打架的两条，引擎不替风水师选边，
+   * 也不按分数高低裁决，只交给风水师审（外部审阅：冲突即暂停自动建议）。
+   */
+  readonly needsReview: readonly Action[];
+  /** 化凶与避忌、且无矛盾者（客户报告第一页的候选，仍须风水师确认）。 */
   readonly mustAddress: readonly Action[];
   /** 催吉（另列，不与化凶混排 —— 承接 README 规则 7）。 */
   readonly enhancements: readonly Action[];
@@ -357,17 +439,21 @@ export interface ActionPlan {
 
 /** 一份合参结果 → 一份按优先级排好的行动清单。 */
 export function buildActionPlan(s: SynthesisResult): ActionPlan {
+  const prelim = isPreliminary(s);
   const fromCures = s.prioritisedCures
     .map((c, i) => actionFromCure(c, s, i))
     .filter((a): a is Action => a != null);
   const fromGeJu = s.geju ? actionsFromGeJu(s.geju, s) : [];
-  const fromSha = actionsFromAnnualSha(annualSha(s.year));
+  const fromSha = actionsFromAnnualSha(annualSha(s.year), prelim ? '初步' : '完整');
   const all = sortActions(dedupe([...fromCures, ...fromGeJu, ...fromSha]));
+  const conflicts = findConflicts(all);
+  const conflicted = new Set(conflicts.flatMap((c) => [c.recommendsId, c.forbidsId]));
   return {
     year: s.year,
     actions: all,
-    conflicts: findConflicts(all),
-    mustAddress: all.filter((a) => a.intent !== '催吉'),
-    enhancements: all.filter((a) => a.intent === '催吉'),
+    conflicts,
+    needsReview: all.filter((a) => conflicted.has(a.id)),
+    mustAddress: all.filter((a) => a.intent !== '催吉' && !conflicted.has(a.id)),
+    enhancements: all.filter((a) => a.intent === '催吉' && !conflicted.has(a.id)),
   };
 }

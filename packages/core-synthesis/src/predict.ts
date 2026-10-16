@@ -515,15 +515,15 @@ export function predict(input: AnalysisInput, synthesis: SynthesisResult): Predi
     const organRisks = organRisksOf([a.stars.shan, a.stars.xiang, a.stars.annual], period);
     if (organRisks.length > 0 && a.score < 0.1) {
       const organs = Array.from(new Set(organRisks.slice(0, 4).map((o) => o.organ)));
-      const ailments = Array.from(new Set(organRisks.flatMap((o) => o.ailments))).slice(0, 5);
       const famNote = PALACE_FAMILY[p];
       const f: Finding = {
         schools: ['玄空飞星', '形峦缺角'],
         confidence: '高',
         statement:
-          `${a.direction}失令之星应${organs.join('、')}，须留意${ailments.join('、')}；` +
-          `此方于后天八卦属${famNote.member}位，故${famNote.member}受应最深。`,
-        principle: '九星各有所属脏腑：一白肾耳、二黑脾胃、三碧肝足、四绿胆股、五黄毒瘤、六白肺骨、七赤口齿、八白脾关节、九紫心目。星失令则其所主之腑先见征兆。',
+          `${a.direction}失令之星应${organs.join('、')}方面，宜多留意；` +
+          `此方于后天八卦属${famNote.member}位，故${famNote.member}受应最深。` +
+          `此为传统取象，不是医学判断；身体不适请就医。`,
+        principle: '九星各有所属脏腑：一白肾耳、二黑脾胃、三碧肝足、四绿胆股、五黄中焦、六白肺骨、七赤口齿、八白脾关节、九紫心目。星失令则其所主之腑先见征兆。',
         impact: -0.5,
         domains: ['健康'],
       };
@@ -543,7 +543,7 @@ export function predict(input: AnalysisInput, synthesis: SynthesisResult): Predi
         schools: badBaZhai && badStar.length ? ['八宅', '玄空飞星'] : badBaZhai ? ['八宅'] : ['玄空飞星'],
         confidence: '高',
         statement: `主卧落于${a.direction}，${reasons.join('，')} —— 触发夫妻关系预警。此为强制规则，凡主卧见五鬼、六煞、二黑、五黄之一即报。`,
-        principle: '五鬼主小人暗算与情绪失控，六煞主桃花酒色与无谓损耗，二黑主久病与阴气，五黄主横祸。四者临主卧，先坏枕边气氛，久则伤情分。',
+        principle: '五鬼主小人暗算与情绪失控，六煞主桃花酒色与无谓损耗，二黑主病气与阴气，五黄主意外。四者临主卧，先坏枕边气氛，久则伤情分。',
         impact: -0.65,
         domains: ['感情'],
       };

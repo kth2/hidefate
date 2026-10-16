@@ -4,6 +4,7 @@ import { assessGeJu, isConsecutiveTriple } from './geju.js';
 import { annualSha, inSector } from './annualSha.js';
 import { DEFAULT_SCHOOL, describeSchool, resolveChartYear, resolveSchool, schoolDeviations } from './school.js';
 import { MOUNTAINS } from './mountains.js';
+import { fengShuiYearOf, liChunOf, periodTransitionNote } from './period.js';
 import { PALACE_INDEXES, type PalaceIndex } from './constants.js';
 
 const kinds = (sit: number, year: number, now = 2026, useTiXing = false) =>
@@ -194,5 +195,36 @@ describe('门派设置', () => {
 
   it('报告页脚八项齐全', () => {
     expect(describeSchool(DEFAULT_SCHOOL)).toHaveLength(8);
+  });
+});
+
+describe('立春时刻与设备时区无关（第零期审计 D4）', () => {
+  // 期望值为北京时间立春时刻换算成 UTC：2024-02-04 16:27:07 CST、2027-02-04 09:46:18 CST。
+  const EXPECT = { 2024: '2024-02-04T08:27:07.000Z', 2027: '2027-02-04T01:46:18.000Z' } as const;
+
+  it.each(['Asia/Kuala_Lumpur', 'America/New_York', 'Europe/London', 'Australia/Sydney', 'UTC'])('%s 下立春时刻相同', (tz) => {
+    const prev = process.env.TZ;
+    process.env.TZ = tz;
+    try {
+      expect(liChunOf(2024).toISOString()).toBe(EXPECT[2024]);
+      expect(liChunOf(2027).toISOString()).toBe(EXPECT[2027]);
+    } finally {
+      process.env.TZ = prev;
+    }
+  });
+
+  it('立春前一刻仍属上一年', () => {
+    const t = liChunOf(2027).getTime();
+    expect(fengShuiYearOf(new Date(t - 60_000))).toBe(2026);
+    expect(fengShuiYearOf(new Date(t + 60_000))).toBe(2027);
+  });
+});
+
+describe('换运年提示（第零期审计 D7）', () => {
+  it('2024、2044 为换运年，提示改填前一年；其余年份不提示', () => {
+    expect(periodTransitionNote(2024)).toMatch(/2 月 4 日立春之前.*八运.*2023/);
+    expect(periodTransitionNote(2044)).toMatch(/2043/);
+    expect(periodTransitionNote(2025)).toBeNull();
+    expect(periodTransitionNote(2023)).toBeNull();
   });
 });

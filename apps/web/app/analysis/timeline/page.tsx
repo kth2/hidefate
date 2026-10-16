@@ -8,18 +8,18 @@ import { AppBar, Empty, Expandable, SegRow, Skeleton } from '../../../components
 import { useProperty } from '../../../lib/PropertyContext';
 
 export default function TimelinePage() {
-  const { property, members, cures, year, loading } = useProperty();
+  const { property, members, cures, year, loading, school } = useProperty();
   const [span, setSpan] = useState(12);
 
   const timeline = useMemo(() => {
     if (!property) return null;
-    return buildTimeline({ profile: property, members, qiMen: null, appliedCures: cures }, { startYear: year, span });
-  }, [property, members, cures, year, span]);
+    return buildTimeline({ profile: property, members, qiMen: null, appliedCures: cures, school }, { startYear: year, span });
+  }, [property, members, cures, year, span, school]);
 
   const comparison = useMemo(() => {
     if (!property) return null;
-    return compareYears({ profile: property, members, qiMen: null }, year - 1, year, cures);
-  }, [property, members, cures, year]);
+    return compareYears({ profile: property, members, qiMen: null, school }, year - 1, year, cures);
+  }, [property, members, cures, year, school]);
 
   if (loading) return <><AppBar title="宅运时间轴" back="/me" /><div className="px-4 py-4"><Skeleton lines={6} /></div></>;
   if (!property || !timeline) {

@@ -237,14 +237,14 @@ describe('双星组合与应期', () => {
     expect(maxReachableLayers(['合:交剑煞', '临:交剑煞'])).toBe(2);
   });
 
-  it('原局有交剑煞、流年又临交剑煞 —— 年星临门，血光之象成立', () => {
+  it('原局有交剑煞、流年又临交剑煞 —— 年星临门，外伤之象成立', () => {
     const e = predictEvents({
       year: 2027,
       tokens: [t('合:交剑煞', '风水'), t('临:交剑煞', '运')],
     });
     const x = e.find((v) => v.templateId === 'combo.crossSword')!;
     expect(x).toBeDefined();
-    expect(x.title).toContain('血光');
+    expect(x.title).toContain('外伤');
     expect(x.resonance).toBe(2);
   });
 

@@ -27,14 +27,14 @@ import { useProperty } from '../../lib/PropertyContext';
 type Knob = '搬房间' | '改坐向' | '补缺角' | '换楼层' | '谁在家';
 
 export default function SimulatePage() {
-  const { property, members, cures, result, year, monthIndex, loading } = useProperty();
+  const { property, members, cures, result, year, monthIndex, loading, school } = useProperty();
   const [changes, setChanges] = useState<ScenarioChanges>({});
   const [knob, setKnob] = useState<Knob | null>(null);
 
   const input: AnalysisInput | null = useMemo(() => {
     if (!property) return null;
-    return { profile: property, members, year, monthIndex, appliedCures: cures, qiMen: null };
-  }, [property, members, cures, year, monthIndex]);
+    return { profile: property, members, year, monthIndex, appliedCures: cures, qiMen: null, school };
+  }, [property, members, cures, year, monthIndex, school]);
 
   const dirty = Object.keys(changes).length > 0;
   const sim = useMemo(() => {

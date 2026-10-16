@@ -23,6 +23,8 @@ import type { SynthesisResult } from '@hidefate/core-synthesis';
 import type { ShanXiangResult } from '@hidefate/core-qimen';
 import { db, type StoredCure, type StoredMember, type StoredProperty } from './db';
 import { currentFengShuiTime, toCures, toMembers, useAnalysis } from './useAnalysis';
+import { useSchool } from './schoolStore';
+import type { SchoolSettings } from '@hidefate/core-fengshui';
 
 const ACTIVE_KEY = 'hidefate.activeProperty';
 
@@ -36,6 +38,11 @@ interface PropertyContextValue {
   members: ReturnType<typeof toMembers>;
   cures: ReturnType<typeof toCures>;
   result: SynthesisResult | null;
+  /**
+   * 门派设置。凡在本页另行调用合参函数（逐月、时间轴、融合报告、预警、模拟、分房）者，
+   * **必须**把它带进输入 —— 否则同一页会混用两套门派（第零期审计 D3）。
+   */
+  school: SchoolSettings;
   qiMen: ShanXiangResult | null;
   qiMenLoading: boolean;
   qiMenError: string | null;
@@ -124,6 +131,7 @@ export function PropertyProvider({ children }: { children: ReactNode }) {
   const members = useMemo(() => toMembers(memberRows), [memberRows]);
   const cures = useMemo(() => toCures(cureRows), [cureRows]);
 
+  const [school] = useSchool();
   const { result, qiMen, qiMenLoading, qiMenError, retryQiMen } = useAnalysis({
     profile: property,
     members,
@@ -131,6 +139,7 @@ export function PropertyProvider({ children }: { children: ReactNode }) {
     year,
     monthIndex: now.monthIndex,
     enableQiMen,
+    school,
   });
 
   const setActive = useCallback((id: string) => {
@@ -161,6 +170,7 @@ export function PropertyProvider({ children }: { children: ReactNode }) {
     members,
     cures,
     result,
+    school,
     qiMen,
     qiMenLoading,
     qiMenError,

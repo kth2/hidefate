@@ -32,7 +32,7 @@ const VERDICTS: { v: Verdict; label: string; tone: string }[] = [
 ];
 
 export default function CalibratePage() {
-  const { memberRows, properties, loading } = useProperty();
+  const { memberRows, properties, loading, school } = useProperty();
   const [personId, setPersonId] = useState<string | null>(null);
   const [residences, setResidences] = useState<ResidencePeriod[]>([]);
   const [records, setRecords] = useState<PredictionRecord[]>([]);
@@ -69,7 +69,7 @@ export default function CalibratePage() {
   function preview() {
     if (!person) return;
     try {
-      setPlan(planRetrospect({ person: birth(person), residences, properties: propertyMap }));
+      setPlan(planRetrospect({ person: birth(person), residences, properties: propertyMap, school }));
       setMsg(null);
     } catch (e) {
       setMsg(`生成失败：${e instanceof Error ? e.message : String(e)}`);

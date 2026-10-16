@@ -30,7 +30,7 @@ export default function MePage() {
   async function handleImport(file: File) {
     try {
       const r = await importAll(await file.text());
-      setMsg(`已导入 ${r.properties} 处房屋、${r.members} 位成员。`);
+      setMsg(`已导入 ${r.properties} 处房屋、${r.members} 位成员、${r.predictions} 条预测、${r.divinations} 局占局；门派设置一并还原。`);
       reload();
     } catch (e) {
       setMsg(`导入失败：${e instanceof Error ? e.message : String(e)}`);
