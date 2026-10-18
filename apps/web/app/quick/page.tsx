@@ -11,7 +11,7 @@
  */
 
 import Link from 'next/link';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import {
   PALACE_DIRECTION,
   analyzeLine,
@@ -59,6 +59,19 @@ export default function QuickChartPage() {
   const [lookYear, setLookYear] = useState(nowYear);
   const [buildingType, setBuildingType] = useState<BuildingType>('公寓');
   const [sel, setSel] = useState<PalaceIndex | null>(null);
+
+  // 从「罗盘起盘」带过来的坐山度数与立盘年（/quick?deg=327.4&year=2026）
+  useEffect(() => {
+    try {
+      const q = new URLSearchParams(window.location.search);
+      const d = q.get('deg');
+      const y = q.get('year');
+      if (d != null && Number.isFinite(Number(d))) setDegText(d);
+      if (y != null && Number.isInteger(Number(y))) setYearText(y);
+    } catch {
+      /* 忽略 */
+    }
+  }, []);
 
   const deg = degText.trim() === '' ? null : Number(degText);
   const chartYear = Number(yearText);
@@ -109,6 +122,9 @@ export default function QuickChartPage() {
               value={degText}
               onChange={(e) => setDegText(e.target.value)}
             />
+            <Link href="/compass" className="mt-1.5 inline-block text-[0.8125rem] text-cinnabar underline underline-offset-2">
+              没带罗盘？用手机罗盘量 →
+            </Link>
             {sitting && facing && (
               <p className="mt-1.5 text-[0.8125rem] text-ink-soft">
                 坐<b>{sitting.name}</b>向<b>{facing.name}</b>（{sitting.gua}宫{sitting.yuan}）
