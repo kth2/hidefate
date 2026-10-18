@@ -516,6 +516,12 @@ export function synthesise(input: AnalysisInput): SynthesisResult {
     chartYear,
     geju,
     phasePeriod: period,
+    provenance: {
+      ...flyingStar.provenance,
+      ruleSet:
+        `${flyingStar.provenance.ruleSet};period-basis=${school.periodBasis};phase=${school.phaseBasis};` +
+        `weights=hecan@0`,
+    },
   };
 }
 

@@ -519,6 +519,12 @@ export default function ReportPage() {
               <b>本案门派设置</b> —— {describeSchool(result.school).join('；')}。{result.chartYear?.note}
             </li>
           )}
+          {result.provenance && (
+            <li>
+              <b>计算出处</b> —— 引擎 {result.provenance.engine}；规则 {result.provenance.ruleSet}。
+              日后重算若这两项不同，结果可能不同。
+            </li>
+          )}
         </ul>
 
         <h3>置信度如何判定</h3>

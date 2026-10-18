@@ -1,0 +1,30 @@
+{
+ "id": "B-000",
+ "kind": "book",
+ "title": "（例）八运 壬山丙向 兼亥巳 替卦",
+ "source": {
+  "type": "book",
+  "title": "（书名，如《沈氏玄空学》）",
+  "edition": "（出版社、年份、版次、ISBN）",
+  "page": "（页码）",
+  "passage": "（与本例相关的原文，逐字）",
+  "transcriber": "（录入人）",
+  "transcribedAt": "（YYYY-MM-DD）"
+ },
+ "input": {
+  "period": null,
+  "sitting": "（山名）",
+  "facing": "（山名）",
+  "degree": null,
+  "useTiXing": null,
+  "assumptions": ["（书上没写、但录入时不得不假定的条件，逐条写明）"]
+ },
+ "expected": {
+  "intermediate": {"shanCenter": null, "shanDir": null, "shanRef": null, "xiangCenter": null, "xiangDir": null, "xiangRef": null},
+  "chart": {"1": {"yun": null, "shan": null, "xiang": null}},
+  "assertions": []
+ },
+ "covers": [],
+ "review": {"status": "unreviewed", "reviewer": null, "notes": ""},
+ "ambiguities": []
+}

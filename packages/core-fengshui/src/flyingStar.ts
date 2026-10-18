@@ -32,6 +32,7 @@ import {
   type MountainInput,
 } from './mountains.js';
 import { annualStar, monthlyStar, periodOfYear, type PeriodInfo } from './period.js';
+import { chartProvenance, type CalcProvenance } from './provenance.js';
 
 /** 九宫数值盘：宫位洛书数 → 星数。 */
 export type StarPlate = Record<PalaceIndex, PalaceIndex>;
@@ -91,6 +92,8 @@ export interface FlyingStarChart {
   readonly pattern: BoardPattern;
   /** 排盘过程的可追溯说明，供「为何如此判断」展示。 */
   readonly derivation: readonly string[];
+  /** 哪个引擎版本、哪套规则算出的这张盘（只附加，不影响任何星数）。 */
+  readonly provenance: CalcProvenance;
 }
 
 /** 某数入中，按 direction 飞布九宫。 */
@@ -245,6 +248,12 @@ export function buildFlyingStarChart(opts: FlyingStarOptions): FlyingStarChart {
     palaces,
     pattern,
     derivation,
+    provenance: chartProvenance({
+      centerFiveRule: rule,
+      jianThreshold: opts.jianThreshold ?? 3,
+      useTiXing: useTi,
+      fiveTiXing: 'period',
+    }),
   };
 }
 

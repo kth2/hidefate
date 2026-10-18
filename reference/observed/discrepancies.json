@@ -1,0 +1,12138 @@
+{
+ "note": "引擎与参照的全部差异，由 harness 生成，勿手改。",
+ "count": 1238,
+ "discrepancies": [
+  {
+   "caseId": "T-004",
+   "check": "geju:全盘伏吟",
+   "expected": true,
+   "observed": false,
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "T-005",
+   "check": "geju-any:壬:反吟",
+   "expected": true,
+   "observed": false,
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "T-005",
+   "check": "geju-any:丙:反吟",
+   "expected": true,
+   "observed": false,
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "T-006",
+   "check": "旺山旺向.3运.仅引擎有",
+   "expected": [],
+   "observed": [
+    "乙辛"
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "T-006",
+   "check": "旺山旺向.4运.仅引擎有",
+   "expected": [],
+   "observed": [
+    "申寅"
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "T-006",
+   "check": "旺山旺向.5运.仅引擎有",
+   "expected": [],
+   "observed": [
+    "癸丁",
+    "乙辛",
+    "丁癸"
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "T-006",
+   "check": "旺山旺向.6运.仅引擎有",
+   "expected": [],
+   "observed": [
+    "申寅"
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "T-009",
+   "check": "边界.337.5°（来源：不属壬）",
+   "expected": "亥",
+   "observed": "壬",
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "T-009",
+   "check": "边界.352.5°（来源：属壬）",
+   "expected": "壬",
+   "observed": "子",
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "T-012",
+   "check": "门派选项.可关闭替卦",
+   "expected": true,
+   "observed": false,
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-1-壬",
+   "check": "intermediate.xiangCenter",
+   "expected": 5,
+   "observed": 2,
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-1-壬",
+   "check": "chart.1",
+   "expected": [
+    6,
+    1,
+    1
+   ],
+   "observed": [
+    6,
+    1,
+    7
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-1-壬",
+   "check": "chart.2",
+   "expected": [
+    7,
+    9,
+    2
+   ],
+   "observed": [
+    7,
+    9,
+    8
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-1-壬",
+   "check": "chart.3",
+   "expected": [
+    8,
+    8,
+    3
+   ],
+   "observed": [
+    8,
+    8,
+    9
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-1-壬",
+   "check": "chart.4",
+   "expected": [
+    9,
+    7,
+    4
+   ],
+   "observed": [
+    9,
+    7,
+    1
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-1-壬",
+   "check": "chart.5",
+   "expected": [
+    1,
+    6,
+    5
+   ],
+   "observed": [
+    1,
+    6,
+    2
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-1-壬",
+   "check": "chart.6",
+   "expected": [
+    2,
+    5,
+    6
+   ],
+   "observed": [
+    2,
+    5,
+    3
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-1-壬",
+   "check": "chart.7",
+   "expected": [
+    3,
+    4,
+    7
+   ],
+   "observed": [
+    3,
+    4,
+    4
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-1-壬",
+   "check": "chart.8",
+   "expected": [
+    4,
+    3,
+    8
+   ],
+   "observed": [
+    4,
+    3,
+    5
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-1-壬",
+   "check": "chart.9",
+   "expected": [
+    5,
+    2,
+    9
+   ],
+   "observed": [
+    5,
+    2,
+    6
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-1-子",
+   "check": "intermediate.xiangCenter",
+   "expected": 5,
+   "observed": 1,
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-1-子",
+   "check": "chart.1",
+   "expected": [
+    6,
+    2,
+    9
+   ],
+   "observed": [
+    6,
+    2,
+    5
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-1-子",
+   "check": "chart.2",
+   "expected": [
+    7,
+    3,
+    8
+   ],
+   "observed": [
+    7,
+    3,
+    4
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-1-子",
+   "check": "chart.3",
+   "expected": [
+    8,
+    4,
+    7
+   ],
+   "observed": [
+    8,
+    4,
+    3
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-1-子",
+   "check": "chart.4",
+   "expected": [
+    9,
+    5,
+    6
+   ],
+   "observed": [
+    9,
+    5,
+    2
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-1-子",
+   "check": "chart.5",
+   "expected": [
+    1,
+    6,
+    5
+   ],
+   "observed": [
+    1,
+    6,
+    1
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-1-子",
+   "check": "chart.6",
+   "expected": [
+    2,
+    7,
+    4
+   ],
+   "observed": [
+    2,
+    7,
+    9
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-1-子",
+   "check": "chart.7",
+   "expected": [
+    3,
+    8,
+    3
+   ],
+   "observed": [
+    3,
+    8,
+    8
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-1-子",
+   "check": "chart.8",
+   "expected": [
+    4,
+    9,
+    2
+   ],
+   "observed": [
+    4,
+    9,
+    7
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-1-子",
+   "check": "chart.9",
+   "expected": [
+    5,
+    1,
+    1
+   ],
+   "observed": [
+    5,
+    1,
+    6
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-1-癸",
+   "check": "intermediate.xiangCenter",
+   "expected": 5,
+   "observed": 1,
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-1-癸",
+   "check": "chart.1",
+   "expected": [
+    6,
+    2,
+    9
+   ],
+   "observed": [
+    6,
+    2,
+    5
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-1-癸",
+   "check": "chart.2",
+   "expected": [
+    7,
+    3,
+    8
+   ],
+   "observed": [
+    7,
+    3,
+    4
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-1-癸",
+   "check": "chart.3",
+   "expected": [
+    8,
+    4,
+    7
+   ],
+   "observed": [
+    8,
+    4,
+    3
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-1-癸",
+   "check": "chart.4",
+   "expected": [
+    9,
+    5,
+    6
+   ],
+   "observed": [
+    9,
+    5,
+    2
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-1-癸",
+   "check": "chart.5",
+   "expected": [
+    1,
+    6,
+    5
+   ],
+   "observed": [
+    1,
+    6,
+    1
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-1-癸",
+   "check": "chart.6",
+   "expected": [
+    2,
+    7,
+    4
+   ],
+   "observed": [
+    2,
+    7,
+    9
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-1-癸",
+   "check": "chart.7",
+   "expected": [
+    3,
+    8,
+    3
+   ],
+   "observed": [
+    3,
+    8,
+    8
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-1-癸",
+   "check": "chart.8",
+   "expected": [
+    4,
+    9,
+    2
+   ],
+   "observed": [
+    4,
+    9,
+    7
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-1-癸",
+   "check": "chart.9",
+   "expected": [
+    5,
+    1,
+    1
+   ],
+   "observed": [
+    5,
+    1,
+    6
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-1-丙",
+   "check": "intermediate.shanCenter",
+   "expected": 5,
+   "observed": 2,
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-1-丙",
+   "check": "chart.1",
+   "expected": [
+    6,
+    1,
+    1
+   ],
+   "observed": [
+    6,
+    7,
+    1
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-1-丙",
+   "check": "chart.2",
+   "expected": [
+    7,
+    2,
+    9
+   ],
+   "observed": [
+    7,
+    8,
+    9
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-1-丙",
+   "check": "chart.3",
+   "expected": [
+    8,
+    3,
+    8
+   ],
+   "observed": [
+    8,
+    9,
+    8
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-1-丙",
+   "check": "chart.4",
+   "expected": [
+    9,
+    4,
+    7
+   ],
+   "observed": [
+    9,
+    1,
+    7
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-1-丙",
+   "check": "chart.5",
+   "expected": [
+    1,
+    5,
+    6
+   ],
+   "observed": [
+    1,
+    2,
+    6
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-1-丙",
+   "check": "chart.6",
+   "expected": [
+    2,
+    6,
+    5
+   ],
+   "observed": [
+    2,
+    3,
+    5
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-1-丙",
+   "check": "chart.7",
+   "expected": [
+    3,
+    7,
+    4
+   ],
+   "observed": [
+    3,
+    4,
+    4
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-1-丙",
+   "check": "chart.8",
+   "expected": [
+    4,
+    8,
+    3
+   ],
+   "observed": [
+    4,
+    5,
+    3
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-1-丙",
+   "check": "chart.9",
+   "expected": [
+    5,
+    9,
+    2
+   ],
+   "observed": [
+    5,
+    6,
+    2
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-1-午",
+   "check": "intermediate.shanCenter",
+   "expected": 5,
+   "observed": 1,
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-1-午",
+   "check": "chart.1",
+   "expected": [
+    6,
+    9,
+    2
+   ],
+   "observed": [
+    6,
+    5,
+    2
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-1-午",
+   "check": "chart.2",
+   "expected": [
+    7,
+    8,
+    3
+   ],
+   "observed": [
+    7,
+    4,
+    3
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-1-午",
+   "check": "chart.3",
+   "expected": [
+    8,
+    7,
+    4
+   ],
+   "observed": [
+    8,
+    3,
+    4
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-1-午",
+   "check": "chart.4",
+   "expected": [
+    9,
+    6,
+    5
+   ],
+   "observed": [
+    9,
+    2,
+    5
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-1-午",
+   "check": "chart.5",
+   "expected": [
+    1,
+    5,
+    6
+   ],
+   "observed": [
+    1,
+    1,
+    6
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-1-午",
+   "check": "chart.6",
+   "expected": [
+    2,
+    4,
+    7
+   ],
+   "observed": [
+    2,
+    9,
+    7
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-1-午",
+   "check": "chart.7",
+   "expected": [
+    3,
+    3,
+    8
+   ],
+   "observed": [
+    3,
+    8,
+    8
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-1-午",
+   "check": "chart.8",
+   "expected": [
+    4,
+    2,
+    9
+   ],
+   "observed": [
+    4,
+    7,
+    9
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-1-午",
+   "check": "chart.9",
+   "expected": [
+    5,
+    1,
+    1
+   ],
+   "observed": [
+    5,
+    6,
+    1
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-1-丁",
+   "check": "intermediate.shanCenter",
+   "expected": 5,
+   "observed": 1,
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-1-丁",
+   "check": "chart.1",
+   "expected": [
+    6,
+    9,
+    2
+   ],
+   "observed": [
+    6,
+    5,
+    2
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-1-丁",
+   "check": "chart.2",
+   "expected": [
+    7,
+    8,
+    3
+   ],
+   "observed": [
+    7,
+    4,
+    3
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-1-丁",
+   "check": "chart.3",
+   "expected": [
+    8,
+    7,
+    4
+   ],
+   "observed": [
+    8,
+    3,
+    4
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-1-丁",
+   "check": "chart.4",
+   "expected": [
+    9,
+    6,
+    5
+   ],
+   "observed": [
+    9,
+    2,
+    5
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-1-丁",
+   "check": "chart.5",
+   "expected": [
+    1,
+    5,
+    6
+   ],
+   "observed": [
+    1,
+    1,
+    6
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-1-丁",
+   "check": "chart.6",
+   "expected": [
+    2,
+    4,
+    7
+   ],
+   "observed": [
+    2,
+    9,
+    7
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-1-丁",
+   "check": "chart.7",
+   "expected": [
+    3,
+    3,
+    8
+   ],
+   "observed": [
+    3,
+    8,
+    8
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-1-丁",
+   "check": "chart.8",
+   "expected": [
+    4,
+    2,
+    9
+   ],
+   "observed": [
+    4,
+    7,
+    9
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-1-丁",
+   "check": "chart.9",
+   "expected": [
+    5,
+    1,
+    1
+   ],
+   "observed": [
+    5,
+    6,
+    1
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-2-丑",
+   "check": "intermediate.shanCenter",
+   "expected": 5,
+   "observed": 2,
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-2-丑",
+   "check": "chart.1",
+   "expected": [
+    7,
+    9,
+    2
+   ],
+   "observed": [
+    7,
+    6,
+    2
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-2-丑",
+   "check": "chart.2",
+   "expected": [
+    8,
+    8,
+    1
+   ],
+   "observed": [
+    8,
+    5,
+    1
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-2-丑",
+   "check": "chart.3",
+   "expected": [
+    9,
+    7,
+    9
+   ],
+   "observed": [
+    9,
+    4,
+    9
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-2-丑",
+   "check": "chart.4",
+   "expected": [
+    1,
+    6,
+    8
+   ],
+   "observed": [
+    1,
+    3,
+    8
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-2-丑",
+   "check": "chart.5",
+   "expected": [
+    2,
+    5,
+    7
+   ],
+   "observed": [
+    2,
+    2,
+    7
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-2-丑",
+   "check": "chart.6",
+   "expected": [
+    3,
+    4,
+    6
+   ],
+   "observed": [
+    3,
+    1,
+    6
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-2-丑",
+   "check": "chart.7",
+   "expected": [
+    4,
+    3,
+    5
+   ],
+   "observed": [
+    4,
+    9,
+    5
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-2-丑",
+   "check": "chart.8",
+   "expected": [
+    5,
+    2,
+    4
+   ],
+   "observed": [
+    5,
+    8,
+    4
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-2-丑",
+   "check": "chart.9",
+   "expected": [
+    6,
+    1,
+    3
+   ],
+   "observed": [
+    6,
+    7,
+    3
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-2-艮",
+   "check": "intermediate.shanCenter",
+   "expected": 5,
+   "observed": 2,
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-2-艮",
+   "check": "chart.1",
+   "expected": [
+    7,
+    1,
+    3
+   ],
+   "observed": [
+    7,
+    7,
+    3
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-2-艮",
+   "check": "chart.2",
+   "expected": [
+    8,
+    2,
+    4
+   ],
+   "observed": [
+    8,
+    8,
+    4
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-2-艮",
+   "check": "chart.3",
+   "expected": [
+    9,
+    3,
+    5
+   ],
+   "observed": [
+    9,
+    9,
+    5
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-2-艮",
+   "check": "chart.4",
+   "expected": [
+    1,
+    4,
+    6
+   ],
+   "observed": [
+    1,
+    1,
+    6
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-2-艮",
+   "check": "chart.5",
+   "expected": [
+    2,
+    5,
+    7
+   ],
+   "observed": [
+    2,
+    2,
+    7
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-2-艮",
+   "check": "chart.6",
+   "expected": [
+    3,
+    6,
+    8
+   ],
+   "observed": [
+    3,
+    3,
+    8
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-2-艮",
+   "check": "chart.7",
+   "expected": [
+    4,
+    7,
+    9
+   ],
+   "observed": [
+    4,
+    4,
+    9
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-2-艮",
+   "check": "chart.8",
+   "expected": [
+    5,
+    8,
+    1
+   ],
+   "observed": [
+    5,
+    5,
+    1
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-2-艮",
+   "check": "chart.9",
+   "expected": [
+    6,
+    9,
+    2
+   ],
+   "observed": [
+    6,
+    6,
+    2
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-2-寅",
+   "check": "intermediate.shanCenter",
+   "expected": 5,
+   "observed": 1,
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-2-寅",
+   "check": "chart.1",
+   "expected": [
+    7,
+    1,
+    5
+   ],
+   "observed": [
+    7,
+    6,
+    5
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-2-寅",
+   "check": "chart.2",
+   "expected": [
+    8,
+    2,
+    6
+   ],
+   "observed": [
+    8,
+    7,
+    6
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-2-寅",
+   "check": "chart.3",
+   "expected": [
+    9,
+    3,
+    7
+   ],
+   "observed": [
+    9,
+    8,
+    7
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-2-寅",
+   "check": "chart.4",
+   "expected": [
+    1,
+    4,
+    8
+   ],
+   "observed": [
+    1,
+    9,
+    8
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-2-寅",
+   "check": "chart.5",
+   "expected": [
+    2,
+    5,
+    9
+   ],
+   "observed": [
+    2,
+    1,
+    9
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-2-寅",
+   "check": "chart.6",
+   "expected": [
+    3,
+    6,
+    1
+   ],
+   "observed": [
+    3,
+    2,
+    1
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-2-寅",
+   "check": "chart.7",
+   "expected": [
+    4,
+    7,
+    2
+   ],
+   "observed": [
+    4,
+    3,
+    2
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-2-寅",
+   "check": "chart.8",
+   "expected": [
+    5,
+    8,
+    3
+   ],
+   "observed": [
+    5,
+    4,
+    3
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-2-寅",
+   "check": "chart.9",
+   "expected": [
+    6,
+    9,
+    4
+   ],
+   "observed": [
+    6,
+    5,
+    4
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-2-未",
+   "check": "intermediate.xiangCenter",
+   "expected": 5,
+   "observed": 2,
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-2-未",
+   "check": "chart.1",
+   "expected": [
+    7,
+    2,
+    9
+   ],
+   "observed": [
+    7,
+    2,
+    6
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-2-未",
+   "check": "chart.2",
+   "expected": [
+    8,
+    1,
+    8
+   ],
+   "observed": [
+    8,
+    1,
+    5
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-2-未",
+   "check": "chart.3",
+   "expected": [
+    9,
+    9,
+    7
+   ],
+   "observed": [
+    9,
+    9,
+    4
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-2-未",
+   "check": "chart.4",
+   "expected": [
+    1,
+    8,
+    6
+   ],
+   "observed": [
+    1,
+    8,
+    3
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-2-未",
+   "check": "chart.5",
+   "expected": [
+    2,
+    7,
+    5
+   ],
+   "observed": [
+    2,
+    7,
+    2
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-2-未",
+   "check": "chart.6",
+   "expected": [
+    3,
+    6,
+    4
+   ],
+   "observed": [
+    3,
+    6,
+    1
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-2-未",
+   "check": "chart.7",
+   "expected": [
+    4,
+    5,
+    3
+   ],
+   "observed": [
+    4,
+    5,
+    9
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-2-未",
+   "check": "chart.8",
+   "expected": [
+    5,
+    4,
+    2
+   ],
+   "observed": [
+    5,
+    4,
+    8
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-2-未",
+   "check": "chart.9",
+   "expected": [
+    6,
+    3,
+    1
+   ],
+   "observed": [
+    6,
+    3,
+    7
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-2-坤",
+   "check": "intermediate.xiangCenter",
+   "expected": 5,
+   "observed": 2,
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-2-坤",
+   "check": "chart.1",
+   "expected": [
+    7,
+    3,
+    1
+   ],
+   "observed": [
+    7,
+    3,
+    7
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-2-坤",
+   "check": "chart.2",
+   "expected": [
+    8,
+    4,
+    2
+   ],
+   "observed": [
+    8,
+    4,
+    8
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-2-坤",
+   "check": "chart.3",
+   "expected": [
+    9,
+    5,
+    3
+   ],
+   "observed": [
+    9,
+    5,
+    9
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-2-坤",
+   "check": "chart.4",
+   "expected": [
+    1,
+    6,
+    4
+   ],
+   "observed": [
+    1,
+    6,
+    1
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-2-坤",
+   "check": "chart.5",
+   "expected": [
+    2,
+    7,
+    5
+   ],
+   "observed": [
+    2,
+    7,
+    2
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-2-坤",
+   "check": "chart.6",
+   "expected": [
+    3,
+    8,
+    6
+   ],
+   "observed": [
+    3,
+    8,
+    3
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-2-坤",
+   "check": "chart.7",
+   "expected": [
+    4,
+    9,
+    7
+   ],
+   "observed": [
+    4,
+    9,
+    4
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-2-坤",
+   "check": "chart.8",
+   "expected": [
+    5,
+    1,
+    8
+   ],
+   "observed": [
+    5,
+    1,
+    5
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-2-坤",
+   "check": "chart.9",
+   "expected": [
+    6,
+    2,
+    9
+   ],
+   "observed": [
+    6,
+    2,
+    6
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-2-申",
+   "check": "intermediate.xiangCenter",
+   "expected": 5,
+   "observed": 1,
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-2-申",
+   "check": "chart.1",
+   "expected": [
+    7,
+    5,
+    1
+   ],
+   "observed": [
+    7,
+    5,
+    6
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-2-申",
+   "check": "chart.2",
+   "expected": [
+    8,
+    6,
+    2
+   ],
+   "observed": [
+    8,
+    6,
+    7
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-2-申",
+   "check": "chart.3",
+   "expected": [
+    9,
+    7,
+    3
+   ],
+   "observed": [
+    9,
+    7,
+    8
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-2-申",
+   "check": "chart.4",
+   "expected": [
+    1,
+    8,
+    4
+   ],
+   "observed": [
+    1,
+    8,
+    9
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-2-申",
+   "check": "chart.5",
+   "expected": [
+    2,
+    9,
+    5
+   ],
+   "observed": [
+    2,
+    9,
+    1
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-2-申",
+   "check": "chart.6",
+   "expected": [
+    3,
+    1,
+    6
+   ],
+   "observed": [
+    3,
+    1,
+    2
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-2-申",
+   "check": "chart.7",
+   "expected": [
+    4,
+    2,
+    7
+   ],
+   "observed": [
+    4,
+    2,
+    3
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-2-申",
+   "check": "chart.8",
+   "expected": [
+    5,
+    3,
+    8
+   ],
+   "observed": [
+    5,
+    3,
+    4
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-2-申",
+   "check": "chart.9",
+   "expected": [
+    6,
+    4,
+    9
+   ],
+   "observed": [
+    6,
+    4,
+    5
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-3-甲",
+   "check": "intermediate.xiangCenter",
+   "expected": 5,
+   "observed": 1,
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-3-甲",
+   "check": "chart.1",
+   "expected": [
+    8,
+    7,
+    1
+   ],
+   "observed": [
+    8,
+    7,
+    6
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-3-甲",
+   "check": "chart.2",
+   "expected": [
+    9,
+    8,
+    2
+   ],
+   "observed": [
+    9,
+    8,
+    7
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-3-甲",
+   "check": "chart.3",
+   "expected": [
+    1,
+    9,
+    3
+   ],
+   "observed": [
+    1,
+    9,
+    8
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-3-甲",
+   "check": "chart.4",
+   "expected": [
+    2,
+    1,
+    4
+   ],
+   "observed": [
+    2,
+    1,
+    9
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-3-甲",
+   "check": "chart.5",
+   "expected": [
+    3,
+    2,
+    5
+   ],
+   "observed": [
+    3,
+    2,
+    1
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-3-甲",
+   "check": "chart.6",
+   "expected": [
+    4,
+    3,
+    6
+   ],
+   "observed": [
+    4,
+    3,
+    2
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-3-甲",
+   "check": "chart.7",
+   "expected": [
+    5,
+    4,
+    7
+   ],
+   "observed": [
+    5,
+    4,
+    3
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-3-甲",
+   "check": "chart.8",
+   "expected": [
+    6,
+    5,
+    8
+   ],
+   "observed": [
+    6,
+    5,
+    4
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-3-甲",
+   "check": "chart.9",
+   "expected": [
+    7,
+    6,
+    9
+   ],
+   "observed": [
+    7,
+    6,
+    5
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-3-卯",
+   "check": "intermediate.xiangCenter",
+   "expected": 5,
+   "observed": 2,
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-3-卯",
+   "check": "chart.1",
+   "expected": [
+    8,
+    5,
+    9
+   ],
+   "observed": [
+    8,
+    5,
+    6
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-3-卯",
+   "check": "chart.2",
+   "expected": [
+    9,
+    4,
+    8
+   ],
+   "observed": [
+    9,
+    4,
+    5
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-3-卯",
+   "check": "chart.3",
+   "expected": [
+    1,
+    3,
+    7
+   ],
+   "observed": [
+    1,
+    3,
+    4
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-3-卯",
+   "check": "chart.4",
+   "expected": [
+    2,
+    2,
+    6
+   ],
+   "observed": [
+    2,
+    2,
+    3
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-3-卯",
+   "check": "chart.5",
+   "expected": [
+    3,
+    1,
+    5
+   ],
+   "observed": [
+    3,
+    1,
+    2
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-3-卯",
+   "check": "chart.6",
+   "expected": [
+    4,
+    9,
+    4
+   ],
+   "observed": [
+    4,
+    9,
+    1
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-3-卯",
+   "check": "chart.7",
+   "expected": [
+    5,
+    8,
+    3
+   ],
+   "observed": [
+    5,
+    8,
+    9
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-3-卯",
+   "check": "chart.8",
+   "expected": [
+    6,
+    7,
+    2
+   ],
+   "observed": [
+    6,
+    7,
+    8
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-3-卯",
+   "check": "chart.9",
+   "expected": [
+    7,
+    6,
+    1
+   ],
+   "observed": [
+    7,
+    6,
+    7
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-3-乙",
+   "check": "intermediate.xiangCenter",
+   "expected": 5,
+   "observed": 2,
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-3-乙",
+   "check": "chart.1",
+   "expected": [
+    8,
+    5,
+    9
+   ],
+   "observed": [
+    8,
+    5,
+    6
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-3-乙",
+   "check": "chart.2",
+   "expected": [
+    9,
+    4,
+    8
+   ],
+   "observed": [
+    9,
+    4,
+    5
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-3-乙",
+   "check": "chart.3",
+   "expected": [
+    1,
+    3,
+    7
+   ],
+   "observed": [
+    1,
+    3,
+    4
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-3-乙",
+   "check": "chart.4",
+   "expected": [
+    2,
+    2,
+    6
+   ],
+   "observed": [
+    2,
+    2,
+    3
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-3-乙",
+   "check": "chart.5",
+   "expected": [
+    3,
+    1,
+    5
+   ],
+   "observed": [
+    3,
+    1,
+    2
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-3-乙",
+   "check": "chart.6",
+   "expected": [
+    4,
+    9,
+    4
+   ],
+   "observed": [
+    4,
+    9,
+    1
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-3-乙",
+   "check": "chart.7",
+   "expected": [
+    5,
+    8,
+    3
+   ],
+   "observed": [
+    5,
+    8,
+    9
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-3-乙",
+   "check": "chart.8",
+   "expected": [
+    6,
+    7,
+    2
+   ],
+   "observed": [
+    6,
+    7,
+    8
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-3-乙",
+   "check": "chart.9",
+   "expected": [
+    7,
+    6,
+    1
+   ],
+   "observed": [
+    7,
+    6,
+    7
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-3-庚",
+   "check": "intermediate.shanCenter",
+   "expected": 5,
+   "observed": 1,
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-3-庚",
+   "check": "chart.1",
+   "expected": [
+    8,
+    1,
+    7
+   ],
+   "observed": [
+    8,
+    6,
+    7
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-3-庚",
+   "check": "chart.2",
+   "expected": [
+    9,
+    2,
+    8
+   ],
+   "observed": [
+    9,
+    7,
+    8
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-3-庚",
+   "check": "chart.3",
+   "expected": [
+    1,
+    3,
+    9
+   ],
+   "observed": [
+    1,
+    8,
+    9
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-3-庚",
+   "check": "chart.4",
+   "expected": [
+    2,
+    4,
+    1
+   ],
+   "observed": [
+    2,
+    9,
+    1
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-3-庚",
+   "check": "chart.5",
+   "expected": [
+    3,
+    5,
+    2
+   ],
+   "observed": [
+    3,
+    1,
+    2
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-3-庚",
+   "check": "chart.6",
+   "expected": [
+    4,
+    6,
+    3
+   ],
+   "observed": [
+    4,
+    2,
+    3
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-3-庚",
+   "check": "chart.7",
+   "expected": [
+    5,
+    7,
+    4
+   ],
+   "observed": [
+    5,
+    3,
+    4
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-3-庚",
+   "check": "chart.8",
+   "expected": [
+    6,
+    8,
+    5
+   ],
+   "observed": [
+    6,
+    4,
+    5
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-3-庚",
+   "check": "chart.9",
+   "expected": [
+    7,
+    9,
+    6
+   ],
+   "observed": [
+    7,
+    5,
+    6
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-3-酉",
+   "check": "intermediate.shanCenter",
+   "expected": 5,
+   "observed": 2,
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-3-酉",
+   "check": "chart.1",
+   "expected": [
+    8,
+    9,
+    5
+   ],
+   "observed": [
+    8,
+    6,
+    5
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-3-酉",
+   "check": "chart.2",
+   "expected": [
+    9,
+    8,
+    4
+   ],
+   "observed": [
+    9,
+    5,
+    4
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-3-酉",
+   "check": "chart.3",
+   "expected": [
+    1,
+    7,
+    3
+   ],
+   "observed": [
+    1,
+    4,
+    3
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-3-酉",
+   "check": "chart.4",
+   "expected": [
+    2,
+    6,
+    2
+   ],
+   "observed": [
+    2,
+    3,
+    2
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-3-酉",
+   "check": "chart.5",
+   "expected": [
+    3,
+    5,
+    1
+   ],
+   "observed": [
+    3,
+    2,
+    1
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-3-酉",
+   "check": "chart.6",
+   "expected": [
+    4,
+    4,
+    9
+   ],
+   "observed": [
+    4,
+    1,
+    9
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-3-酉",
+   "check": "chart.7",
+   "expected": [
+    5,
+    3,
+    8
+   ],
+   "observed": [
+    5,
+    9,
+    8
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-3-酉",
+   "check": "chart.8",
+   "expected": [
+    6,
+    2,
+    7
+   ],
+   "observed": [
+    6,
+    8,
+    7
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-3-酉",
+   "check": "chart.9",
+   "expected": [
+    7,
+    1,
+    6
+   ],
+   "observed": [
+    7,
+    7,
+    6
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-3-辛",
+   "check": "intermediate.shanCenter",
+   "expected": 5,
+   "observed": 2,
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-3-辛",
+   "check": "chart.1",
+   "expected": [
+    8,
+    9,
+    5
+   ],
+   "observed": [
+    8,
+    6,
+    5
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-3-辛",
+   "check": "chart.2",
+   "expected": [
+    9,
+    8,
+    4
+   ],
+   "observed": [
+    9,
+    5,
+    4
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-3-辛",
+   "check": "chart.3",
+   "expected": [
+    1,
+    7,
+    3
+   ],
+   "observed": [
+    1,
+    4,
+    3
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-3-辛",
+   "check": "chart.4",
+   "expected": [
+    2,
+    6,
+    2
+   ],
+   "observed": [
+    2,
+    3,
+    2
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-3-辛",
+   "check": "chart.5",
+   "expected": [
+    3,
+    5,
+    1
+   ],
+   "observed": [
+    3,
+    2,
+    1
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-3-辛",
+   "check": "chart.6",
+   "expected": [
+    4,
+    4,
+    9
+   ],
+   "observed": [
+    4,
+    1,
+    9
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-3-辛",
+   "check": "chart.7",
+   "expected": [
+    5,
+    3,
+    8
+   ],
+   "observed": [
+    5,
+    9,
+    8
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-3-辛",
+   "check": "chart.8",
+   "expected": [
+    6,
+    2,
+    7
+   ],
+   "observed": [
+    6,
+    8,
+    7
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-3-辛",
+   "check": "chart.9",
+   "expected": [
+    7,
+    1,
+    6
+   ],
+   "observed": [
+    7,
+    7,
+    6
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-4-辰",
+   "check": "intermediate.xiangCenter",
+   "expected": 5,
+   "observed": 6,
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-4-辰",
+   "check": "chart.1",
+   "expected": [
+    9,
+    6,
+    9
+   ],
+   "observed": [
+    9,
+    6,
+    1
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-4-辰",
+   "check": "chart.2",
+   "expected": [
+    1,
+    7,
+    8
+   ],
+   "observed": [
+    1,
+    7,
+    9
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-4-辰",
+   "check": "chart.3",
+   "expected": [
+    2,
+    8,
+    7
+   ],
+   "observed": [
+    2,
+    8,
+    8
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-4-辰",
+   "check": "chart.4",
+   "expected": [
+    3,
+    9,
+    6
+   ],
+   "observed": [
+    3,
+    9,
+    7
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-4-辰",
+   "check": "chart.5",
+   "expected": [
+    4,
+    1,
+    5
+   ],
+   "observed": [
+    4,
+    1,
+    6
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-4-辰",
+   "check": "chart.6",
+   "expected": [
+    5,
+    2,
+    4
+   ],
+   "observed": [
+    5,
+    2,
+    5
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-4-辰",
+   "check": "chart.7",
+   "expected": [
+    6,
+    3,
+    3
+   ],
+   "observed": [
+    6,
+    3,
+    4
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-4-辰",
+   "check": "chart.8",
+   "expected": [
+    7,
+    4,
+    2
+   ],
+   "observed": [
+    7,
+    4,
+    3
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-4-辰",
+   "check": "chart.9",
+   "expected": [
+    8,
+    5,
+    1
+   ],
+   "observed": [
+    8,
+    5,
+    2
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-4-巽",
+   "check": "intermediate.xiangCenter",
+   "expected": 5,
+   "observed": 6,
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-4-巽",
+   "check": "chart.1",
+   "expected": [
+    9,
+    6,
+    1
+   ],
+   "observed": [
+    9,
+    6,
+    2
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-4-巽",
+   "check": "chart.2",
+   "expected": [
+    1,
+    5,
+    2
+   ],
+   "observed": [
+    1,
+    5,
+    3
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-4-巽",
+   "check": "chart.3",
+   "expected": [
+    2,
+    4,
+    3
+   ],
+   "observed": [
+    2,
+    4,
+    4
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-4-巽",
+   "check": "chart.4",
+   "expected": [
+    3,
+    3,
+    4
+   ],
+   "observed": [
+    3,
+    3,
+    5
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-4-巽",
+   "check": "chart.5",
+   "expected": [
+    4,
+    2,
+    5
+   ],
+   "observed": [
+    4,
+    2,
+    6
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-4-巽",
+   "check": "chart.6",
+   "expected": [
+    5,
+    1,
+    6
+   ],
+   "observed": [
+    5,
+    1,
+    7
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-4-巽",
+   "check": "chart.7",
+   "expected": [
+    6,
+    9,
+    7
+   ],
+   "observed": [
+    6,
+    9,
+    8
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-4-巽",
+   "check": "chart.8",
+   "expected": [
+    7,
+    8,
+    8
+   ],
+   "observed": [
+    7,
+    8,
+    9
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-4-巽",
+   "check": "chart.9",
+   "expected": [
+    8,
+    7,
+    9
+   ],
+   "observed": [
+    8,
+    7,
+    1
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-4-巳",
+   "check": "intermediate.xiangCenter",
+   "expected": 5,
+   "observed": 6,
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-4-巳",
+   "check": "chart.1",
+   "expected": [
+    9,
+    6,
+    1
+   ],
+   "observed": [
+    9,
+    6,
+    2
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-4-巳",
+   "check": "chart.2",
+   "expected": [
+    1,
+    5,
+    2
+   ],
+   "observed": [
+    1,
+    5,
+    3
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-4-巳",
+   "check": "chart.3",
+   "expected": [
+    2,
+    4,
+    3
+   ],
+   "observed": [
+    2,
+    4,
+    4
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-4-巳",
+   "check": "chart.4",
+   "expected": [
+    3,
+    3,
+    4
+   ],
+   "observed": [
+    3,
+    3,
+    5
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-4-巳",
+   "check": "chart.5",
+   "expected": [
+    4,
+    2,
+    5
+   ],
+   "observed": [
+    4,
+    2,
+    6
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-4-巳",
+   "check": "chart.6",
+   "expected": [
+    5,
+    1,
+    6
+   ],
+   "observed": [
+    5,
+    1,
+    7
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-4-巳",
+   "check": "chart.7",
+   "expected": [
+    6,
+    9,
+    7
+   ],
+   "observed": [
+    6,
+    9,
+    8
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-4-巳",
+   "check": "chart.8",
+   "expected": [
+    7,
+    8,
+    8
+   ],
+   "observed": [
+    7,
+    8,
+    9
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-4-巳",
+   "check": "chart.9",
+   "expected": [
+    8,
+    7,
+    9
+   ],
+   "observed": [
+    8,
+    7,
+    1
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-4-戌",
+   "check": "intermediate.shanCenter",
+   "expected": 5,
+   "observed": 6,
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-4-戌",
+   "check": "chart.1",
+   "expected": [
+    9,
+    9,
+    6
+   ],
+   "observed": [
+    9,
+    1,
+    6
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-4-戌",
+   "check": "chart.2",
+   "expected": [
+    1,
+    8,
+    7
+   ],
+   "observed": [
+    1,
+    9,
+    7
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-4-戌",
+   "check": "chart.3",
+   "expected": [
+    2,
+    7,
+    8
+   ],
+   "observed": [
+    2,
+    8,
+    8
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-4-戌",
+   "check": "chart.4",
+   "expected": [
+    3,
+    6,
+    9
+   ],
+   "observed": [
+    3,
+    7,
+    9
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-4-戌",
+   "check": "chart.5",
+   "expected": [
+    4,
+    5,
+    1
+   ],
+   "observed": [
+    4,
+    6,
+    1
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-4-戌",
+   "check": "chart.6",
+   "expected": [
+    5,
+    4,
+    2
+   ],
+   "observed": [
+    5,
+    5,
+    2
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-4-戌",
+   "check": "chart.7",
+   "expected": [
+    6,
+    3,
+    3
+   ],
+   "observed": [
+    6,
+    4,
+    3
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-4-戌",
+   "check": "chart.8",
+   "expected": [
+    7,
+    2,
+    4
+   ],
+   "observed": [
+    7,
+    3,
+    4
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-4-戌",
+   "check": "chart.9",
+   "expected": [
+    8,
+    1,
+    5
+   ],
+   "observed": [
+    8,
+    2,
+    5
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-4-乾",
+   "check": "intermediate.shanCenter",
+   "expected": 5,
+   "observed": 6,
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-4-乾",
+   "check": "chart.1",
+   "expected": [
+    9,
+    1,
+    6
+   ],
+   "observed": [
+    9,
+    2,
+    6
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-4-乾",
+   "check": "chart.2",
+   "expected": [
+    1,
+    2,
+    5
+   ],
+   "observed": [
+    1,
+    3,
+    5
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-4-乾",
+   "check": "chart.3",
+   "expected": [
+    2,
+    3,
+    4
+   ],
+   "observed": [
+    2,
+    4,
+    4
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-4-乾",
+   "check": "chart.4",
+   "expected": [
+    3,
+    4,
+    3
+   ],
+   "observed": [
+    3,
+    5,
+    3
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-4-乾",
+   "check": "chart.5",
+   "expected": [
+    4,
+    5,
+    2
+   ],
+   "observed": [
+    4,
+    6,
+    2
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-4-乾",
+   "check": "chart.6",
+   "expected": [
+    5,
+    6,
+    1
+   ],
+   "observed": [
+    5,
+    7,
+    1
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-4-乾",
+   "check": "chart.7",
+   "expected": [
+    6,
+    7,
+    9
+   ],
+   "observed": [
+    6,
+    8,
+    9
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-4-乾",
+   "check": "chart.8",
+   "expected": [
+    7,
+    8,
+    8
+   ],
+   "observed": [
+    7,
+    9,
+    8
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-4-乾",
+   "check": "chart.9",
+   "expected": [
+    8,
+    9,
+    7
+   ],
+   "observed": [
+    8,
+    1,
+    7
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-4-亥",
+   "check": "intermediate.shanCenter",
+   "expected": 5,
+   "observed": 6,
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-4-亥",
+   "check": "chart.1",
+   "expected": [
+    9,
+    1,
+    6
+   ],
+   "observed": [
+    9,
+    2,
+    6
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-4-亥",
+   "check": "chart.2",
+   "expected": [
+    1,
+    2,
+    5
+   ],
+   "observed": [
+    1,
+    3,
+    5
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-4-亥",
+   "check": "chart.3",
+   "expected": [
+    2,
+    3,
+    4
+   ],
+   "observed": [
+    2,
+    4,
+    4
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-4-亥",
+   "check": "chart.4",
+   "expected": [
+    3,
+    4,
+    3
+   ],
+   "observed": [
+    3,
+    5,
+    3
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-4-亥",
+   "check": "chart.5",
+   "expected": [
+    4,
+    5,
+    2
+   ],
+   "observed": [
+    4,
+    6,
+    2
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-4-亥",
+   "check": "chart.6",
+   "expected": [
+    5,
+    6,
+    1
+   ],
+   "observed": [
+    5,
+    7,
+    1
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-4-亥",
+   "check": "chart.7",
+   "expected": [
+    6,
+    7,
+    9
+   ],
+   "observed": [
+    6,
+    8,
+    9
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-4-亥",
+   "check": "chart.8",
+   "expected": [
+    7,
+    8,
+    8
+   ],
+   "observed": [
+    7,
+    9,
+    8
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-4-亥",
+   "check": "chart.9",
+   "expected": [
+    8,
+    9,
+    7
+   ],
+   "observed": [
+    8,
+    1,
+    7
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-6-辰",
+   "check": "intermediate.shanCenter",
+   "expected": 5,
+   "observed": 6,
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-6-辰",
+   "check": "chart.1",
+   "expected": [
+    2,
+    9,
+    5
+   ],
+   "observed": [
+    2,
+    1,
+    5
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-6-辰",
+   "check": "chart.2",
+   "expected": [
+    3,
+    8,
+    6
+   ],
+   "observed": [
+    3,
+    9,
+    6
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-6-辰",
+   "check": "chart.3",
+   "expected": [
+    4,
+    7,
+    7
+   ],
+   "observed": [
+    4,
+    8,
+    7
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-6-辰",
+   "check": "chart.4",
+   "expected": [
+    5,
+    6,
+    8
+   ],
+   "observed": [
+    5,
+    7,
+    8
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-6-辰",
+   "check": "chart.5",
+   "expected": [
+    6,
+    5,
+    9
+   ],
+   "observed": [
+    6,
+    6,
+    9
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-6-辰",
+   "check": "chart.6",
+   "expected": [
+    7,
+    4,
+    1
+   ],
+   "observed": [
+    7,
+    5,
+    1
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-6-辰",
+   "check": "chart.7",
+   "expected": [
+    8,
+    3,
+    2
+   ],
+   "observed": [
+    8,
+    4,
+    2
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-6-辰",
+   "check": "chart.8",
+   "expected": [
+    9,
+    2,
+    3
+   ],
+   "observed": [
+    9,
+    3,
+    3
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-6-辰",
+   "check": "chart.9",
+   "expected": [
+    1,
+    1,
+    4
+   ],
+   "observed": [
+    1,
+    2,
+    4
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-6-巽",
+   "check": "intermediate.shanCenter",
+   "expected": 5,
+   "observed": 6,
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-6-巽",
+   "check": "chart.1",
+   "expected": [
+    2,
+    1,
+    2
+   ],
+   "observed": [
+    2,
+    2,
+    2
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-6-巽",
+   "check": "chart.2",
+   "expected": [
+    3,
+    2,
+    1
+   ],
+   "observed": [
+    3,
+    3,
+    1
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-6-巽",
+   "check": "chart.3",
+   "expected": [
+    4,
+    3,
+    9
+   ],
+   "observed": [
+    4,
+    4,
+    9
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-6-巽",
+   "check": "chart.4",
+   "expected": [
+    5,
+    4,
+    8
+   ],
+   "observed": [
+    5,
+    5,
+    8
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-6-巽",
+   "check": "chart.5",
+   "expected": [
+    6,
+    5,
+    7
+   ],
+   "observed": [
+    6,
+    6,
+    7
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-6-巽",
+   "check": "chart.6",
+   "expected": [
+    7,
+    6,
+    6
+   ],
+   "observed": [
+    7,
+    7,
+    6
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-6-巽",
+   "check": "chart.7",
+   "expected": [
+    8,
+    7,
+    5
+   ],
+   "observed": [
+    8,
+    8,
+    5
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-6-巽",
+   "check": "chart.8",
+   "expected": [
+    9,
+    8,
+    4
+   ],
+   "observed": [
+    9,
+    9,
+    4
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-6-巽",
+   "check": "chart.9",
+   "expected": [
+    1,
+    9,
+    3
+   ],
+   "observed": [
+    1,
+    1,
+    3
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-6-巳",
+   "check": "intermediate.shanCenter",
+   "expected": 5,
+   "observed": 6,
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-6-巳",
+   "check": "chart.1",
+   "expected": [
+    2,
+    1,
+    2
+   ],
+   "observed": [
+    2,
+    2,
+    2
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-6-巳",
+   "check": "chart.2",
+   "expected": [
+    3,
+    2,
+    1
+   ],
+   "observed": [
+    3,
+    3,
+    1
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-6-巳",
+   "check": "chart.3",
+   "expected": [
+    4,
+    3,
+    9
+   ],
+   "observed": [
+    4,
+    4,
+    9
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-6-巳",
+   "check": "chart.4",
+   "expected": [
+    5,
+    4,
+    8
+   ],
+   "observed": [
+    5,
+    5,
+    8
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-6-巳",
+   "check": "chart.5",
+   "expected": [
+    6,
+    5,
+    7
+   ],
+   "observed": [
+    6,
+    6,
+    7
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-6-巳",
+   "check": "chart.6",
+   "expected": [
+    7,
+    6,
+    6
+   ],
+   "observed": [
+    7,
+    7,
+    6
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-6-巳",
+   "check": "chart.7",
+   "expected": [
+    8,
+    7,
+    5
+   ],
+   "observed": [
+    8,
+    8,
+    5
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-6-巳",
+   "check": "chart.8",
+   "expected": [
+    9,
+    8,
+    4
+   ],
+   "observed": [
+    9,
+    9,
+    4
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-6-巳",
+   "check": "chart.9",
+   "expected": [
+    1,
+    9,
+    3
+   ],
+   "observed": [
+    1,
+    1,
+    3
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-6-戌",
+   "check": "intermediate.xiangCenter",
+   "expected": 5,
+   "observed": 6,
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-6-戌",
+   "check": "chart.1",
+   "expected": [
+    2,
+    5,
+    9
+   ],
+   "observed": [
+    2,
+    5,
+    1
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-6-戌",
+   "check": "chart.2",
+   "expected": [
+    3,
+    6,
+    8
+   ],
+   "observed": [
+    3,
+    6,
+    9
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-6-戌",
+   "check": "chart.3",
+   "expected": [
+    4,
+    7,
+    7
+   ],
+   "observed": [
+    4,
+    7,
+    8
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-6-戌",
+   "check": "chart.4",
+   "expected": [
+    5,
+    8,
+    6
+   ],
+   "observed": [
+    5,
+    8,
+    7
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-6-戌",
+   "check": "chart.5",
+   "expected": [
+    6,
+    9,
+    5
+   ],
+   "observed": [
+    6,
+    9,
+    6
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-6-戌",
+   "check": "chart.6",
+   "expected": [
+    7,
+    1,
+    4
+   ],
+   "observed": [
+    7,
+    1,
+    5
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-6-戌",
+   "check": "chart.7",
+   "expected": [
+    8,
+    2,
+    3
+   ],
+   "observed": [
+    8,
+    2,
+    4
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-6-戌",
+   "check": "chart.8",
+   "expected": [
+    9,
+    3,
+    2
+   ],
+   "observed": [
+    9,
+    3,
+    3
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-6-戌",
+   "check": "chart.9",
+   "expected": [
+    1,
+    4,
+    1
+   ],
+   "observed": [
+    1,
+    4,
+    2
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-6-乾",
+   "check": "intermediate.xiangCenter",
+   "expected": 5,
+   "observed": 6,
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-6-乾",
+   "check": "chart.1",
+   "expected": [
+    2,
+    2,
+    1
+   ],
+   "observed": [
+    2,
+    2,
+    2
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-6-乾",
+   "check": "chart.2",
+   "expected": [
+    3,
+    1,
+    2
+   ],
+   "observed": [
+    3,
+    1,
+    3
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-6-乾",
+   "check": "chart.3",
+   "expected": [
+    4,
+    9,
+    3
+   ],
+   "observed": [
+    4,
+    9,
+    4
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-6-乾",
+   "check": "chart.4",
+   "expected": [
+    5,
+    8,
+    4
+   ],
+   "observed": [
+    5,
+    8,
+    5
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-6-乾",
+   "check": "chart.5",
+   "expected": [
+    6,
+    7,
+    5
+   ],
+   "observed": [
+    6,
+    7,
+    6
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-6-乾",
+   "check": "chart.6",
+   "expected": [
+    7,
+    6,
+    6
+   ],
+   "observed": [
+    7,
+    6,
+    7
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-6-乾",
+   "check": "chart.7",
+   "expected": [
+    8,
+    5,
+    7
+   ],
+   "observed": [
+    8,
+    5,
+    8
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-6-乾",
+   "check": "chart.8",
+   "expected": [
+    9,
+    4,
+    8
+   ],
+   "observed": [
+    9,
+    4,
+    9
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-6-乾",
+   "check": "chart.9",
+   "expected": [
+    1,
+    3,
+    9
+   ],
+   "observed": [
+    1,
+    3,
+    1
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-6-亥",
+   "check": "intermediate.xiangCenter",
+   "expected": 5,
+   "observed": 6,
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-6-亥",
+   "check": "chart.1",
+   "expected": [
+    2,
+    2,
+    1
+   ],
+   "observed": [
+    2,
+    2,
+    2
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-6-亥",
+   "check": "chart.2",
+   "expected": [
+    3,
+    1,
+    2
+   ],
+   "observed": [
+    3,
+    1,
+    3
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-6-亥",
+   "check": "chart.3",
+   "expected": [
+    4,
+    9,
+    3
+   ],
+   "observed": [
+    4,
+    9,
+    4
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-6-亥",
+   "check": "chart.4",
+   "expected": [
+    5,
+    8,
+    4
+   ],
+   "observed": [
+    5,
+    8,
+    5
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-6-亥",
+   "check": "chart.5",
+   "expected": [
+    6,
+    7,
+    5
+   ],
+   "observed": [
+    6,
+    7,
+    6
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-6-亥",
+   "check": "chart.6",
+   "expected": [
+    7,
+    6,
+    6
+   ],
+   "observed": [
+    7,
+    6,
+    7
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-6-亥",
+   "check": "chart.7",
+   "expected": [
+    8,
+    5,
+    7
+   ],
+   "observed": [
+    8,
+    5,
+    8
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-6-亥",
+   "check": "chart.8",
+   "expected": [
+    9,
+    4,
+    8
+   ],
+   "observed": [
+    9,
+    4,
+    9
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-6-亥",
+   "check": "chart.9",
+   "expected": [
+    1,
+    3,
+    9
+   ],
+   "observed": [
+    1,
+    3,
+    1
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-7-甲",
+   "check": "intermediate.shanCenter",
+   "expected": 5,
+   "observed": 9,
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-7-甲",
+   "check": "chart.1",
+   "expected": [
+    3,
+    1,
+    3
+   ],
+   "observed": [
+    3,
+    5,
+    3
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-7-甲",
+   "check": "chart.2",
+   "expected": [
+    4,
+    2,
+    4
+   ],
+   "observed": [
+    4,
+    6,
+    4
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-7-甲",
+   "check": "chart.3",
+   "expected": [
+    5,
+    3,
+    5
+   ],
+   "observed": [
+    5,
+    7,
+    5
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-7-甲",
+   "check": "chart.4",
+   "expected": [
+    6,
+    4,
+    6
+   ],
+   "observed": [
+    6,
+    8,
+    6
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-7-甲",
+   "check": "chart.5",
+   "expected": [
+    7,
+    5,
+    7
+   ],
+   "observed": [
+    7,
+    9,
+    7
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-7-甲",
+   "check": "chart.6",
+   "expected": [
+    8,
+    6,
+    8
+   ],
+   "observed": [
+    8,
+    1,
+    8
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-7-甲",
+   "check": "chart.7",
+   "expected": [
+    9,
+    7,
+    9
+   ],
+   "observed": [
+    9,
+    2,
+    9
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-7-甲",
+   "check": "chart.8",
+   "expected": [
+    1,
+    8,
+    1
+   ],
+   "observed": [
+    1,
+    3,
+    1
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-7-甲",
+   "check": "chart.9",
+   "expected": [
+    2,
+    9,
+    2
+   ],
+   "observed": [
+    2,
+    4,
+    2
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-7-卯",
+   "check": "intermediate.shanCenter",
+   "expected": 5,
+   "observed": 7,
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-7-卯",
+   "check": "chart.1",
+   "expected": [
+    3,
+    9,
+    4
+   ],
+   "observed": [
+    3,
+    2,
+    4
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-7-卯",
+   "check": "chart.2",
+   "expected": [
+    4,
+    8,
+    3
+   ],
+   "observed": [
+    4,
+    1,
+    3
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-7-卯",
+   "check": "chart.3",
+   "expected": [
+    5,
+    7,
+    2
+   ],
+   "observed": [
+    5,
+    9,
+    2
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-7-卯",
+   "check": "chart.4",
+   "expected": [
+    6,
+    6,
+    1
+   ],
+   "observed": [
+    6,
+    8,
+    1
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-7-卯",
+   "check": "chart.5",
+   "expected": [
+    7,
+    5,
+    9
+   ],
+   "observed": [
+    7,
+    7,
+    9
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-7-卯",
+   "check": "chart.6",
+   "expected": [
+    8,
+    4,
+    8
+   ],
+   "observed": [
+    8,
+    6,
+    8
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-7-卯",
+   "check": "chart.7",
+   "expected": [
+    9,
+    3,
+    7
+   ],
+   "observed": [
+    9,
+    5,
+    7
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-7-卯",
+   "check": "chart.8",
+   "expected": [
+    1,
+    2,
+    6
+   ],
+   "observed": [
+    1,
+    4,
+    6
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-7-卯",
+   "check": "chart.9",
+   "expected": [
+    2,
+    1,
+    5
+   ],
+   "observed": [
+    2,
+    3,
+    5
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-7-乙",
+   "check": "intermediate.shanCenter",
+   "expected": 5,
+   "observed": 7,
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-7-乙",
+   "check": "chart.1",
+   "expected": [
+    3,
+    9,
+    4
+   ],
+   "observed": [
+    3,
+    2,
+    4
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-7-乙",
+   "check": "chart.2",
+   "expected": [
+    4,
+    8,
+    3
+   ],
+   "observed": [
+    4,
+    1,
+    3
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-7-乙",
+   "check": "chart.3",
+   "expected": [
+    5,
+    7,
+    2
+   ],
+   "observed": [
+    5,
+    9,
+    2
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-7-乙",
+   "check": "chart.4",
+   "expected": [
+    6,
+    6,
+    1
+   ],
+   "observed": [
+    6,
+    8,
+    1
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-7-乙",
+   "check": "chart.5",
+   "expected": [
+    7,
+    5,
+    9
+   ],
+   "observed": [
+    7,
+    7,
+    9
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-7-乙",
+   "check": "chart.6",
+   "expected": [
+    8,
+    4,
+    8
+   ],
+   "observed": [
+    8,
+    6,
+    8
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-7-乙",
+   "check": "chart.7",
+   "expected": [
+    9,
+    3,
+    7
+   ],
+   "observed": [
+    9,
+    5,
+    7
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-7-乙",
+   "check": "chart.8",
+   "expected": [
+    1,
+    2,
+    6
+   ],
+   "observed": [
+    1,
+    4,
+    6
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-7-乙",
+   "check": "chart.9",
+   "expected": [
+    2,
+    1,
+    5
+   ],
+   "observed": [
+    2,
+    3,
+    5
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-7-庚",
+   "check": "intermediate.xiangCenter",
+   "expected": 5,
+   "observed": 9,
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-7-庚",
+   "check": "chart.1",
+   "expected": [
+    3,
+    3,
+    1
+   ],
+   "observed": [
+    3,
+    3,
+    5
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-7-庚",
+   "check": "chart.2",
+   "expected": [
+    4,
+    4,
+    2
+   ],
+   "observed": [
+    4,
+    4,
+    6
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-7-庚",
+   "check": "chart.3",
+   "expected": [
+    5,
+    5,
+    3
+   ],
+   "observed": [
+    5,
+    5,
+    7
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-7-庚",
+   "check": "chart.4",
+   "expected": [
+    6,
+    6,
+    4
+   ],
+   "observed": [
+    6,
+    6,
+    8
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-7-庚",
+   "check": "chart.5",
+   "expected": [
+    7,
+    7,
+    5
+   ],
+   "observed": [
+    7,
+    7,
+    9
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-7-庚",
+   "check": "chart.6",
+   "expected": [
+    8,
+    8,
+    6
+   ],
+   "observed": [
+    8,
+    8,
+    1
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-7-庚",
+   "check": "chart.7",
+   "expected": [
+    9,
+    9,
+    7
+   ],
+   "observed": [
+    9,
+    9,
+    2
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-7-庚",
+   "check": "chart.8",
+   "expected": [
+    1,
+    1,
+    8
+   ],
+   "observed": [
+    1,
+    1,
+    3
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-7-庚",
+   "check": "chart.9",
+   "expected": [
+    2,
+    2,
+    9
+   ],
+   "observed": [
+    2,
+    2,
+    4
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-7-酉",
+   "check": "intermediate.xiangCenter",
+   "expected": 5,
+   "observed": 7,
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-7-酉",
+   "check": "chart.1",
+   "expected": [
+    3,
+    4,
+    9
+   ],
+   "observed": [
+    3,
+    4,
+    2
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-7-酉",
+   "check": "chart.2",
+   "expected": [
+    4,
+    3,
+    8
+   ],
+   "observed": [
+    4,
+    3,
+    1
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-7-酉",
+   "check": "chart.3",
+   "expected": [
+    5,
+    2,
+    7
+   ],
+   "observed": [
+    5,
+    2,
+    9
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-7-酉",
+   "check": "chart.4",
+   "expected": [
+    6,
+    1,
+    6
+   ],
+   "observed": [
+    6,
+    1,
+    8
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-7-酉",
+   "check": "chart.5",
+   "expected": [
+    7,
+    9,
+    5
+   ],
+   "observed": [
+    7,
+    9,
+    7
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-7-酉",
+   "check": "chart.6",
+   "expected": [
+    8,
+    8,
+    4
+   ],
+   "observed": [
+    8,
+    8,
+    6
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-7-酉",
+   "check": "chart.7",
+   "expected": [
+    9,
+    7,
+    3
+   ],
+   "observed": [
+    9,
+    7,
+    5
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-7-酉",
+   "check": "chart.8",
+   "expected": [
+    1,
+    6,
+    2
+   ],
+   "observed": [
+    1,
+    6,
+    4
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-7-酉",
+   "check": "chart.9",
+   "expected": [
+    2,
+    5,
+    1
+   ],
+   "observed": [
+    2,
+    5,
+    3
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-7-辛",
+   "check": "intermediate.xiangCenter",
+   "expected": 5,
+   "observed": 7,
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-7-辛",
+   "check": "chart.1",
+   "expected": [
+    3,
+    4,
+    9
+   ],
+   "observed": [
+    3,
+    4,
+    2
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-7-辛",
+   "check": "chart.2",
+   "expected": [
+    4,
+    3,
+    8
+   ],
+   "observed": [
+    4,
+    3,
+    1
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-7-辛",
+   "check": "chart.3",
+   "expected": [
+    5,
+    2,
+    7
+   ],
+   "observed": [
+    5,
+    2,
+    9
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-7-辛",
+   "check": "chart.4",
+   "expected": [
+    6,
+    1,
+    6
+   ],
+   "observed": [
+    6,
+    1,
+    8
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-7-辛",
+   "check": "chart.5",
+   "expected": [
+    7,
+    9,
+    5
+   ],
+   "observed": [
+    7,
+    9,
+    7
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-7-辛",
+   "check": "chart.6",
+   "expected": [
+    8,
+    8,
+    4
+   ],
+   "observed": [
+    8,
+    8,
+    6
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-7-辛",
+   "check": "chart.7",
+   "expected": [
+    9,
+    7,
+    3
+   ],
+   "observed": [
+    9,
+    7,
+    5
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-7-辛",
+   "check": "chart.8",
+   "expected": [
+    1,
+    6,
+    2
+   ],
+   "observed": [
+    1,
+    6,
+    4
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-7-辛",
+   "check": "chart.9",
+   "expected": [
+    2,
+    5,
+    1
+   ],
+   "observed": [
+    2,
+    5,
+    3
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-8-丑",
+   "check": "intermediate.xiangCenter",
+   "expected": 5,
+   "observed": 7,
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-8-丑",
+   "check": "chart.1",
+   "expected": [
+    4,
+    6,
+    9
+   ],
+   "observed": [
+    4,
+    6,
+    2
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-8-丑",
+   "check": "chart.2",
+   "expected": [
+    5,
+    5,
+    8
+   ],
+   "observed": [
+    5,
+    5,
+    1
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-8-丑",
+   "check": "chart.3",
+   "expected": [
+    6,
+    4,
+    7
+   ],
+   "observed": [
+    6,
+    4,
+    9
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-8-丑",
+   "check": "chart.4",
+   "expected": [
+    7,
+    3,
+    6
+   ],
+   "observed": [
+    7,
+    3,
+    8
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-8-丑",
+   "check": "chart.5",
+   "expected": [
+    8,
+    2,
+    5
+   ],
+   "observed": [
+    8,
+    2,
+    7
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-8-丑",
+   "check": "chart.6",
+   "expected": [
+    9,
+    1,
+    4
+   ],
+   "observed": [
+    9,
+    1,
+    6
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-8-丑",
+   "check": "chart.7",
+   "expected": [
+    1,
+    9,
+    3
+   ],
+   "observed": [
+    1,
+    9,
+    5
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-8-丑",
+   "check": "chart.8",
+   "expected": [
+    2,
+    8,
+    2
+   ],
+   "observed": [
+    2,
+    8,
+    4
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-8-丑",
+   "check": "chart.9",
+   "expected": [
+    3,
+    7,
+    1
+   ],
+   "observed": [
+    3,
+    7,
+    3
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-8-艮",
+   "check": "intermediate.xiangCenter",
+   "expected": 5,
+   "observed": 7,
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-8-艮",
+   "check": "chart.1",
+   "expected": [
+    4,
+    7,
+    1
+   ],
+   "observed": [
+    4,
+    7,
+    3
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-8-艮",
+   "check": "chart.2",
+   "expected": [
+    5,
+    8,
+    2
+   ],
+   "observed": [
+    5,
+    8,
+    4
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-8-艮",
+   "check": "chart.3",
+   "expected": [
+    6,
+    9,
+    3
+   ],
+   "observed": [
+    6,
+    9,
+    5
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-8-艮",
+   "check": "chart.4",
+   "expected": [
+    7,
+    1,
+    4
+   ],
+   "observed": [
+    7,
+    1,
+    6
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-8-艮",
+   "check": "chart.5",
+   "expected": [
+    8,
+    2,
+    5
+   ],
+   "observed": [
+    8,
+    2,
+    7
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-8-艮",
+   "check": "chart.6",
+   "expected": [
+    9,
+    3,
+    6
+   ],
+   "observed": [
+    9,
+    3,
+    8
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-8-艮",
+   "check": "chart.7",
+   "expected": [
+    1,
+    4,
+    7
+   ],
+   "observed": [
+    1,
+    4,
+    9
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-8-艮",
+   "check": "chart.8",
+   "expected": [
+    2,
+    5,
+    8
+   ],
+   "observed": [
+    2,
+    5,
+    1
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-8-艮",
+   "check": "chart.9",
+   "expected": [
+    3,
+    6,
+    9
+   ],
+   "observed": [
+    3,
+    6,
+    2
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-8-寅",
+   "check": "intermediate.xiangCenter",
+   "expected": 5,
+   "observed": 9,
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-8-寅",
+   "check": "chart.1",
+   "expected": [
+    4,
+    6,
+    1
+   ],
+   "observed": [
+    4,
+    6,
+    5
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-8-寅",
+   "check": "chart.2",
+   "expected": [
+    5,
+    7,
+    2
+   ],
+   "observed": [
+    5,
+    7,
+    6
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-8-寅",
+   "check": "chart.3",
+   "expected": [
+    6,
+    8,
+    3
+   ],
+   "observed": [
+    6,
+    8,
+    7
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-8-寅",
+   "check": "chart.4",
+   "expected": [
+    7,
+    9,
+    4
+   ],
+   "observed": [
+    7,
+    9,
+    8
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-8-寅",
+   "check": "chart.5",
+   "expected": [
+    8,
+    1,
+    5
+   ],
+   "observed": [
+    8,
+    1,
+    9
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-8-寅",
+   "check": "chart.6",
+   "expected": [
+    9,
+    2,
+    6
+   ],
+   "observed": [
+    9,
+    2,
+    1
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-8-寅",
+   "check": "chart.7",
+   "expected": [
+    1,
+    3,
+    7
+   ],
+   "observed": [
+    1,
+    3,
+    2
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-8-寅",
+   "check": "chart.8",
+   "expected": [
+    2,
+    4,
+    8
+   ],
+   "observed": [
+    2,
+    4,
+    3
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-8-寅",
+   "check": "chart.9",
+   "expected": [
+    3,
+    5,
+    9
+   ],
+   "observed": [
+    3,
+    5,
+    4
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-8-未",
+   "check": "intermediate.shanCenter",
+   "expected": 5,
+   "observed": 7,
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-8-未",
+   "check": "chart.1",
+   "expected": [
+    4,
+    9,
+    6
+   ],
+   "observed": [
+    4,
+    2,
+    6
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-8-未",
+   "check": "chart.2",
+   "expected": [
+    5,
+    8,
+    5
+   ],
+   "observed": [
+    5,
+    1,
+    5
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-8-未",
+   "check": "chart.3",
+   "expected": [
+    6,
+    7,
+    4
+   ],
+   "observed": [
+    6,
+    9,
+    4
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-8-未",
+   "check": "chart.4",
+   "expected": [
+    7,
+    6,
+    3
+   ],
+   "observed": [
+    7,
+    8,
+    3
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-8-未",
+   "check": "chart.5",
+   "expected": [
+    8,
+    5,
+    2
+   ],
+   "observed": [
+    8,
+    7,
+    2
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-8-未",
+   "check": "chart.6",
+   "expected": [
+    9,
+    4,
+    1
+   ],
+   "observed": [
+    9,
+    6,
+    1
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-8-未",
+   "check": "chart.7",
+   "expected": [
+    1,
+    3,
+    9
+   ],
+   "observed": [
+    1,
+    5,
+    9
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-8-未",
+   "check": "chart.8",
+   "expected": [
+    2,
+    2,
+    8
+   ],
+   "observed": [
+    2,
+    4,
+    8
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-8-未",
+   "check": "chart.9",
+   "expected": [
+    3,
+    1,
+    7
+   ],
+   "observed": [
+    3,
+    3,
+    7
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-8-坤",
+   "check": "intermediate.shanCenter",
+   "expected": 5,
+   "observed": 7,
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-8-坤",
+   "check": "chart.1",
+   "expected": [
+    4,
+    1,
+    7
+   ],
+   "observed": [
+    4,
+    3,
+    7
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-8-坤",
+   "check": "chart.2",
+   "expected": [
+    5,
+    2,
+    8
+   ],
+   "observed": [
+    5,
+    4,
+    8
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-8-坤",
+   "check": "chart.3",
+   "expected": [
+    6,
+    3,
+    9
+   ],
+   "observed": [
+    6,
+    5,
+    9
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-8-坤",
+   "check": "chart.4",
+   "expected": [
+    7,
+    4,
+    1
+   ],
+   "observed": [
+    7,
+    6,
+    1
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-8-坤",
+   "check": "chart.5",
+   "expected": [
+    8,
+    5,
+    2
+   ],
+   "observed": [
+    8,
+    7,
+    2
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-8-坤",
+   "check": "chart.6",
+   "expected": [
+    9,
+    6,
+    3
+   ],
+   "observed": [
+    9,
+    8,
+    3
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-8-坤",
+   "check": "chart.7",
+   "expected": [
+    1,
+    7,
+    4
+   ],
+   "observed": [
+    1,
+    9,
+    4
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-8-坤",
+   "check": "chart.8",
+   "expected": [
+    2,
+    8,
+    5
+   ],
+   "observed": [
+    2,
+    1,
+    5
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-8-坤",
+   "check": "chart.9",
+   "expected": [
+    3,
+    9,
+    6
+   ],
+   "observed": [
+    3,
+    2,
+    6
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-8-申",
+   "check": "intermediate.shanCenter",
+   "expected": 5,
+   "observed": 9,
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-8-申",
+   "check": "chart.1",
+   "expected": [
+    4,
+    1,
+    6
+   ],
+   "observed": [
+    4,
+    5,
+    6
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-8-申",
+   "check": "chart.2",
+   "expected": [
+    5,
+    2,
+    7
+   ],
+   "observed": [
+    5,
+    6,
+    7
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-8-申",
+   "check": "chart.3",
+   "expected": [
+    6,
+    3,
+    8
+   ],
+   "observed": [
+    6,
+    7,
+    8
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-8-申",
+   "check": "chart.4",
+   "expected": [
+    7,
+    4,
+    9
+   ],
+   "observed": [
+    7,
+    8,
+    9
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-8-申",
+   "check": "chart.5",
+   "expected": [
+    8,
+    5,
+    1
+   ],
+   "observed": [
+    8,
+    9,
+    1
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-8-申",
+   "check": "chart.6",
+   "expected": [
+    9,
+    6,
+    2
+   ],
+   "observed": [
+    9,
+    1,
+    2
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-8-申",
+   "check": "chart.7",
+   "expected": [
+    1,
+    7,
+    3
+   ],
+   "observed": [
+    1,
+    2,
+    3
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-8-申",
+   "check": "chart.8",
+   "expected": [
+    2,
+    8,
+    4
+   ],
+   "observed": [
+    2,
+    3,
+    4
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-8-申",
+   "check": "chart.9",
+   "expected": [
+    3,
+    9,
+    5
+   ],
+   "observed": [
+    3,
+    4,
+    5
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-9-壬",
+   "check": "intermediate.shanCenter",
+   "expected": 5,
+   "observed": 7,
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-9-壬",
+   "check": "chart.1",
+   "expected": [
+    5,
+    1,
+    1
+   ],
+   "observed": [
+    5,
+    3,
+    1
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-9-壬",
+   "check": "chart.2",
+   "expected": [
+    6,
+    2,
+    9
+   ],
+   "observed": [
+    6,
+    4,
+    9
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-9-壬",
+   "check": "chart.3",
+   "expected": [
+    7,
+    3,
+    8
+   ],
+   "observed": [
+    7,
+    5,
+    8
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-9-壬",
+   "check": "chart.4",
+   "expected": [
+    8,
+    4,
+    7
+   ],
+   "observed": [
+    8,
+    6,
+    7
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-9-壬",
+   "check": "chart.5",
+   "expected": [
+    9,
+    5,
+    6
+   ],
+   "observed": [
+    9,
+    7,
+    6
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-9-壬",
+   "check": "chart.6",
+   "expected": [
+    1,
+    6,
+    5
+   ],
+   "observed": [
+    1,
+    8,
+    5
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-9-壬",
+   "check": "chart.7",
+   "expected": [
+    2,
+    7,
+    4
+   ],
+   "observed": [
+    2,
+    9,
+    4
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-9-壬",
+   "check": "chart.8",
+   "expected": [
+    3,
+    8,
+    3
+   ],
+   "observed": [
+    3,
+    1,
+    3
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-9-壬",
+   "check": "chart.9",
+   "expected": [
+    4,
+    9,
+    2
+   ],
+   "observed": [
+    4,
+    2,
+    2
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-9-子",
+   "check": "intermediate.shanCenter",
+   "expected": 5,
+   "observed": 9,
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-9-子",
+   "check": "chart.1",
+   "expected": [
+    5,
+    9,
+    2
+   ],
+   "observed": [
+    5,
+    4,
+    2
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-9-子",
+   "check": "chart.2",
+   "expected": [
+    6,
+    8,
+    3
+   ],
+   "observed": [
+    6,
+    3,
+    3
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-9-子",
+   "check": "chart.3",
+   "expected": [
+    7,
+    7,
+    4
+   ],
+   "observed": [
+    7,
+    2,
+    4
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-9-子",
+   "check": "chart.4",
+   "expected": [
+    8,
+    6,
+    5
+   ],
+   "observed": [
+    8,
+    1,
+    5
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-9-子",
+   "check": "chart.5",
+   "expected": [
+    9,
+    5,
+    6
+   ],
+   "observed": [
+    9,
+    9,
+    6
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-9-子",
+   "check": "chart.6",
+   "expected": [
+    1,
+    4,
+    7
+   ],
+   "observed": [
+    1,
+    8,
+    7
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-9-子",
+   "check": "chart.7",
+   "expected": [
+    2,
+    3,
+    8
+   ],
+   "observed": [
+    2,
+    7,
+    8
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-9-子",
+   "check": "chart.8",
+   "expected": [
+    3,
+    2,
+    9
+   ],
+   "observed": [
+    3,
+    6,
+    9
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-9-子",
+   "check": "chart.9",
+   "expected": [
+    4,
+    1,
+    1
+   ],
+   "observed": [
+    4,
+    5,
+    1
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-9-癸",
+   "check": "intermediate.shanCenter",
+   "expected": 5,
+   "observed": 9,
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-9-癸",
+   "check": "chart.1",
+   "expected": [
+    5,
+    9,
+    2
+   ],
+   "observed": [
+    5,
+    4,
+    2
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-9-癸",
+   "check": "chart.2",
+   "expected": [
+    6,
+    8,
+    3
+   ],
+   "observed": [
+    6,
+    3,
+    3
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-9-癸",
+   "check": "chart.3",
+   "expected": [
+    7,
+    7,
+    4
+   ],
+   "observed": [
+    7,
+    2,
+    4
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-9-癸",
+   "check": "chart.4",
+   "expected": [
+    8,
+    6,
+    5
+   ],
+   "observed": [
+    8,
+    1,
+    5
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-9-癸",
+   "check": "chart.5",
+   "expected": [
+    9,
+    5,
+    6
+   ],
+   "observed": [
+    9,
+    9,
+    6
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-9-癸",
+   "check": "chart.6",
+   "expected": [
+    1,
+    4,
+    7
+   ],
+   "observed": [
+    1,
+    8,
+    7
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-9-癸",
+   "check": "chart.7",
+   "expected": [
+    2,
+    3,
+    8
+   ],
+   "observed": [
+    2,
+    7,
+    8
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-9-癸",
+   "check": "chart.8",
+   "expected": [
+    3,
+    2,
+    9
+   ],
+   "observed": [
+    3,
+    6,
+    9
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-9-癸",
+   "check": "chart.9",
+   "expected": [
+    4,
+    1,
+    1
+   ],
+   "observed": [
+    4,
+    5,
+    1
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-9-丙",
+   "check": "intermediate.xiangCenter",
+   "expected": 5,
+   "observed": 7,
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-9-丙",
+   "check": "chart.1",
+   "expected": [
+    5,
+    1,
+    1
+   ],
+   "observed": [
+    5,
+    1,
+    3
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-9-丙",
+   "check": "chart.2",
+   "expected": [
+    6,
+    9,
+    2
+   ],
+   "observed": [
+    6,
+    9,
+    4
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-9-丙",
+   "check": "chart.3",
+   "expected": [
+    7,
+    8,
+    3
+   ],
+   "observed": [
+    7,
+    8,
+    5
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-9-丙",
+   "check": "chart.4",
+   "expected": [
+    8,
+    7,
+    4
+   ],
+   "observed": [
+    8,
+    7,
+    6
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-9-丙",
+   "check": "chart.5",
+   "expected": [
+    9,
+    6,
+    5
+   ],
+   "observed": [
+    9,
+    6,
+    7
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-9-丙",
+   "check": "chart.6",
+   "expected": [
+    1,
+    5,
+    6
+   ],
+   "observed": [
+    1,
+    5,
+    8
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-9-丙",
+   "check": "chart.7",
+   "expected": [
+    2,
+    4,
+    7
+   ],
+   "observed": [
+    2,
+    4,
+    9
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-9-丙",
+   "check": "chart.8",
+   "expected": [
+    3,
+    3,
+    8
+   ],
+   "observed": [
+    3,
+    3,
+    1
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-9-丙",
+   "check": "chart.9",
+   "expected": [
+    4,
+    2,
+    9
+   ],
+   "observed": [
+    4,
+    2,
+    2
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-9-午",
+   "check": "intermediate.xiangCenter",
+   "expected": 5,
+   "observed": 9,
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-9-午",
+   "check": "chart.1",
+   "expected": [
+    5,
+    2,
+    9
+   ],
+   "observed": [
+    5,
+    2,
+    4
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-9-午",
+   "check": "chart.2",
+   "expected": [
+    6,
+    3,
+    8
+   ],
+   "observed": [
+    6,
+    3,
+    3
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-9-午",
+   "check": "chart.3",
+   "expected": [
+    7,
+    4,
+    7
+   ],
+   "observed": [
+    7,
+    4,
+    2
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-9-午",
+   "check": "chart.4",
+   "expected": [
+    8,
+    5,
+    6
+   ],
+   "observed": [
+    8,
+    5,
+    1
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-9-午",
+   "check": "chart.5",
+   "expected": [
+    9,
+    6,
+    5
+   ],
+   "observed": [
+    9,
+    6,
+    9
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-9-午",
+   "check": "chart.6",
+   "expected": [
+    1,
+    7,
+    4
+   ],
+   "observed": [
+    1,
+    7,
+    8
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-9-午",
+   "check": "chart.7",
+   "expected": [
+    2,
+    8,
+    3
+   ],
+   "observed": [
+    2,
+    8,
+    7
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-9-午",
+   "check": "chart.8",
+   "expected": [
+    3,
+    9,
+    2
+   ],
+   "observed": [
+    3,
+    9,
+    6
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-9-午",
+   "check": "chart.9",
+   "expected": [
+    4,
+    1,
+    1
+   ],
+   "observed": [
+    4,
+    1,
+    5
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-9-丁",
+   "check": "intermediate.xiangCenter",
+   "expected": 5,
+   "observed": 9,
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-9-丁",
+   "check": "chart.1",
+   "expected": [
+    5,
+    2,
+    9
+   ],
+   "observed": [
+    5,
+    2,
+    4
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-9-丁",
+   "check": "chart.2",
+   "expected": [
+    6,
+    3,
+    8
+   ],
+   "observed": [
+    6,
+    3,
+    3
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-9-丁",
+   "check": "chart.3",
+   "expected": [
+    7,
+    4,
+    7
+   ],
+   "observed": [
+    7,
+    4,
+    2
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-9-丁",
+   "check": "chart.4",
+   "expected": [
+    8,
+    5,
+    6
+   ],
+   "observed": [
+    8,
+    5,
+    1
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-9-丁",
+   "check": "chart.5",
+   "expected": [
+    9,
+    6,
+    5
+   ],
+   "observed": [
+    9,
+    6,
+    9
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-9-丁",
+   "check": "chart.6",
+   "expected": [
+    1,
+    7,
+    4
+   ],
+   "observed": [
+    1,
+    7,
+    8
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-9-丁",
+   "check": "chart.7",
+   "expected": [
+    2,
+    8,
+    3
+   ],
+   "observed": [
+    2,
+    8,
+    7
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-9-丁",
+   "check": "chart.8",
+   "expected": [
+    3,
+    9,
+    2
+   ],
+   "observed": [
+    3,
+    9,
+    6
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-TG5K-9-丁",
+   "check": "chart.9",
+   "expected": [
+    4,
+    1,
+    1
+   ],
+   "observed": [
+    4,
+    1,
+    5
+   ],
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-BOUNDS",
+   "check": "山.7.5°",
+   "expected": "子",
+   "observed": "癸",
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-BOUNDS",
+   "check": "山.22.5°",
+   "expected": "癸",
+   "observed": "丑",
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-BOUNDS",
+   "check": "山.337.5°",
+   "expected": "亥",
+   "observed": "壬",
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "D-BOUNDS",
+   "check": "山.352.5°",
+   "expected": "壬",
+   "observed": "子",
+   "reviewStatus": "unreviewed"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.6.0°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.6.1°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.6.2°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.6.3°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.6.4°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.6.5°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.6.6°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.6.7°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.6.8°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.6.9°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.7.0°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.7.1°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.7.2°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.7.3°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.7.4°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.7.5°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.7.6°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.7.7°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.7.8°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.7.9°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.8.0°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.8.1°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.8.2°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.8.3°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.8.4°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.8.5°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.8.6°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.8.7°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.8.8°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.8.9°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.9.0°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.21.0°.大空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.21.1°.大空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.21.2°.大空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.21.3°.大空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.21.4°.大空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.21.5°.大空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.21.6°.大空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.21.7°.大空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.21.8°.大空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.21.9°.大空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.22.0°.大空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.22.1°.大空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.22.2°.大空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.22.3°.大空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.22.4°.大空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.22.5°.大空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.22.6°.大空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.22.7°.大空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.22.8°.大空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.22.9°.大空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.23.0°.大空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.23.1°.大空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.23.2°.大空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.23.3°.大空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.23.4°.大空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.23.5°.大空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.23.6°.大空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.23.7°.大空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.23.8°.大空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.23.9°.大空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.24.0°.大空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.36.0°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.36.1°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.36.2°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.36.3°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.36.4°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.36.5°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.36.6°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.36.7°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.36.8°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.36.9°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.37.0°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.37.1°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.37.2°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.37.3°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.37.4°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.37.5°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.37.6°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.37.7°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.37.8°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.37.9°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.38.0°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.38.1°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.38.2°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.38.3°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.38.4°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.38.5°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.38.6°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.38.7°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.38.8°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.38.9°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.39.0°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.51.0°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.51.1°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.51.2°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.51.3°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.51.4°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.51.5°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.51.6°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.51.7°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.51.8°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.51.9°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.52.0°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.52.1°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.52.2°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.52.3°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.52.4°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.52.5°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.52.6°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.52.7°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.52.8°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.52.9°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.53.0°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.53.1°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.53.2°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.53.3°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.53.4°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.53.5°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.53.6°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.53.7°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.53.8°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.53.9°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.54.0°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.66.0°.大空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.66.1°.大空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.66.2°.大空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.66.3°.大空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.66.4°.大空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.66.5°.大空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.66.6°.大空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.66.7°.大空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.66.8°.大空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.66.9°.大空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.67.0°.大空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.67.1°.大空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.67.2°.大空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.67.3°.大空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.67.4°.大空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.67.5°.大空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.67.6°.大空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.67.7°.大空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.67.8°.大空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.67.9°.大空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.68.0°.大空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.68.1°.大空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.68.2°.大空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.68.3°.大空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.68.4°.大空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.68.5°.大空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.68.6°.大空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.68.7°.大空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.68.8°.大空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.68.9°.大空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.69.0°.大空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.81.0°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.81.1°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.81.2°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.81.3°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.81.4°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.81.5°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.81.6°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.81.7°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.81.8°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.81.9°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.82.0°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.82.1°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.82.2°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.82.3°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.82.4°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.82.5°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.82.6°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.82.7°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.82.8°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.82.9°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.83.0°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.83.1°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.83.2°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.83.3°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.83.4°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.83.5°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.83.6°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.83.7°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.83.8°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.83.9°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.84.0°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.96.0°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.96.1°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.96.2°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.96.3°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.96.4°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.96.5°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.96.6°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.96.7°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.96.8°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.96.9°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.97.0°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.97.1°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.97.2°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.97.3°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.97.4°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.97.5°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.97.6°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.97.7°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.97.8°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.97.9°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.98.0°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.98.1°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.98.2°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.98.3°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.98.4°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.98.5°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.98.6°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.98.7°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.98.8°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.98.9°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.99.0°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.111.0°.大空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.111.1°.大空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.111.2°.大空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.111.3°.大空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.111.4°.大空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.111.5°.大空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.111.6°.大空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.111.7°.大空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.111.8°.大空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.111.9°.大空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.112.0°.大空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.112.1°.大空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.112.2°.大空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.112.3°.大空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.112.4°.大空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.112.5°.大空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.112.6°.大空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.112.7°.大空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.112.8°.大空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.112.9°.大空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.113.0°.大空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.113.1°.大空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.113.2°.大空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.113.3°.大空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.113.4°.大空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.113.5°.大空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.113.6°.大空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.113.7°.大空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.113.8°.大空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.113.9°.大空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.114.0°.大空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.126.0°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.126.1°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.126.2°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.126.3°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.126.4°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.126.5°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.126.6°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.126.7°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.126.8°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.126.9°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.127.0°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.127.1°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.127.2°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.127.3°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.127.4°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.127.5°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.127.6°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.127.7°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.127.8°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.127.9°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.128.0°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.128.1°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.128.2°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.128.3°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.128.4°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.128.5°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.128.6°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.128.7°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.128.8°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.128.9°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.129.0°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.141.0°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.141.1°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.141.2°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.141.3°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.141.4°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.141.5°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.141.6°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.141.7°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.141.8°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.141.9°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.142.0°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.142.1°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.142.2°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.142.3°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.142.4°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.142.5°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.142.6°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.142.7°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.142.8°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.142.9°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.143.0°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.143.1°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.143.2°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.143.3°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.143.4°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.143.5°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.143.6°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.143.7°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.143.8°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.143.9°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.144.0°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.156.0°.大空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.156.1°.大空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.156.2°.大空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.156.3°.大空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.156.4°.大空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.156.5°.大空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.156.6°.大空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.156.7°.大空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.156.8°.大空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.156.9°.大空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.157.0°.大空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.157.1°.大空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.157.2°.大空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.157.3°.大空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.157.4°.大空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.157.5°.大空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.157.6°.大空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.157.7°.大空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.157.8°.大空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.157.9°.大空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.158.0°.大空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.158.1°.大空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.158.2°.大空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.158.3°.大空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.158.4°.大空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.158.5°.大空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.158.6°.大空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.158.7°.大空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.158.8°.大空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.158.9°.大空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.159.0°.大空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.171.0°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.171.1°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.171.2°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.171.3°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.171.4°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.171.5°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.171.6°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.171.7°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.171.8°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.171.9°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.172.0°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.172.1°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.172.2°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.172.3°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.172.4°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.172.5°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.172.6°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.172.7°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.172.8°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.172.9°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.173.0°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.173.1°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.173.2°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.173.3°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.173.4°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.173.5°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.173.6°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.173.7°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.173.8°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.173.9°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.174.0°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.186.0°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.186.1°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.186.2°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.186.3°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.186.4°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.186.5°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.186.6°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.186.7°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.186.8°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.186.9°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.187.0°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.187.1°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.187.2°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.187.3°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.187.4°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.187.5°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.187.6°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.187.7°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.187.8°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.187.9°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.188.0°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.188.1°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.188.2°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.188.3°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.188.4°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.188.5°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.188.6°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.188.7°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.188.8°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.188.9°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.189.0°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.201.0°.大空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.201.1°.大空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.201.2°.大空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.201.3°.大空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.201.4°.大空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.201.5°.大空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.201.6°.大空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.201.7°.大空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.201.8°.大空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.201.9°.大空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.202.0°.大空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.202.1°.大空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.202.2°.大空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.202.3°.大空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.202.4°.大空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.202.5°.大空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.202.6°.大空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.202.7°.大空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.202.8°.大空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.202.9°.大空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.203.0°.大空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.203.1°.大空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.203.2°.大空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.203.3°.大空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.203.4°.大空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.203.5°.大空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.203.6°.大空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.203.7°.大空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.203.8°.大空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.203.9°.大空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.204.0°.大空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.216.0°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.216.1°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.216.2°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.216.3°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.216.4°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.216.5°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.216.6°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.216.7°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.216.8°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.216.9°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.217.0°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.217.1°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.217.2°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.217.3°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.217.4°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.217.5°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.217.6°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.217.7°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.217.8°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.217.9°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.218.0°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.218.1°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.218.2°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.218.3°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.218.4°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.218.5°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.218.6°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.218.7°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.218.8°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.218.9°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.219.0°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.231.0°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.231.1°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.231.2°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.231.3°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.231.4°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.231.5°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.231.6°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.231.7°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.231.8°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.231.9°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.232.0°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.232.1°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.232.2°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.232.3°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.232.4°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.232.5°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.232.6°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.232.7°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.232.8°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.232.9°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.233.0°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.233.1°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.233.2°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.233.3°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.233.4°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.233.5°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.233.6°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.233.7°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.233.8°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.233.9°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.234.0°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.246.0°.大空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.246.1°.大空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.246.2°.大空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.246.3°.大空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.246.4°.大空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.246.5°.大空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.246.6°.大空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.246.7°.大空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.246.8°.大空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.246.9°.大空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.247.0°.大空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.247.1°.大空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.247.2°.大空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.247.3°.大空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.247.4°.大空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.247.5°.大空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.247.6°.大空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.247.7°.大空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.247.8°.大空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.247.9°.大空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.248.0°.大空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.248.1°.大空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.248.2°.大空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.248.3°.大空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.248.4°.大空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.248.5°.大空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.248.6°.大空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.248.7°.大空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.248.8°.大空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.248.9°.大空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.249.0°.大空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.261.0°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.261.1°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.261.2°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.261.3°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.261.4°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.261.5°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.261.6°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.261.7°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.261.8°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.261.9°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.262.0°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.262.1°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.262.2°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.262.3°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.262.4°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.262.5°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.262.6°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.262.7°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.262.8°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.262.9°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.263.0°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.263.1°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.263.2°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.263.3°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.263.4°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.263.5°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.263.6°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.263.7°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.263.8°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.263.9°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.264.0°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.276.0°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.276.1°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.276.2°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.276.3°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.276.4°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.276.5°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.276.6°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.276.7°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.276.8°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.276.9°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.277.0°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.277.1°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.277.2°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.277.3°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.277.4°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.277.5°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.277.6°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.277.7°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.277.8°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.277.9°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.278.0°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.278.1°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.278.2°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.278.3°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.278.4°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.278.5°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.278.6°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.278.7°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.278.8°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.278.9°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.279.0°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.291.0°.大空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.291.1°.大空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.291.2°.大空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.291.3°.大空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.291.4°.大空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.291.5°.大空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.291.6°.大空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.291.7°.大空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.291.8°.大空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.291.9°.大空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.292.0°.大空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.292.1°.大空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.292.2°.大空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.292.3°.大空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.292.4°.大空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.292.5°.大空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.292.6°.大空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.292.7°.大空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.292.8°.大空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.292.9°.大空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.293.0°.大空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.293.1°.大空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.293.2°.大空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.293.3°.大空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.293.4°.大空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.293.5°.大空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.293.6°.大空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.293.7°.大空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.293.8°.大空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.293.9°.大空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.294.0°.大空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.306.0°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.306.1°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.306.2°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.306.3°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.306.4°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.306.5°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.306.6°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.306.7°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.306.8°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.306.9°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.307.0°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.307.1°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.307.2°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.307.3°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.307.4°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.307.5°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.307.6°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.307.7°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.307.8°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.307.9°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.308.0°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.308.1°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.308.2°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.308.3°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.308.4°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.308.5°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.308.6°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.308.7°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.308.8°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.308.9°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.309.0°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.321.0°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.321.1°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.321.2°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.321.3°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.321.4°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.321.5°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.321.6°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.321.7°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.321.8°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.321.9°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.322.0°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.322.1°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.322.2°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.322.3°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.322.4°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.322.5°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.322.6°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.322.7°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.322.8°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.322.9°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.323.0°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.323.1°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.323.2°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.323.3°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.323.4°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.323.5°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.323.6°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.323.7°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.323.8°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.323.9°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.324.0°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.336.0°.大空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.336.1°.大空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.336.2°.大空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.336.3°.大空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.336.4°.大空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.336.5°.大空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.336.6°.大空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.336.7°.大空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.336.8°.大空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.336.9°.大空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.337.0°.大空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.337.1°.大空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.337.2°.大空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.337.3°.大空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.337.4°.大空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.337.5°.大空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.337.6°.大空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.337.7°.大空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.337.8°.大空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.337.9°.大空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.338.0°.大空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.338.1°.大空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.338.2°.大空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.338.3°.大空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.338.4°.大空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.338.5°.大空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.338.6°.大空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.338.7°.大空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.338.8°.大空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.338.9°.大空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.339.0°.大空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.351.0°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.351.1°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.351.2°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.351.3°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.351.4°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.351.5°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.351.6°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.351.7°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.351.8°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.351.9°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.352.0°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.352.1°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.352.2°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.352.3°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.352.4°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.352.5°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.352.6°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.352.7°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.352.8°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.352.9°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.353.0°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.353.1°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.353.2°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.353.3°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.353.4°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.353.5°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.353.6°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.353.7°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.353.8°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.353.9°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  },
+  {
+   "caseId": "I-LINE",
+   "check": "立线与排盘.354.0°.小空亡",
+   "expected": false,
+   "observed": true,
+   "reviewStatus": "internal"
+  }
+ ]
+}

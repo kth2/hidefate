@@ -312,6 +312,7 @@ export default function QuickChartPage() {
             <p className="px-1 text-[0.6875rem] leading-relaxed text-ink-mute">
               本盘门派：{describeSchool(school).join(' · ')}。
               {data.result.chartYear?.note}
+              {data.result.provenance && <> 计算出处：{data.result.provenance.engine}（{data.result.provenance.ruleSet}）。</>}
             </p>
 
             <Link href="/new" className="btn btn-block">存为房屋，补房间与家人 →</Link>

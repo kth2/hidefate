@@ -18,4 +18,5 @@ export * from './geju.js';
 export * from './annualSha.js';
 export * from './school.js';
 export * from './healthLexicon.js';
+export * from './provenance.js';
 export * from './timeStars.js';
