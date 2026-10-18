@@ -213,6 +213,15 @@ export default function HomePage() {
           <p className="mt-2 text-[0.875rem] leading-relaxed text-ink-soft">{glance.note}</p>
         </section>
 
+        {/* 即时飞星：此刻时辰 + 手机罗盘 */}
+        <Link href="/now" className="card flex items-center gap-3 active:bg-rice-deep/40">
+          <div className="min-w-0 flex-1">
+            <p className="font-serif text-[1rem] font-semibold">即时飞星 · 财星方位</p>
+            <p className="mt-0.5 text-[0.75rem] text-ink-mute">以此刻时辰起盘，手机罗盘指出财星在哪一方</p>
+          </div>
+          <span className="text-ink-mute">→</span>
+        </Link>
+
         {/* 风水师入口：不建档，只要坐向与年份 */}
         <Link href="/quick" className="card flex items-center gap-3 active:bg-rice-deep/40">
           <div className="min-w-0 flex-1">
