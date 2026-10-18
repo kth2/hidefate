@@ -19,17 +19,17 @@ function worstText(b: PersonBurden): string {
 }
 
 export default function PlanPage() {
-  const { property, members, cures, year, loading, reload } = useProperty();
+  const { property, members, cures, year, loading, reload, school } = useProperty();
   const [applied, setApplied] = useState(false);
 
   const plan = useMemo(() => {
     if (!property || members.length === 0) return null;
     try {
-      return planRooms({ profile: property, members, year, appliedCures: cures, qiMen: null });
+      return planRooms({ profile: property, members, year, appliedCures: cures, qiMen: null, school });
     } catch {
       return null;
     }
-  }, [property, members, cures, year]);
+  }, [property, members, cures, year, school]);
 
   if (loading) return <><AppBar title="怎么分房最好" back="/me" /><div className="px-4 py-4"><Skeleton lines={5} /></div></>;
 

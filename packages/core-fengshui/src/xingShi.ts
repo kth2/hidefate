@@ -146,7 +146,7 @@ export const XING_SHI_META: Record<XingShiFeature, XingShiMeta> = {
   },
   天斩煞: {
     feature: '天斩煞', kind: '凶', scope: '方位', weight: -0.3,
-    affects: '意外、血光、夫妻不和、健康',
+    affects: '意外、外伤、夫妻不和、健康',
     classical: '《阳宅撮要》：两楼相夹之缝正对本宅，如刀斩下，谓之天斩。缝隙愈窄、距离愈近，煞气愈烈。',
     cures: [
       '受冲之窗宜常闭或加厚窗帘、贴磨砂膜，先断其直视。',
@@ -172,7 +172,7 @@ export const XING_SHI_META: Record<XingShiFeature, XingShiMeta> = {
   电塔变压器: {
     feature: '电塔变压器', kind: '凶', scope: '方位', weight: -0.32,
     affects: '健康、神经、意外、火险',
-    classical: '古无电塔，然以形势论，高压电塔属「孤峰带煞」兼火金之气，主神经不宁、血光与火厄。',
+    classical: '古无电塔，然以形势论，高压电塔属「孤峰带煞」兼火金之气，主心神不宁、外伤与火厄。',
     cures: [
       '受冲之窗加厚窗帘常闭；该方室内忌设卧床，尤忌儿童房。',
       '置厚重土性之物（黄玉、陶瓮、粗盐）以厚土制之。',

@@ -20,6 +20,7 @@ import {
   RESIDENTIAL_TYPES,
   analyzeLine,
   periodOfYear,
+  periodTransitionNote,
   requiresFloor,
   requiresStoreys,
   type BuildingType,
@@ -255,6 +256,9 @@ export default function NewPropertyPage() {
                 onChange={(e) => setMoveInYear(Number(e.target.value))}
               />
               <p className="mt-1.5 text-[0.8125rem] text-ink-mute">推得元运：{periodOfYear(moveInYear).label}</p>
+              {periodTransitionNote(moveInYear) && (
+                <p className="mt-1 text-[0.8125rem] font-medium text-cinnabar">{periodTransitionNote(moveInYear)}</p>
+              )}
             </div>
 
             <div>

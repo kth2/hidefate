@@ -275,7 +275,7 @@ const ZIWEI: readonly XiangYi[] = [
     id: 'ziwei.lianzhen.health.blood',
     source: { layer: '命', system: '紫微', kind: '主星', token: '廉贞' },
     domain: '健康', valence: '凶', facet: '体',
-    statement: '血光、心血管或炎症类病候',
+    statement: '外伤出血，或心脏、血液循环方面需要就医',
     minResonance: 3, prior: 0.25,
     classic: '《紫微斗数全书》，廉贞属火主血',
     interventionability: '空间可调',

@@ -257,7 +257,7 @@ export const EVENT_TEMPLATES: readonly EventTemplate[] = [
   },
   {
     id: 'health.chronic',
-    title: '慢性问题反复（肠胃、代谢、妇科）',
+    title: '健康问题反复（肠胃、腹部）',
     domain: '健康',
     valence: '凶',
     allOf: ['二黑'],
@@ -297,7 +297,7 @@ export const EVENT_TEMPLATES: readonly EventTemplate[] = [
     prior: 0.3,
     classic: '偏印为枭主忧思；《紫白诀》四绿失令主神经衰弱；奇门腾蛇主惊恐虚诈',
     interventionability: '空间可调',
-    criterion: '{窗口}内是否连续两周以上睡不好、明显焦虑或情绪低落',
+    criterion: '{窗口}内是否连续两周以上睡不好、明显紧张不安或情绪低落',
     advice: '卧室少放镜面与电器，床头朝本人天医方；这段睡前少看屏幕，压力大就说出来。',
   },
   {
@@ -489,7 +489,7 @@ export const EVENT_TEMPLATES: readonly EventTemplate[] = [
 
   {
     id: 'combo.crossSword',
-    title: '血光、刀伤或与人正面冲突（交剑煞应期）',
+    title: '外伤或与人正面冲突（交剑煞应期）',
     domain: '意外',
     valence: '凶',
     anyOf: ['合:交剑煞', '临:交剑煞'],
@@ -504,7 +504,7 @@ export const EVENT_TEMPLATES: readonly EventTemplate[] = [
   },
   {
     id: 'combo.twoFive',
-    title: '重病、久病或家中有人健康出大问题（二五交加应期）',
+    title: '家中有人健康出现较大问题（二五交加应期）',
     domain: '健康',
     valence: '凶',
     anyOf: ['合:二五交加', '合:五二交加', '临:二五交加', '临:五二交加'],
@@ -534,7 +534,7 @@ export const EVENT_TEMPLATES: readonly EventTemplate[] = [
   },
   {
     id: 'combo.fireHeaven',
-    title: '火险、目疾或长辈头部之疾（火烧天门应期）',
+    title: '火险，或长辈头部、眼目方面需要就医（火烧天门应期）',
     domain: '健康',
     valence: '凶',
     anyOf: ['合:火烧天门', '临:火烧天门'],
@@ -543,7 +543,7 @@ export const EVENT_TEMPLATES: readonly EventTemplate[] = [
     prior: 0.2,
     classic: '《紫白诀》：「七九合辙，常招回禄。」六九火照天门，主长上之灾与头疾',
     interventionability: '空间可调',
-    criterion: '{窗口}内是否发生火警、电器起火、眼疾就医，或家中长辈头部与心血管方面的问题',
+    criterion: '{窗口}内是否发生火警、电器起火、眼睛问题就医，或家中长辈头部、心脏方面需要就医',
     advice: '此方忌明火与红色，忌堆放易燃物；用水或金泄之，并检查该方位的电路与炉灶。',
   },
   {

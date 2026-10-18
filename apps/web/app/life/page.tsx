@@ -155,7 +155,7 @@ function EventCard({ e }: { e: PredictedEvent }) {
 }
 
 export default function LifePage() {
-  const { memberRows, properties, loading, year } = useProperty();
+  const { memberRows, properties, loading, year, school } = useProperty();
 
   const [personId, setPersonId] = useState<string | null>(null);
   // 从「这屋对我」跳过来时带 ?id=，直接看那个人（不用 useSearchParams，免得整页要包 Suspense）
@@ -202,11 +202,12 @@ export default function LifePage() {
         residences,
         properties: new Map<string, PropertyProfile>(properties.map((p) => [p.id, p])),
         thisYear: year,
+        school,
       });
     } catch {
       return null;
     }
-  }, [person, residences, properties, year]);
+  }, [person, residences, properties, year, school]);
 
   async function track(outlook: YearOutlook) {
     if (!person) return;

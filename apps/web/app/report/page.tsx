@@ -18,6 +18,7 @@ import {
   PALACE_INDEXES,
   STAR_NAME,
   type PalaceIndex,
+  describeSchool,
 } from '@hidefate/core-fengshui';
 import {
   RISK_COLOR,
@@ -37,7 +38,7 @@ import { useProperty } from '../../lib/PropertyContext';
 export default function ReportPage() {
   // 取「当前房屋」而非路由参数：静态导出没有服务器，动态段 [id] 无法预渲染，
   // 且报告本来就只会针对当前选中的那处房屋出具。
-  const { property, members, cures, loading } = useProperty();
+  const { property, members, cures, loading, school } = useProperty();
   const [now] = useState(() => currentFengShuiTime());
   const [qiMen, setQiMen] = useState<ShanXiangResult | null>(null);
   const [qiMenPending, setQiMenPending] = useState(false);
@@ -70,27 +71,28 @@ export default function ReportPage() {
       monthIndex: now.monthIndex,
       appliedCures: cures,
       qiMen,
+      school,
     };
     try {
       const result = analyse(input, synthesise(input));
-      const timeline = buildTimeline({ profile: property, members, qiMen: null, appliedCures: cures }, {
+      const timeline = buildTimeline({ profile: property, members, qiMen: null, appliedCures: cures, school }, {
         startYear: now.year,
         span: 12,
       });
       const fusion = members.length
-        ? buildFamilyFusionReport({ profile: property, members, qiMen: null }, now.year, 10)
+        ? buildFamilyFusionReport({ profile: property, members, qiMen: null, school }, now.year, 10)
         : null;
       const people = members
         .map((m) => buildPersonView(result, members, m.id))
         .filter((v): v is NonNullable<typeof v> => v != null);
       const monthly = members.length
-        ? monthlyOutlook({ profile: property, members, qiMen: result.qiMenEnabled ? qiMen : null, appliedCures: cures }, now.year, now.monthIndex, 12)
+        ? monthlyOutlook({ profile: property, members, qiMen: result.qiMenEnabled ? qiMen : null, appliedCures: cures, school }, now.year, now.monthIndex, 12)
         : null;
       return { result, timeline, fusion, people, monthly };
     } catch {
       return null;
     }
-  }, [property, members, cures, now, qiMen]);
+  }, [property, members, cures, now, qiMen, school]);
 
   if (loading) return <p className="px-4 py-6 text-sm text-ink-mute">读取中…</p>;
   if (qiMenPending) {
@@ -497,7 +499,7 @@ export default function ReportPage() {
         <ul>
           <li>
             <b>玄空飞星</b> —— 以元运数入中排运盘，取坐山与向首所在宫之运星分别入中排山盘与向盘，
-            阴阳依该运星本宫中与坐山同元龙之山而定；兼向逾 3° 起替卦（二十四山起星诀）。
+            阴阳依该运星本宫中与坐山同元龙之山而定；兼向逾 {result.school?.jianThreshold ?? 3}° 起替卦（二十四山起星诀）。
           </li>
           <li>
             <b>八宅派</b> —— 以坐山所属卦宫为宅卦，依翻卦掌次第布游年八星；
@@ -512,6 +514,11 @@ export default function ReportPage() {
             <b>八字命理</b> —— 四柱五行力量加权判身强弱与喜忌；资料残缺时按精度分级降权，
             命卦部分只需出生年与性别，故不受影响。
           </li>
+          {result.school && (
+            <li>
+              <b>本案门派设置</b> —— {describeSchool(result.school).join('；')}。{result.chartYear?.note}
+            </li>
+          )}
         </ul>
 
         <h3>置信度如何判定</h3>

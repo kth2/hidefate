@@ -146,7 +146,7 @@ function FamilyRow({ row }: { row: ReturnType<typeof familyOverview>[number] }) 
 }
 
 export default function HomePage() {
-  const { property, result, members, cures, qiMen, year, monthIndex, loading, properties } = useProperty();
+  const { property, result, members, cures, qiMen, year, monthIndex, loading, properties, school } = useProperty();
   const [span, setSpan] = useState<'year' | 'month'>('year');
 
   const glance = useMemo(() => yearGlance(year), [year]);
@@ -174,7 +174,7 @@ export default function HomePage() {
     const now = currentFengShuiTime();
     try {
       return monthlyOutlook(
-        { profile: property, members, qiMen: result?.qiMenEnabled ? qiMen : null, appliedCures: cures },
+        { profile: property, members, qiMen: result?.qiMenEnabled ? qiMen : null, appliedCures: cures, school },
         year,
         year === now.year ? now.monthIndex : 1,
         12,
@@ -182,7 +182,7 @@ export default function HomePage() {
     } catch {
       return null;
     }
-  }, [span, property, members, cures, qiMen, result, year]);
+  }, [span, property, members, cures, qiMen, result, year, school]);
 
   /** 还没指定谁住的卧房、书房 —— 不指定，预测就落不到人身上。 */
   const unassigned = useMemo(
@@ -193,11 +193,11 @@ export default function HomePage() {
   const alerts = useMemo(() => {
     if (!property) return [];
     try {
-      return buildAlerts({ profile: property, members, qiMen: null, appliedCures: cures }, year, monthIndex, 6).slice(0, 3);
+      return buildAlerts({ profile: property, members, qiMen: null, appliedCures: cures, school }, year, monthIndex, 6).slice(0, 3);
     } catch {
       return [];
     }
-  }, [property, members, cures, year, monthIndex]);
+  }, [property, members, cures, year, monthIndex, school]);
 
   return (
     <>
@@ -212,6 +212,15 @@ export default function HomePage() {
           </p>
           <p className="mt-2 text-[0.875rem] leading-relaxed text-ink-soft">{glance.note}</p>
         </section>
+
+        {/* 风水师入口：不建档，只要坐向与年份 */}
+        <Link href="/quick" className="card flex items-center gap-3 active:bg-rice-deep/40">
+          <div className="min-w-0 flex-1">
+            <p className="font-serif text-[1rem] font-semibold">十秒起盘</p>
+            <p className="mt-0.5 text-[0.75rem] text-ink-mute">只要坐向度数与年份：飞星、格局、煞方、先做什么</p>
+          </div>
+          <span className="text-ink-mute">→</span>
+        </Link>
 
         {loading && <Skeleton lines={4} />}
 

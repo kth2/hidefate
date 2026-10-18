@@ -67,7 +67,7 @@ export const FAQ_BANK: readonly FaqItem[] = [
   // 健康人丁
   { id: 'h-h1', scenario: '居家', category: '健康人丁', question: '我常失眠头痛、肠胃不好，跟床头靠厕或灶对水槽有关吗？',
     lookAt: ['主卧宫位与其脏腑应象', '厨房宫位', '二黑五黄所到之方'], domains: ['健康'] },
-  { id: 'h-h2', scenario: '居家', category: '健康人丁', question: '久婚不孕（或曾流产），风水上要注意什么？',
+  { id: 'h-h2', scenario: '居家', category: '健康人丁', question: '久婚未有子女，风水上要注意什么？',
     lookAt: ['主卧宫位山星（主人丁）', '当元旺山之方（添丁位）', '西南坤宫（母）状况'], domains: ['人丁', '健康'] },
   { id: 'h-h3', scenario: '居家', category: '健康人丁', question: '窗外有尖角／天斩煞／电塔，要怎么化解？',
     lookAt: ['外部环境（峦头）清单', '形煞所在方位', '峦头化解建议'], domains: ['健康', '意外'] },

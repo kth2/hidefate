@@ -11,7 +11,7 @@
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { computeBaziChart } from '@hidefate/core-bazi';
-import { fengShuiYearOf, solarMonthIndexOf, type PropertyProfile } from '@hidefate/core-fengshui';
+import { fengShuiYearOf, solarMonthIndexOf, type PropertyProfile, type SchoolSettings } from '@hidefate/core-fengshui';
 import { computeShanXiang, type ShanXiangResult } from '@hidefate/core-qimen';
 import {
   analyse,
@@ -22,6 +22,7 @@ import {
   type SynthesisResult,
 } from '@hidefate/core-synthesis';
 import type { StoredCure, StoredMember } from './db';
+import { useSchool } from './schoolStore';
 
 export function toMembers(rows: readonly StoredMember[]): Member[] {
   return rows.map((r) => {
@@ -71,6 +72,8 @@ export interface UseAnalysisArgs {
   monthIndex?: number;
   /** 是否启用山向奇门层。 */
   enableQiMen: boolean;
+  /** 门派设置；不给则自行读本机设置。 */
+  school?: SchoolSettings;
 }
 
 export interface UseAnalysisResult {
@@ -84,6 +87,8 @@ export interface UseAnalysisResult {
 
 export function useAnalysis(args: UseAnalysisArgs): UseAnalysisResult {
   const { profile, members, cures, year, monthIndex, enableQiMen } = args;
+  const [ownSchool] = useSchool();
+  const school = args.school ?? ownSchool;
 
   const [qiMen, setQiMen] = useState<ShanXiangResult | null>(null);
   const [qiMenLoading, setQiMenLoading] = useState(false);
@@ -131,13 +136,14 @@ export function useAnalysis(args: UseAnalysisArgs): UseAnalysisResult {
       monthIndex,
       appliedCures: cures,
       qiMen: enableQiMen ? qiMen : null,
+      school,
     };
     try {
       return analyse(input, synthesise(input));
     } catch {
       return null;
     }
-  }, [profile, members, cures, year, monthIndex, enableQiMen, qiMen]);
+  }, [profile, members, cures, year, monthIndex, enableQiMen, qiMen, school]);
 
   const retryQiMen = useCallback(() => setRetryToken((t) => t + 1), []);
 

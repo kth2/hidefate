@@ -52,14 +52,14 @@ export function buildFlyingStarXiangYi(): XiangYi[] {
   for (const p of PALACES) {
     const meta = STAR_META[p];
 
-    // ---- 身体面：脏腑与病候 ----
+    // ---- 身体面：只取部位，不列病名（README 规则 8）----
     out.push({
       id: `fengshui.star${p}.health.organ`,
       source: { layer: '风水', system: '飞星', kind: '单星', token: meta.name },
       domain: '健康',
       valence: meta.nature === '吉' ? '中' : '凶',
       facet: '体',
-      statement: `${meta.organs.join('、')}方面的病候；常见${meta.ailments.slice(0, 3).join('、')}`,
+      statement: `${meta.organs.join('、')}方面出现需要就医的状况`,
       minResonance: 2,
       prior: priorFor(meta.nature, '体'),
       classic: `《紫白诀》《飞星赋》${meta.name}（${meta.alias}）之应`,

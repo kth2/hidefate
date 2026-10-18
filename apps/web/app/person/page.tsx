@@ -71,7 +71,7 @@ function DomainTile({ c }: { c: PersonDomainCell }) {
 
 function PersonInner() {
   const params = useSearchParams();
-  const { property, result, members, cures, qiMen, year, loading } = useProperty();
+  const { property, result, members, cures, qiMen, year, loading, school } = useProperty();
   const id = params.get('id') ?? members[0]?.id ?? null;
 
   const view = useMemo(
@@ -85,7 +85,7 @@ function PersonInner() {
     const now = currentFengShuiTime();
     try {
       const out = monthlyOutlook(
-        { profile: property, members, qiMen: result?.qiMenEnabled ? qiMen : null, appliedCures: cures },
+        { profile: property, members, qiMen: result?.qiMenEnabled ? qiMen : null, appliedCures: cures, school },
         year,
         year === now.year ? now.monthIndex : 1,
         12,
@@ -94,7 +94,7 @@ function PersonInner() {
     } catch {
       return null;
     }
-  }, [property, members, cures, qiMen, result, year, id]);
+  }, [property, members, cures, qiMen, result, year, id, school]);
 
   if (loading) return <><AppBar title="这屋对我" back="/" /><div className="px-4 py-4"><Skeleton lines={5} /></div></>;
 

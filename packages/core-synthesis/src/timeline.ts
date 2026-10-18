@@ -14,6 +14,7 @@ import {
 } from '@hidefate/core-fengshui';
 import { synthesise } from './assess.js';
 import { predict, probabilityFor } from './predict.js';
+import { phasePeriodOf } from './types.js';
 import type {
   AnalysisInput,
   AppliedCure,
@@ -96,7 +97,7 @@ export function buildTimeline(
     const s = synthesise(yearInput);
     const preds = predict(yearInput, s);
 
-    const period = s.flyingStar.period.period;
+    const period = phasePeriodOf(s);
     const yearPeriod = periodOfYear(year);
     const isChange = prevPeriod != null && yearPeriod.period !== periodOfYear(year - 1).period;
     prevPeriod = period;
@@ -203,7 +204,7 @@ export function compareYears(
   const toYear = (t: { s: SynthesisResult; preds: Prediction[] }, y: number): TimelineYear => ({
     year: y,
     age: y - input.profile.moveInYear,
-    period: t.s.flyingStar.period.period,
+    period: phasePeriodOf(t.s),
     periodLabel: t.s.flyingStar.period.label,
     isPeriodChange: false,
     annualStar: annualStar(y),

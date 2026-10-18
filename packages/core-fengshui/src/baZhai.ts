@@ -38,13 +38,13 @@ export interface YouNianMeta {
 
 export const YOU_NIAN_META: Record<YouNianStar, YouNianMeta> = {
   生气: { star: '生气', auspicious: true, power: 3, alias: '贪狼', wuXing: '木', governs: '事业·活力·人缘', summary: '第一吉方，主积极进取、升迁添丁，宜设主门、办公位、卧床。' },
-  天医: { star: '天医', auspicious: true, power: 2, alias: '巨门', wuXing: '土', governs: '健康·贵人·财源', summary: '主病去身安、遇贵得助，宜设卧室、厨房（食禄），久病者尤重此方。' },
+  天医: { star: '天医', auspicious: true, power: 2, alias: '巨门', wuXing: '土', governs: '健康·贵人·财源', summary: '主病去身安、遇贵得助，宜设卧室、厨房（食禄），体弱或正在调养者尤重此方。' },
   延年: { star: '延年', auspicious: true, power: 2, alias: '武曲', wuXing: '金', governs: '感情·寿元·人际', summary: '主婚姻和合、寿元绵长，夫妻卧房与谈判座位首选。' },
   伏位: { star: '伏位', auspicious: true, power: 1, alias: '辅弼', wuXing: '木', governs: '稳定·守成·文昌', summary: '力量最缓的吉方，主安稳无波，宜书房、静养、储蓄。' },
   祸害: { star: '祸害', auspicious: false, power: -1, alias: '禄存', wuXing: '土', governs: '口舌·官非·小病', summary: '最轻之凶，主是非争执、小病缠身，宜作储物、厕所等「压凶」用途。' },
   六煞: { star: '六煞', auspicious: false, power: -2, alias: '文曲', wuXing: '水', governs: '桃花·酒色·破财', summary: '主感情纠纷、烂桃花与无谓损耗，最忌落在夫妻主卧。' },
   五鬼: { star: '五鬼', auspicious: false, power: -3, alias: '廉贞', wuXing: '火', governs: '小人·意外·失窃·火险', summary: '主横祸、盗失、小人暗算与情绪失控，忌开门、忌主卧、忌炉灶。' },
-  绝命: { star: '绝命', auspicious: false, power: -3, alias: '破军', wuXing: '金', governs: '重病·大破财·绝嗣', summary: '最凶之方，主重症手术、投资大败，宜作厕所、储藏以镇之。' },
+  绝命: { star: '绝命', auspicious: false, power: -3, alias: '破军', wuXing: '金', governs: '健康·大破财·子嗣', summary: '最凶之方，主健康受损、投资大败，宜作厕所、储藏以镇之。' },
 };
 
 /**

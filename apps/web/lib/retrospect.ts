@@ -23,7 +23,7 @@
  */
 
 import { computeBaziChart, type BirthInput } from '@hidefate/core-bazi';
-import { STAR_NAME, buildFlyingStarChart, type PropertyProfile } from '@hidefate/core-fengshui';
+import { STAR_NAME, buildFlyingStarChart, chartOptionsFor, resolveSchool, schoolHashPart, type PropertyProfile, type SchoolSettings } from '@hidefate/core-fengshui';
 import {
   buildLifeTimeline,
   type LifeTimeline,
@@ -50,6 +50,8 @@ export interface RetrospectInput {
   readonly properties: ReadonlyMap<string, PropertyProfile>;
   /** 回溯到哪一年为止，默认去年（今年尚未过完，不可判定）。 */
   readonly untilYear?: number;
+  /** 门派设置；不给则取默认。 */
+  readonly school?: Partial<SchoolSettings>;
 }
 
 export interface RetrospectSegment {
@@ -128,7 +130,7 @@ function mingTokens(
  * 低保真段不出 token —— 与 core-synthesis 的 `learnable` 一致，
  * 宁可让该段只剩命层，也不拿推测的坐向去凑共振。
  */
-function fengShuiTokens(timeline: LifeTimeline, fromYear: number, toYear: number): string[] {
+function fengShuiTokens(timeline: LifeTimeline, fromYear: number, toYear: number, school: SchoolSettings): string[] {
   const tokens = new Set<string>();
   for (const y of timeline.years) {
     if (y.year < fromYear || y.year > toYear) continue;
@@ -136,11 +138,8 @@ function fengShuiTokens(timeline: LifeTimeline, fromYear: number, toYear: number
     for (const r of y.fengShui.residences) {
       if (!r.profile || !r.capability.flyingStar) continue;
       try {
-        const chart = buildFlyingStarChart({
-          sitting: r.profile.sitting,
-          ...(r.profile.facing != null ? { facing: r.profile.facing } : {}),
-          moveInYear: r.profile.moveInYear,
-        });
+        const { chartYear: _cy, ...opts } = chartOptionsFor(r.profile, school);
+        const chart = buildFlyingStarChart(opts);
         for (const p of [1, 2, 3, 4, 5, 6, 7, 8, 9] as const) {
           const cell = chart.palaces[p];
           // 山星主人丁健康、向星主财禄 —— 两者都是取象来源。
@@ -206,6 +205,7 @@ export function planRetrospect(input: RetrospectInput): RetrospectPlan {
     residences: [...input.residences].map((r) => ({
       propertyId: r.propertyId, fromYear: r.fromYear, toYear: r.toYear, role: r.role, fidelity: r.fidelity,
     })),
+    ...(schoolHashPart(resolveSchool(input.school)) ? { school: schoolHashPart(resolveSchool(input.school)) } : {}),
   });
 
   /**
@@ -226,7 +226,7 @@ export function planRetrospect(input: RetrospectInput): RetrospectPlan {
 
     const tokens = [
       ...mingTokens(person, seg.fromYear, seg.toYear, notes),
-      ...fengShuiTokens(timeline, seg.fromYear, seg.toYear),
+      ...fengShuiTokens(timeline, seg.fromYear, seg.toYear, resolveSchool(input.school)),
     ];
     const resonance = analyseResonance(DICTIONARY, tokens);
     const fengShuiUsable = timeline.years.some(

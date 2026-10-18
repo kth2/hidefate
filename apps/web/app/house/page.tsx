@@ -902,7 +902,7 @@ export default function HousePage() {
                 {[a.stars.shan, a.stars.xiang, a.stars.annual].map((s, i) => (
                   <p key={i}>
                     <b className="text-ink">{STAR_NAME[s]}</b>（{STAR_META[s].alias}·{STAR_META[s].wuXing}·
-                    {STAR_META[s].person}）：应 {STAR_META[s].organs.join('、')}；须留意 {STAR_META[s].ailments.join('、')}。
+                    {STAR_META[s].person}）：应 {STAR_META[s].organs.join('、')}方面（传统取象，非医学判断）。
                   </p>
                 ))}
               </div>

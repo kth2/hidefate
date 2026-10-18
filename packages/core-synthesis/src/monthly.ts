@@ -25,6 +25,7 @@ import {
 } from '@hidefate/core-fengshui';
 import { synthesise } from './assess.js';
 import { PROB_CEIL, PROB_FLOOR, predict, probabilityFor } from './predict.js';
+import { phasePeriodOf } from './types.js';
 import type { AnalysisInput, Member, Prediction } from './types.js';
 
 /** 月星对月概率的力度（logit 单位，乘在 -starScore 上）。 */
@@ -170,7 +171,7 @@ export function monthlyOutlook(
   for (const y of new Set(slots.map((s) => s.year))) {
     const yi: AnalysisInput = { ...input, year: y };
     const s = synthesise(yi);
-    yearly.set(y, { preds: predict(yi, s), period: s.flyingStar.period.period });
+    yearly.set(y, { preds: predict(yi, s), period: phasePeriodOf(s) });
   }
 
   const rows: MemberMonthly[] = input.members.map((m: Member) => ({

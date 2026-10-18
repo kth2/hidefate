@@ -178,7 +178,7 @@ const MINOR: Readonly<Partial<Record<RiskDomain, DomainReading>>> = {
 };
 
 const ELDER: Readonly<Partial<Record<RiskDomain, DomainReading>>> = {
-  健康: { label: '健康', text: '慢性病反复、体力下滑，宜定期检查' },
+  健康: { label: '健康', text: '体力与精神易下滑，宜规律作息、定期体检' },
   意外: { label: '意外', text: '跌倒碰伤，尤其夜间起身与浴室' },
   人丁: { label: '子女', text: '为儿孙之事操心' },
   感情: ADULT.感情,

@@ -19,6 +19,7 @@ import {
   type RoomKind,
   type RoomPlacement,
 } from '@hidefate/core-fengshui';
+import { phasePeriodOf } from './types.js';
 import type { Cure, Finding, SynthesisResult } from './types.js';
 
 export interface LayoutIssue {
@@ -54,7 +55,7 @@ export function judgeRoomPlacement(
   kind: RoomKind,
 ): PlacementJudgement {
   const a = s.palaces[palace];
-  const period = s.flyingStar.period.period;
+  const period = phasePeriodOf(s);
   const bz = a.baZhaiStar;
   const auspiciousBaZhai = bz != null && YOU_NIAN_META[bz].auspicious;
   const prosperousStar = a.stars.shan === period || a.stars.xiang === period;
@@ -186,7 +187,7 @@ export function checkLayout(s: SynthesisResult): LayoutIssue[] {
 
     const bz = a.baZhaiStar;
     const isAuspiciousBaZhai = bz != null && YOU_NIAN_META[bz].auspicious;
-    const period = s.flyingStar.period.period;
+    const period = phasePeriodOf(s);
     const isProsperousStar = a.stars.xiang === period || a.stars.shan === period;
 
     const why: string[] = [];
@@ -240,7 +241,7 @@ export function checkLayout(s: SynthesisResult): LayoutIssue[] {
         confidence: '高',
         statement: isStair
           ? '楼梯落在中宫，谓之「穿心煞」。中宫为全宅之心，楼梯动而泄气，等于日夜从家的中心抽气，主家运不聚、家人易生嫌隙。'
-          : `${r.kind}落在中宫。中宫属土、为全宅元气所聚，${r.kind === '厨房' || r.kind === '灶位' ? '火煞焚心，主家人脾气躁、心血管与眼疾' : '污秽压心，主慢性病缠身、家运滞塞'}。`,
+          : `${r.kind}落在中宫。中宫属土、为全宅元气所聚，${r.kind === '厨房' || r.kind === '灶位' ? '火煞焚心，主家人脾气躁，心脏与眼目方面宜留意' : '污秽压心，主健康欠佳、家运滞塞'}。`,
         principle: '《阳宅三要》：「中宫乃一宅之极，宜静宜洁，忌污忌动。」中宫受污受动，全宅之气俱受牵累。',
         impact: -0.6,
         domains: isStair ? ['财运', '感情'] : ['健康'],
@@ -328,7 +329,7 @@ export function checkLayout(s: SynthesisResult): LayoutIssue[] {
         confidence: '高',
         statement:
           `${PALACE_DIRECTION[p]}的${label(r)}见${sha.includes(5) ? '五黄正煞' : '二黑病符'}。` +
-          `灶属火，火生土，正好替这两颗土煞添薪，凶性大增 —— 主家人肠胃病、妇疾，${sha.includes(5) ? '重则见急症与意外。' : '慢性病缠绵难愈。'}`,
+          `灶属火，火生土，正好替这两颗土煞添薪，凶性大增 —— 主家人肠胃欠安，${sha.includes(5) ? '重则见健康急事与意外。' : '健康长期欠佳。'}`,
         principle: '「五黄最忌火来生」。灶火日日燃于煞方，等于天天替凶星补气，此为厨灶第一忌。',
         impact: -0.6,
         domains: ['健康'],

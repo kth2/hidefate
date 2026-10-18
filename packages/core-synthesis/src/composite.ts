@@ -28,6 +28,7 @@ import {
   type XingShiItem,
   type XingShiScore,
 } from '@hidefate/core-fengshui';
+import { phasePeriodOf } from './types.js';
 import type { ConfidenceLevel, SynthesisResult } from './types.js';
 
 /** 理气三派权重。 */
@@ -85,7 +86,7 @@ export interface CompositeScore {
  *   3. 八方吉凶均值 —— 作底，占两成
  */
 function computeFeiXingScore(s: SynthesisResult): number {
-  const period = s.flyingStar.period.period;
+  const period = phasePeriodOf(s);
 
   // ── 1. 格局 ──
   const patternScore =
