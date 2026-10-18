@@ -1,0 +1,92 @@
+{
+ "id": "T-001",
+ "title": "七运 子山午向 下卦（全盘）",
+ "source": {
+  "type": "web",
+  "title": "如何一步步完成玄空飞星手工排盘（精品学习贴）",
+  "publisher": "搜狐",
+  "url": "https://m.sohu.com/n/468745803/",
+  "accessed": "2026-10-16",
+  "edition": null,
+  "page": null,
+  "passage": "七运子山午向下卦图（文字九宫格）；「坐山子为三、三入中，3为卯为阴，故逆飞九宫」；「向首午为二、二入中，2为坤为阳，故顺飞九宫」"
+ },
+ "input": {
+  "period": 7,
+  "sitting": "子",
+  "facing": "午",
+  "useTiXing": false,
+  "assumptions": [
+   "原图南在上；格内上排数字为山星、向星，下排汉字为运星"
+  ]
+ },
+ "expected": {
+  "intermediate": {
+   "shanCenter": 3,
+   "shanDir": "逆",
+   "shanRef": "卯",
+   "xiangCenter": 2,
+   "xiangDir": "顺",
+   "xiangRef": "坤"
+  },
+  "chart": {
+   "4": {
+    "yun": 6,
+    "shan": 4,
+    "xiang": 1
+   },
+   "9": {
+    "yun": 2,
+    "shan": 8,
+    "xiang": 6
+   },
+   "2": {
+    "yun": 4,
+    "shan": 6,
+    "xiang": 8
+   },
+   "3": {
+    "yun": 5,
+    "shan": 5,
+    "xiang": 9
+   },
+   "5": {
+    "yun": 7,
+    "shan": 3,
+    "xiang": 2
+   },
+   "7": {
+    "yun": 9,
+    "shan": 1,
+    "xiang": 4
+   },
+   "8": {
+    "yun": 1,
+    "shan": 9,
+    "xiang": 5
+   },
+   "1": {
+    "yun": 3,
+    "shan": 7,
+    "xiang": 7
+   },
+   "6": {
+    "yun": 8,
+    "shan": 2,
+    "xiang": 3
+   }
+  }
+ },
+ "covers": [
+  "下卦",
+  "定顺逆（R4）",
+  "洛书飞布"
+ ],
+ "review": {
+  "status": "unreviewed",
+  "reviewer": null,
+  "notes": "经网页抓取工具转录（工具会做摘录），须人工对照原网页逐字复核后方可改为 reviewed。"
+ },
+ "ambiguities": [],
+ "kind": "transcribed"
+}

@@ -1,0 +1,92 @@
+{
+ "id": "T-002",
+ "title": "八运 壬山丙向 替卦（全盘）",
+ "source": {
+  "type": "web",
+  "title": "如何一步步完成玄空飞星手工排盘（精品学习贴）",
+  "publisher": "搜狐",
+  "url": "https://m.sohu.com/n/468745803/",
+  "accessed": "2026-10-16",
+  "edition": null,
+  "page": null,
+  "passage": "壬山丙向替卦（八运2004–2023）文字九宫格；「辰4入中，替6，辰为阴，逆飞。甲3入中，替1，甲为阳，顺飞。」；「替星入中后，其阴阳还是按照原卦山之阴阳」"
+ },
+ "input": {
+  "period": 8,
+  "sitting": "壬",
+  "facing": "丙",
+  "useTiXing": true,
+  "assumptions": [
+   "原图南在上，四角标 辰／未／丑／戌，左右标 甲／庚",
+   "未注明兼向度数，只知起替卦"
+  ]
+ },
+ "expected": {
+  "intermediate": {
+   "shanCenter": 6,
+   "shanDir": "逆",
+   "shanRef": "辰",
+   "xiangCenter": 1,
+   "xiangDir": "顺",
+   "xiangRef": "甲"
+  },
+  "chart": {
+   "4": {
+    "yun": 7,
+    "shan": 7,
+    "xiang": 9
+   },
+   "9": {
+    "yun": 3,
+    "shan": 2,
+    "xiang": 5
+   },
+   "2": {
+    "yun": 5,
+    "shan": 9,
+    "xiang": 7
+   },
+   "3": {
+    "yun": 6,
+    "shan": 8,
+    "xiang": 8
+   },
+   "5": {
+    "yun": 8,
+    "shan": 6,
+    "xiang": 1
+   },
+   "7": {
+    "yun": 1,
+    "shan": 4,
+    "xiang": 3
+   },
+   "8": {
+    "yun": 2,
+    "shan": 3,
+    "xiang": 4
+   },
+   "1": {
+    "yun": 4,
+    "shan": 1,
+    "xiang": 6
+   },
+   "6": {
+    "yun": 9,
+    "shan": 5,
+    "xiang": 2
+   }
+  }
+ },
+ "covers": [
+  "替卦",
+  "替星阴阳（R6）"
+ ],
+ "review": {
+  "status": "unreviewed",
+  "reviewer": null,
+  "notes": "经网页抓取工具转录（工具会做摘录），须人工对照原网页逐字复核后方可改为 reviewed。"
+ },
+ "ambiguities": [],
+ "kind": "transcribed"
+}

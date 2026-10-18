@@ -1,0 +1,178 @@
+{
+ "id": "T-005",
+ "title": "九运 二十四山 双星会向／会坐分类",
+ "source": {
+  "type": "web",
+  "title": "下元九运立向法则：二十四山吉凶一览",
+  "publisher": "搜狐",
+  "url": "https://www.sohu.com/a/912032141_121123831",
+  "accessed": "2026-10-16",
+  "edition": null,
+  "page": null,
+  "passage": "逐山「九运建造-双星会向／双星会坐」；壬山丙向、丙山壬向「犯反吟伏吟」；「九运不可立壬山丙向，丙山壬向」"
+ },
+ "input": {
+  "period": 9,
+  "useTiXing": false,
+  "assumptions": [
+   "未说明下卦或替卦，按下卦论"
+  ]
+ },
+ "expected": {
+  "assertions": [
+   {
+    "path": "pattern:壬",
+    "equals": "双星会向",
+    "quote": "壬山九运建造-双星会向"
+   },
+   {
+    "path": "pattern:子",
+    "equals": "双星会坐",
+    "quote": "子山九运建造-双星会坐"
+   },
+   {
+    "path": "pattern:癸",
+    "equals": "双星会坐",
+    "quote": "癸山九运建造-双星会坐"
+   },
+   {
+    "path": "pattern:丑",
+    "equals": "双星会向",
+    "quote": "丑山九运建造-双星会向"
+   },
+   {
+    "path": "pattern:艮",
+    "equals": "双星会坐",
+    "quote": "艮山九运建造-双星会坐"
+   },
+   {
+    "path": "pattern:寅",
+    "equals": "双星会坐",
+    "quote": "寅山九运建造-双星会坐"
+   },
+   {
+    "path": "pattern:甲",
+    "equals": "双星会向",
+    "quote": "甲山九运建造-双星会向"
+   },
+   {
+    "path": "pattern:卯",
+    "equals": "双星会坐",
+    "quote": "卯山九运建造-双星会坐"
+   },
+   {
+    "path": "pattern:乙",
+    "equals": "双星会坐",
+    "quote": "乙山九运建造-双星会坐"
+   },
+   {
+    "path": "pattern:辰",
+    "equals": "双星会坐",
+    "quote": "辰山九运建造-双星会坐"
+   },
+   {
+    "path": "pattern:巽",
+    "equals": "双星会向",
+    "quote": "巽山九运建造-双星会向"
+   },
+   {
+    "path": "pattern:巳",
+    "equals": "双星会向",
+    "quote": "巳山九运建造-双星会向"
+   },
+   {
+    "path": "pattern:丙",
+    "equals": "双星会坐",
+    "quote": "丙山九运建造-双星会坐"
+   },
+   {
+    "path": "pattern:午",
+    "equals": "双星会向",
+    "quote": "午山九运建造-双星会向"
+   },
+   {
+    "path": "pattern:丁",
+    "equals": "双星会向",
+    "quote": "丁山九运建造-双星会向"
+   },
+   {
+    "path": "pattern:未",
+    "equals": "双星会坐",
+    "quote": "未山九运建造-双星会坐"
+   },
+   {
+    "path": "pattern:坤",
+    "equals": "双星会向",
+    "quote": "坤山九运建造-双星会向"
+   },
+   {
+    "path": "pattern:申",
+    "equals": "双星会向",
+    "quote": "申山九运建造-双星会向"
+   },
+   {
+    "path": "pattern:庚",
+    "equals": "双星会坐",
+    "quote": "庚山九运建造-双星会坐"
+   },
+   {
+    "path": "pattern:酉",
+    "equals": "双星会向",
+    "quote": "酉山九运建造-双星会向"
+   },
+   {
+    "path": "pattern:辛",
+    "equals": "双星会向",
+    "quote": "辛山九运建造-双星会向"
+   },
+   {
+    "path": "pattern:戌",
+    "equals": "双星会向",
+    "quote": "戌山九运建造-双星会向"
+   },
+   {
+    "path": "pattern:乾",
+    "equals": "双星会坐",
+    "quote": "乾山九运建造-双星会坐"
+   },
+   {
+    "path": "pattern:亥",
+    "equals": "双星会坐",
+    "quote": "亥山九运建造-双星会坐"
+   },
+   {
+    "path": "geju-any:壬:伏吟",
+    "equals": true,
+    "quote": "壬山丙向……犯反吟伏吟"
+   },
+   {
+    "path": "geju-any:壬:反吟",
+    "equals": true,
+    "quote": "壬山丙向……犯反吟伏吟"
+   },
+   {
+    "path": "geju-any:丙:伏吟",
+    "equals": true,
+    "quote": "丙山壬向……犯反吟伏吟"
+   },
+   {
+    "path": "geju-any:丙:反吟",
+    "equals": true,
+    "quote": "丙山壬向……犯反吟伏吟"
+   }
+  ]
+ },
+ "covers": [
+  "盘局分类",
+  "伏吟反吟"
+ ],
+ "review": {
+  "status": "unreviewed",
+  "reviewer": null,
+  "notes": "经网页抓取工具转录（工具会做摘录），须人工对照原网页逐字复核后方可改为 reviewed。"
+ },
+ "ambiguities": [
+  "「反吟伏吟」可能是泛称，未说明两者是否都成立"
+ ],
+ "kind": "transcribed"
+}

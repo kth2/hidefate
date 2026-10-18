@@ -1,0 +1,50 @@
+{
+ "id": "T-009",
+ "title": "阴阳定式、五入中定阴阳、壬山度数范围",
+ "source": {
+  "type": "web",
+  "title": "Flying Star Feng Shui",
+  "publisher": "Wikipedia",
+  "url": "https://en.wikipedia.org/wiki/Flying_Star_Feng_Shui",
+  "accessed": "2026-10-16",
+  "edition": null,
+  "page": null,
+  "passage": "\"Even-numbered Stars follow a Yin-Yang-Yang form.\" \"Odd-numbered Stars follow a Yang-Yin-Yin form.\" \"To determine the polarity of number 5 star, go by the polarity of the Period number.\" \"Facing: Ren mountain in North direction, bearing 337.6 – 352.5\" \"Period 8, since 2006 is the year of occupying\""
+ },
+ "input": {},
+ "expected": {
+  "yinYangPattern": {
+   "odd": [
+    "阳",
+    "阴",
+    "阴"
+   ],
+   "even": [
+    "阴",
+    "阳",
+    "阳"
+   ]
+  },
+  "fiveCenterPolarity": "period",
+  "renRange": [
+   337.6,
+   352.5
+  ],
+  "periodOf2006": 8
+ },
+ "covers": [
+  "阴阳（R2）",
+  "五入中（R5）",
+  "方位边界（R1）",
+  "元运（R7）"
+ ],
+ "review": {
+  "status": "unreviewed",
+  "reviewer": null,
+  "notes": "经网页抓取工具转录（工具会做摘录），须人工对照原网页逐字复核后方可改为 reviewed。"
+ },
+ "ambiguities": [
+  "「337.6 – 352.5」表示 337.5 归亥、352.5 归壬，即区间 (起, 止]；未说明这是普遍约定还是作者习惯"
+ ],
+ "kind": "transcribed"
+}

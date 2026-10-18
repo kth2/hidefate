@@ -1,0 +1,79 @@
+{
+ "id": "T-003",
+ "title": "九运 壬山丙向 下卦（部分断言）",
+ "source": {
+  "type": "web",
+  "title": "玄空飞星壬山丙向九运挨星下卦以及替卦图",
+  "publisher": "搜狐",
+  "url": "https://www.sohu.com/a/247243130_488508",
+  "accessed": "2026-10-16",
+  "edition": null,
+  "page": null,
+  "passage": "「壬山丙向在九运是山向均犯[伏吟]之局，虽然山向盘之当令旺星到向，山盘之生气星一白到山」；「丑方之向盘挨星一白」；「甲卯乙方挨星六三」；「辰巽巳宫挨星五四」（盘面本身为图片，未能逐格转录）"
+ },
+ "input": {
+  "period": 9,
+  "sitting": "壬",
+  "facing": "丙",
+  "useTiXing": false,
+  "assumptions": []
+ },
+ "expected": {
+  "assertions": [
+   {
+    "path": "xiang.8",
+    "equals": 1,
+    "quote": "丑方之向盘挨星一白"
+   },
+   {
+    "path": "set:3",
+    "equals": [
+     3,
+     6
+    ],
+    "quote": "甲卯乙方挨星六三（未说明哪个是山星）"
+   },
+   {
+    "path": "set:4",
+    "equals": [
+     4,
+     5
+    ],
+    "quote": "辰巽巳宫挨星五四（未说明哪个是山星）"
+   },
+   {
+    "path": "xiang.9",
+    "equals": 9,
+    "quote": "当令旺星到向"
+   },
+   {
+    "path": "shan.9",
+    "equals": 9,
+    "quote": "山向盘之当令旺星到向"
+   },
+   {
+    "path": "shan.1",
+    "equals": 1,
+    "quote": "山盘之生气星一白到山"
+   },
+   {
+    "path": "geju:伏吟",
+    "equals": true,
+    "quote": "山向均犯[伏吟]之局"
+   }
+  ]
+ },
+ "covers": [
+  "五入中",
+  "伏吟"
+ ],
+ "review": {
+  "status": "unreviewed",
+  "reviewer": null,
+  "notes": "经网页抓取工具转录（工具会做摘录），须人工对照原网页逐字复核后方可改为 reviewed。"
+ },
+ "ambiguities": [
+  "「山向均犯伏吟」未说明是全盘还是局部、山盘还是向盘"
+ ],
+ "kind": "transcribed"
+}

@@ -23,6 +23,7 @@ import type {
   SchoolSettings,
   ChartYearResolution,
   GeJuReport,
+  CalcProvenance,
 } from '@hidefate/core-fengshui';
 import type { ShanXiangResult } from '@hidefate/core-qimen';
 import type { RelativeLevel } from './relative.js';
@@ -258,6 +259,8 @@ export interface SynthesisResult {
   readonly geju?: GeJuReport;
   /** 论星曜旺衰所用之运：门派选「宅运」即宅之元运，选「时运」即看盘当年之元运。 */
   readonly phasePeriod?: PalaceIndex;
+  /** 哪个引擎版本、哪套规则算出的这份结果（只附加，不影响任何分数）。 */
+  readonly provenance?: CalcProvenance;
 }
 
 /** 论旺衰所用之运。旧结果无此字段时退回宅之元运（与旧行为一致）。 */
