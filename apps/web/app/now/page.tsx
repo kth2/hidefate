@@ -13,10 +13,18 @@ import {
   GRID_LAYOUT,
   PALACE_DIRECTION,
   STAR_NAME,
+  almanacDirections,
+  annualSha,
   degreeToMountain,
+  natalDirections,
+  palaceOfStar,
   timeChart,
+  wenQuMarks,
   type DayChangeRule,
+  type DirectionMark,
+  type FuShenSect,
   type HourBasis,
+  type PalaceIndex,
   type TimeChart,
 } from '@hidefate/core-fengshui';
 import { CompassRose } from '../../components/CompassRose';
@@ -29,9 +37,39 @@ interface Prefs {
   hourBasis: HourBasis;
   dayChange: DayChangeRule;
   longitude: number | null;
+  /** 罗盘上选看哪一方。 */
+  target: string;
+  fuSect: FuShenSect;
+  /** 出生年（立春为界），只存本机，用于桃花、驿马、本命文昌。 */
+  birthYear: number | null;
 }
 
-const DEFAULT_PREFS: Prefs = { hourBasis: '钟表时间', dayChange: '23点换日', longitude: null };
+const DEFAULT_PREFS: Prefs = {
+  hourBasis: '钟表时间',
+  dayChange: '23点换日',
+  longitude: null,
+  target: '财星当旺',
+  fuSect: '福神一',
+  birthYear: null,
+};
+
+/** 罗盘可选看的一方。 */
+interface Target {
+  key: string;
+  label: string;
+  group: string;
+  palace: PalaceIndex;
+  direction: string;
+  bearing: number | null;
+  at: string;
+  meaning: string;
+}
+
+const SOURCE_GROUP: Record<DirectionMark['source'], string> = {
+  通书: '通书吉神',
+  玄空: '玄空文昌',
+  命理神煞: '命理神煞（按你的出生年）',
+};
 
 function loadPrefs(): Prefs {
   try {
@@ -52,11 +90,17 @@ function savePrefs(p: Prefs) {
 
 const hm = (d: Date) => `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
 
+/** 「已面向」的容差：命理神煞取的是地支（一山 15°，±7.5°），其余取一宫（45°，±22.5°）。 */
+function facingTolerance(key: string): number {
+  return ['本命文昌', '桃花', '驿马'].includes(key) ? 7.5 : 22.5;
+}
+
 /** 相对转角：正为向右（顺时针）。 */
 function relTurn(target: number, heading: number): number {
   return ((target - heading + 540) % 360) - 180;
 }
 
+/** 时盘财星三颗。 */
 const ROLE_TEXT: Record<string, string> = {
   当旺: '当令财星：当运旺气所在。求财、谈判、开张，传统上宜面向或坐于此方。',
   生气: '生气星：下一运的旺星，主进展、新机会，宜布局长远之事。',
@@ -102,7 +146,38 @@ export default function NowPage() {
   }, [minuteKey, opts, prefs.longitude, prefs.hourBasis]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const heading = compass.status === 'active' ? compass.heading : manual;
-  const main = chart?.wealth.find((w) => w.role === '当旺') ?? null;
+
+  const almanac = useMemo(
+    () => (now ? almanacDirections(now, { ...opts, fuSect: prefs.fuSect }) : null),
+    [minuteKey, opts, prefs.fuSect], // eslint-disable-line react-hooks/exhaustive-deps
+  );
+  const natal = useMemo(() => (prefs.birthYear != null ? natalDirections(prefs.birthYear) : null), [prefs.birthYear]);
+  const wenQu = useMemo(() => (chart ? wenQuMarks(chart.year.plate, chart.month.plate) : []), [chart]);
+  const sha = useMemo(() => (chart ? annualSha(chart.year.fengShuiYear) : null), [chart]);
+
+  const targets: Target[] = useMemo(() => {
+    if (!chart || !almanac) return [];
+    const fromMark = (m: DirectionMark): Target => ({ ...m, group: SOURCE_GROUP[m.source] });
+    return [
+      ...chart.wealth.map((w) => ({
+        key: `财星${w.role}`,
+        label: `时盘财星·${w.role}`,
+        group: '时盘财星（紫白时星 × 玄空旺衰）',
+        palace: w.palace,
+        direction: w.direction,
+        bearing: w.bearing,
+        at: STAR_NAME[w.star],
+        meaning: ROLE_TEXT[w.role]!,
+      })),
+      ...almanac.day.map(fromMark),
+      ...almanac.hour.map(fromMark),
+      ...wenQu.map(fromMark),
+      ...(natal ? natal.marks.map(fromMark) : []),
+    ];
+  }, [chart, almanac, wenQu, natal]);
+  const target = targets.find((t) => t.key === prefs.target) ?? targets[0] ?? null;
+  const showWealth = target?.key.startsWith('财星') ?? true;
+  const groups = [...new Set(targets.map((t) => t.group))];
 
   function locate() {
     if (!('geolocation' in navigator)) {
@@ -161,22 +236,31 @@ export default function NowPage() {
 
         {/* 罗盘 */}
         <section className="card">
-          <CompassRose heading={heading} plate={chart.hour.plate} wealth={chart.wealth} centerStar={chart.hour.star} />
+          <CompassRose
+            heading={heading}
+            plate={chart.hour.plate}
+            wealth={chart.wealth}
+            centerStar={chart.hour.star}
+            showWealth={showWealth}
+            target={target ? { palace: target.palace, bearing: target.bearing, label: target.label } : null}
+          />
 
-          {main && (
+          {target && (
             <div className="mt-2 text-center">
-              {main.bearing == null ? (
-                <p className="font-serif text-[1.0625rem] font-semibold">此时财星入中宫：宜守本位，不必往外求方。</p>
+              {target.bearing == null ? (
+                <p className="font-serif text-[1.0625rem] font-semibold">{target.label}入中宫：宜守本位，不必往外求方。</p>
               ) : heading == null ? (
                 <p className="font-serif text-[1.0625rem] font-semibold">
-                  此时财星在<span className="text-gold">{main.direction}</span>（{main.bearing}°）
+                  {target.label}在<span className="text-cinnabar">{target.direction}</span>（{target.at}，{target.bearing}°）
                 </p>
-              ) : Math.abs(relTurn(main.bearing, heading)) <= 22.5 ? (
-                <p className="font-serif text-[1.125rem] font-bold text-gold">你正面向财星方位：{main.direction}</p>
+              ) : Math.abs(relTurn(target.bearing, heading)) <= facingTolerance(target.key) ? (
+                <p className="font-serif text-[1.125rem] font-bold text-cinnabar">
+                  你正面向{target.label}：{target.direction}
+                </p>
               ) : (
                 <p className="font-serif text-[1.0625rem] font-semibold">
-                  财星在<span className="text-gold">{main.direction}</span>：请
-                  {relTurn(main.bearing, heading) > 0 ? '向右' : '向左'}转约 {Math.round(Math.abs(relTurn(main.bearing, heading)))}°
+                  {target.label}在<span className="text-cinnabar">{target.direction}</span>：请
+                  {relTurn(target.bearing, heading) > 0 ? '向右' : '向左'}转约 {Math.round(Math.abs(relTurn(target.bearing, heading)))}°
                 </p>
               )}
               {heading != null && (
@@ -188,6 +272,35 @@ export default function NowPage() {
               )}
             </div>
           )}
+
+          {/* 选看哪一方 */}
+          <div className="mt-3 space-y-2">
+            {groups.map((g) => (
+              <div key={g}>
+                <p className="mb-1 text-[0.6875rem] text-ink-mute">{g}</p>
+                <div className="flex flex-wrap gap-1.5">
+                  {targets
+                    .filter((t) => t.group === g)
+                    .map((t) => (
+                      <button
+                        key={t.key}
+                        type="button"
+                        onClick={() => setPrefs({ target: t.key })}
+                        className={`rounded-full border px-2.5 py-1 text-[0.75rem] ${
+                          target?.key === t.key ? 'border-cinnabar bg-cinnabar text-white' : 'border-rice-line bg-white text-ink-soft'
+                        }`}
+                      >
+                        {t.label.replace(/^时盘财星·/, '')} · {t.direction}
+                      </button>
+                    ))}
+                </div>
+              </div>
+            ))}
+            {!natal && (
+              <p className="text-[0.6875rem] text-ink-mute">在下方「个人方位」填出生年，可加看桃花、驿马、本命文昌。</p>
+            )}
+            {target && <p className="text-[0.75rem] leading-relaxed text-ink-soft">{target.meaning}</p>}
+          </div>
 
           {/* 罗盘状态 */}
           <div className="mt-3 text-[0.8125rem] leading-relaxed">
@@ -242,6 +355,58 @@ export default function NowPage() {
             </p>
           )}
         </section>
+
+        {/* 通书吉神 */}
+        {almanac && (
+          <section>
+            <h2 className="section-title">今日 · 此时 通书吉神方位</h2>
+            <div className="card !p-0 overflow-hidden">
+              <table className="w-full text-[0.8125rem]">
+                <thead className="bg-rice-deep/40 text-[0.6875rem] text-ink-mute">
+                  <tr>
+                    <th className="px-3 py-1.5 text-left font-normal"></th>
+                    <th className="px-3 py-1.5 text-left font-normal">今日（{almanac.dayGan}{almanac.dayZhi}日）</th>
+                    <th className="px-3 py-1.5 text-left font-normal">此时（{almanac.hourGan}{almanac.hourZhi}时）</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {(['喜神', '财神', '福神', '阳贵', '阴贵'] as const).map((k) => {
+                    const d = almanac.day.find((m) => m.key === `日${k}`)!;
+                    const h = almanac.hour.find((m) => m.key === `时${k}`)!;
+                    return (
+                      <tr key={k} className="border-t border-rice-line">
+                        <td className="px-3 py-1.5 text-ink-mute">{k === '阳贵' ? '阳贵人' : k === '阴贵' ? '阴贵人' : k}</td>
+                        <td className="px-3 py-1.5">{d.direction}（{d.at}）</td>
+                        <td className="px-3 py-1.5">{h.direction}（{h.at}）</td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+            <p className="mt-1.5 px-1 text-[0.6875rem] leading-relaxed text-ink-mute">
+              按日干、时干查通书。福神现用「{prefs.fuSect}」排法（两种流传排法，可在下方切换）。阳贵人多用于白天，阴贵人多用于夜间。
+            </p>
+          </section>
+        )}
+
+        {/* 宜静之方 */}
+        {sha && (
+          <section>
+            <h2 className="section-title">宜静之方</h2>
+            <div className="card !p-3 space-y-1 text-[0.8125rem] leading-relaxed">
+              <p>
+                <b>此时辰</b>：时星五黄到{PALACE_DIRECTION[palaceOfStar(chart.hour.plate, 5)]}，二黑到
+                {PALACE_DIRECTION[palaceOfStar(chart.hour.plate, 2)]}，此刻这两处不宜动工、敲打。
+              </p>
+              <p>
+                <b>{sha.year} 年</b>：五黄到{PALACE_DIRECTION[sha.wuHuang]}，二黑到{PALACE_DIRECTION[sha.erHei]}；
+                太岁在{sha.zhi}（{PALACE_DIRECTION[sha.taiSui.palaces[0]!]}），岁破在{PALACE_DIRECTION[sha.suiPo.palaces[0]!]}，
+                三煞在{sha.sanSha.mountains.map((m) => m.name).join('')}（{sha.sanSha.range[0]}°–{sha.sanSha.range[1]}°）。今年这些方位勿动土、勿大装修。
+              </p>
+            </div>
+          </section>
+        )}
 
         {/* 四层九宫 */}
         <section>
@@ -313,6 +478,43 @@ export default function NowPage() {
           </div>
         </Expandable>
 
+        <Expandable title="个人方位与福神排法">
+          <div className="space-y-3">
+            <div>
+              <label className="label" htmlFor="by">出生年（立春为界；立春前出生请填前一年）</label>
+              <input
+                id="by"
+                className="field"
+                inputMode="numeric"
+                placeholder="例如 1988"
+                value={prefs.birthYear ?? ''}
+                onChange={(e) => {
+                  const v = e.target.value.trim();
+                  const n = Number(v);
+                  setPrefs({ birthYear: v === '' || !Number.isInteger(n) || n < 1900 || n > 2100 ? null : n });
+                }}
+              />
+              <p className="mt-1 text-[0.75rem] text-ink-mute">
+                {natal
+                  ? `${natal.gan}${natal.zhi}年：本命文昌在${natal.marks[0]!.at}、桃花在${natal.marks[1]!.at}、驿马在${natal.marks[2]!.at}。只存在本机。`
+                  : '只存在本机，不会上传。用于桃花（咸池）、驿马、本命文昌三方。'}
+              </p>
+            </div>
+            <SegRow
+              label="福神排法"
+              options={[
+                { value: '福神一' as const, label: '排法一' },
+                { value: '福神二' as const, label: '排法二' },
+              ]}
+              value={prefs.fuSect}
+              onChange={(v) => setPrefs({ fuSect: v })}
+            />
+            <p className="text-[0.75rem] text-ink-mute">
+              福神方位通书有两种流传排法：排法一甲乙在巽、丙丁在震；排法二甲在坎、乙在坤。两说并存，依你所宗取用。
+            </p>
+          </div>
+        </Expandable>
+
         <Expandable title="本盘取法与限制">
           <ul className="list-disc space-y-1 pl-4 text-[0.75rem] leading-relaxed text-ink-soft">
             {chart.notes.map((n) => (
@@ -321,6 +523,10 @@ export default function NowPage() {
             <li>时星起例依「天一九，地四六，人七三；一四七为阳顺，三六九为阴逆」。与 lunar-typescript 历法库逐时对拍两年，只在冬至、夏至当天有差（交节时刻与交节当日之别）。</li>
             <li>日星另有「冬至、夏至最近甲子起」一法，与本 App 所用「节气后首个甲子起」约七成日子不同；日星只作参考层。</li>
             <li>手机罗盘读的是磁北，易受钢筋、电器、磁吸手机壳干扰；要紧的事以传统罗盘复核。</li>
+            <li>出处各不相同，分开标示：「时盘财星」是把择日一系的时家紫白，借玄空按元运论旺、生、退，属现代流行的混合用法，古籍没有现成原文；古法时家紫白多用于择日，以一白、六白、八白、九紫为吉。</li>
+            <li>喜神、财神、福神、贵人方位依通书按日干、时干查表（时干由五鼠遁推出），与 lunar-typescript 历法库逐日、逐时对拍一致。</li>
+            <li>流年、流月文昌取年星、月星四绿文曲所到之宫，属玄空用法。</li>
+            <li>桃花（咸池）、驿马、本命文昌原是八字神煞，近代才借来论方位；此处只按出生年干支取，另有以日支论者。</li>
             <li>这是传统择时取象，不是投资或理财建议。</li>
           </ul>
         </Expandable>

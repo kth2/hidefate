@@ -49,15 +49,21 @@ export function CompassRose({
   plate,
   wealth,
   centerStar,
+  showWealth = true,
+  target = null,
 }: {
   /** 手机所指方位角；null 时按上北显示。 */
   heading: number | null;
   plate: Record<PalaceIndex, PalaceIndex>;
   wealth: readonly WealthSpot[];
   centerStar: PalaceIndex;
+  /** 是否按时盘财星（当旺、生气、退气）上色。选看其它吉方时关掉，免得两套颜色混在一起。 */
+  showWealth?: boolean;
+  /** 当前选看的方位：朱红粗框标出该宫，外圈红点标出确切方位角。 */
+  target?: { palace: PalaceIndex; bearing: number | null; label: string } | null;
 }) {
   const rot = -(heading ?? 0);
-  const roleOf = (p: PalaceIndex) => wealth.find((w) => w.palace === p)?.role;
+  const roleOf = (p: PalaceIndex) => (showWealth ? wealth.find((w) => w.palace === p)?.role : undefined);
   const centerRole = roleOf(5);
 
   return (
@@ -77,8 +83,8 @@ export function CompassRose({
                 <path
                   d={wedge(bearing)}
                   fill={fill}
-                  stroke={role === '退气' ? '#b08b3f' : '#ddd2c0'}
-                  strokeWidth={role === '退气' ? 2 : 1}
+                  stroke={target?.palace === palace ? '#a8352a' : role === '退气' ? '#b08b3f' : '#ddd2c0'}
+                  strokeWidth={target?.palace === palace ? 4 : role === '退气' ? 2 : 1}
                 />
                 {/* 星数与方位标签同组：随盘转到位后再反转回正，上下叠放，任何角度都不互相遮挡 */}
                 <g style={{ transform: `rotate(${-rot}deg)`, transformOrigin: `${tx}px ${ty}px`, transition: 'transform 180ms linear' }}>
@@ -95,6 +101,11 @@ export function CompassRose({
               </g>
             );
           })}
+          {/* 选看方位的确切方位角 */}
+          {target && target.bearing != null && (() => {
+            const [mx, my] = polar(R - 2, target.bearing);
+            return <circle cx={mx} cy={my} r={5} fill="#a8352a" stroke="#ffffff" strokeWidth={1.5} />;
+          })()}
           {/* 北标 */}
           {(() => {
             const [nx, ny] = polar(R + 2, 0);
@@ -102,7 +113,7 @@ export function CompassRose({
           })()}
         </g>
         {/* 中宫（不随转） */}
-        <circle cx={C} cy={C} r={R_IN - 4} fill={centerRole ? ROLE_FILL[centerRole] : '#f7f3ec'} stroke="#ddd2c0" />
+        <circle cx={C} cy={C} r={R_IN - 4} fill={centerRole ? ROLE_FILL[centerRole] : '#f7f3ec'} stroke={target?.palace === 5 ? '#a8352a' : '#ddd2c0'} strokeWidth={target?.palace === 5 ? 4 : 1} />
         <text x={C} y={C - 6} textAnchor="middle" dominantBaseline="middle" fontSize="32" fontWeight="700"
           fontFamily="'Songti SC','Noto Serif SC',serif" fill={centerRole === '当旺' ? '#ffffff' : '#1a1614'}>
           {centerStar}
