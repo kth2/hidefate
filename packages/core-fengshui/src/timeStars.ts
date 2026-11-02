@@ -177,12 +177,22 @@ export function isYangDun(at: Date): boolean {
   return t >= prevDongZhi;
 }
 
-/** 日支：按子时换日规则，取墙钟所在之日（或 23 点后的次日）。 */
-function dayZhiOf(wall: ShiChenInfo['wall'], rule: DayChangeRule): string {
+/** 日干支：按子时换日规则，取墙钟所在之日（或 23 点后的次日）。 */
+function dayGanZhiOfWall(wall: ShiChenInfo['wall'], rule: DayChangeRule): { gan: string; zhi: string } {
   const next = rule === '23点换日' && wall.h === 23;
   const base = new Date(Date.UTC(wall.y, wall.m - 1, wall.d + (next ? 1 : 0)));
   const s = Solar.fromYmdHms(base.getUTCFullYear(), base.getUTCMonth() + 1, base.getUTCDate(), 12, 0, 0);
-  return s.getLunar().getDayZhi();
+  const l = s.getLunar();
+  return { gan: l.getDayGan(), zhi: l.getDayZhi() };
+}
+
+function dayZhiOf(wall: ShiChenInfo['wall'], rule: DayChangeRule): string {
+  return dayGanZhiOfWall(wall, rule).zhi;
+}
+
+/** 此刻所属之日的日干支（时辰依据与子时换日规则同时盘）。 */
+export function dayGanZhiOf(at: Date, opts: TimeChartOptions = {}): { gan: string; zhi: string } {
+  return dayGanZhiOfWall(shiChenOf(at, opts).wall, opts.dayChange ?? '23点换日');
 }
 
 const TIAN = '子午卯酉';
