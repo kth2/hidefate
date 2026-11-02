@@ -9,7 +9,7 @@
  * `self.location` 天然带上了正确的前缀，据此推出 BASE 即可同时适配两种部署。
  */
 
-const CACHE = 'hidefate-v6';
+const CACHE = 'hidefate-v7';
 
 /** SW 所在目录即站点根，例如 '/' 或 '/hidefate/'。 */
 const BASE = new URL('./', self.location).pathname;
@@ -35,6 +35,7 @@ const PRECACHE = [
   p('new/'),
   p('quick/'),
   p('now/'),
+  p('compass/'),
   p('manifest.webmanifest'),
   p('icon.svg'),
   p('icon-192.png'),

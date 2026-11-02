@@ -213,6 +213,15 @@ export default function HomePage() {
           <p className="mt-2 text-[0.875rem] leading-relaxed text-ink-soft">{glance.note}</p>
         </section>
 
+        {/* 罗盘起盘：手机当罗盘，宅盘随转随出 */}
+        <Link href="/compass" className="card flex items-center gap-3 active:bg-rice-deep/40">
+          <div className="min-w-0 flex-1">
+            <p className="font-serif text-[1rem] font-semibold">罗盘起盘 · 即时宅盘</p>
+            <p className="mt-0.5 text-[0.75rem] text-ink-mute">手机对准屋向，二十四山与玄空飞星盘随转随出</p>
+          </div>
+          <span className="text-ink-mute">→</span>
+        </Link>
+
         {/* 即时飞星：此刻时辰 + 手机罗盘 */}
         <Link href="/now" className="card flex items-center gap-3 active:bg-rice-deep/40">
           <div className="min-w-0 flex-1">
