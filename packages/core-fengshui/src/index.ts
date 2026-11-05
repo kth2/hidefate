@@ -21,3 +21,4 @@ export * from './healthLexicon.js';
 export * from './provenance.js';
 export * from './timeStars.js';
 export * from './almanac.js';
+export * from './overlay.js';
