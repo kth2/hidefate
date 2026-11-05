@@ -20,8 +20,15 @@ import {
   degreeToMountain,
   describeSchool,
   fengShuiYearOf,
+  overlayFindings,
   periodOfYear,
+  timeChart,
+  type DayChangeRule,
+  type HourBasis,
+  type OverlayFinding,
+  type OverlayLayer,
   type PalaceIndex,
+  type StarPlate,
 } from '@hidefate/core-fengshui';
 import { MountainRing } from '../../components/MountainRing';
 import { AppBar, Expandable, SegRow } from '../../components/mobile/ui';
@@ -35,8 +42,37 @@ const PREF_KEY = 'hidefate.compass.v1';
 interface Prefs {
   measure: Measure;
   gridTop: GridTop;
+  /** 叠加哪几层客星。 */
+  layers: OverlayLayer[];
 }
-const DEFAULT_PREFS: Prefs = { measure: '向首', gridTop: '上南' };
+const DEFAULT_PREFS: Prefs = { measure: '向首', gridTop: '上南', layers: ['时'] };
+
+const ALL_LAYERS: readonly OverlayLayer[] = ['年', '月', '时'];
+const LAYER_LABEL: Record<OverlayLayer, string> = { 年: '流年', 月: '流月', 时: '此时辰' };
+
+const LEVEL_TONE: Record<OverlayFinding['level'], string> = {
+  宜静: 'bg-cinnabar text-white',
+  打折: 'bg-risk-warn/20 text-ink',
+  吉: 'bg-gold text-white',
+};
+
+/** 时辰依据与子时换日沿用「即时飞星」页的设置，两页一致。 */
+function loadTimeOpts(): { hourBasis: HourBasis; dayChange: DayChangeRule; longitude?: number } {
+  try {
+    const raw = localStorage.getItem('hidefate.now.v1');
+    if (raw) {
+      const p = JSON.parse(raw) as { hourBasis?: HourBasis; dayChange?: DayChangeRule; longitude?: number | null };
+      return {
+        hourBasis: p.hourBasis ?? '钟表时间',
+        dayChange: p.dayChange ?? '23点换日',
+        ...(p.longitude != null ? { longitude: p.longitude } : {}),
+      };
+    }
+  } catch {
+    /* 忽略 */
+  }
+  return { hourBasis: '钟表时间', dayChange: '23点换日' };
+}
 
 /** 上南（罗盘、古籍习惯）与上北（地图习惯）两种九宫排布。 */
 const LAYOUT: Record<GridTop, readonly PalaceIndex[]> = {
@@ -111,6 +147,33 @@ export default function CompassChartPage() {
   const period = chart.period.period;
   const sitM = chart.sitting.mountain;
   const facM = chart.facing.mountain;
+
+  // 客星：流年、流月、此时辰紫白（分钟粒度重算）
+  const [now, setNow] = useState<Date | null>(null);
+  const [timeOpts, setTimeOpts] = useState<ReturnType<typeof loadTimeOpts>>({ hourBasis: '钟表时间', dayChange: '23点换日' });
+  useEffect(() => {
+    setTimeOpts(loadTimeOpts());
+    setNow(new Date());
+    const t = window.setInterval(() => setNow(new Date()), 30_000);
+    return () => window.clearInterval(t);
+  }, []);
+  const minuteKey = now ? Math.floor(now.getTime() / 60_000) : 0;
+  const tc = useMemo(() => (now ? timeChart(now, timeOpts) : null), [minuteKey, timeOpts]); // eslint-disable-line react-hooks/exhaustive-deps
+  const guestPlates = useMemo(() => {
+    if (!tc) return {} as Partial<Record<OverlayLayer, StarPlate>>;
+    const all: Record<OverlayLayer, StarPlate> = { 年: tc.year.plate, 月: tc.month.plate, 时: tc.hour.plate };
+    return Object.fromEntries(prefs.layers.map((l) => [l, all[l]])) as Partial<Record<OverlayLayer, StarPlate>>;
+  }, [tc, prefs.layers]);
+  const findings = useMemo(() => overlayFindings(chart, guestPlates), [chart, guestPlates]);
+  const levelAt = (p: PalaceIndex) => {
+    const here = findings.filter((f) => f.palace === p);
+    if (here.some((f) => f.level === '宜静')) return '宜静';
+    if (here.some((f) => f.level === '吉')) return '吉';
+    if (here.some((f) => f.level === '打折')) return '打折';
+    return null;
+  };
+  const toggleLayer = (l: OverlayLayer) =>
+    updatePrefs({ layers: prefs.layers.includes(l) ? prefs.layers.filter((x) => x !== l) : ALL_LAYERS.filter((x) => x === l || prefs.layers.includes(x)) });
 
   // 换山时轻震一下（Android 支持；iOS 浏览器无此接口，静默略过）
   const lastMountain = useRef<string | null>(null);
@@ -289,16 +352,34 @@ export default function CompassChartPage() {
             </p>
             <p className="text-[0.75rem] text-ink-mute">{chart.pattern}</p>
           </div>
-          <p className="text-[0.6875rem] text-ink-mute">左上山星 · 右上向星 · 中间运星 · 金框为当运旺星</p>
+          <p className="text-[0.6875rem] text-ink-mute">左上山星 · 右上向星 · 中间运星 · 金框为当运旺星 · 底行为叠加的客星</p>
+          <div className="flex flex-wrap items-center gap-1.5">
+            <span className="text-[0.6875rem] text-ink-mute">叠加：</span>
+            {ALL_LAYERS.map((l) => (
+              <button
+                key={l}
+                type="button"
+                onClick={() => toggleLayer(l)}
+                className={`rounded-full border px-2.5 py-1 text-[0.75rem] ${
+                  prefs.layers.includes(l) ? 'border-ink bg-ink text-white' : 'border-rice-line bg-white text-ink-soft'
+                }`}
+              >
+                {LAYER_LABEL[l]}
+                {l === '时' && tc ? `（${tc.shiChen.zhi}时）` : l === '年' && tc ? `（${tc.year.fengShuiYear}）` : ''}
+              </button>
+            ))}
+          </div>
           <div className="grid grid-cols-3 gap-1.5">
             {LAYOUT[prefs.gridTop].map((p) => {
               const s = chart.palaces[p];
               const isFacing = p === facM.palace;
               const isSitting = p === sitM.palace;
+              const lv = levelAt(p);
+              const bg = lv === '宜静' ? 'bg-cinnabar/10' : lv === '吉' ? 'bg-gold/15' : lv === '打折' ? 'bg-risk-warn/10' : p === 5 ? 'bg-rice-deep/50' : 'bg-white';
               return (
                 <div
                   key={p}
-                  className={`relative rounded-xl border px-2 pb-1.5 pt-1 ${p === 5 ? 'bg-rice-deep/50' : 'bg-white'} ${
+                  className={`relative rounded-xl border px-2 pb-1.5 pt-1 ${bg} ${
                     isFacing ? 'border-cinnabar' : isSitting ? 'border-ink' : 'border-rice-line'
                   }`}
                 >
@@ -311,6 +392,22 @@ export default function CompassChartPage() {
                     {PALACE_DIRECTION[p]}
                     {isFacing ? ' · 向' : isSitting ? ' · 坐' : ''}
                   </p>
+                  {prefs.layers.length > 0 && (
+                    <p className="mt-0.5 flex justify-center gap-1 text-[0.625rem] leading-none">
+                      {ALL_LAYERS.filter((l) => guestPlates[l]).map((l) => {
+                        const g = guestPlates[l]![p];
+                        return (
+                          <span
+                            key={l}
+                            className={`rounded px-1 py-0.5 ${g === period ? 'bg-gold text-white' : g === 5 ? 'bg-cinnabar text-white' : 'bg-rice-deep/60 text-ink-soft'}`}
+                          >
+                            {l}
+                            {g}
+                          </span>
+                        );
+                      })}
+                    </p>
+                  )}
                 </div>
               );
             })}
@@ -325,6 +422,37 @@ export default function CompassChartPage() {
             onChange={(v) => updatePrefs({ gridTop: v })}
           />
         </section>
+
+        {/* 叠加结论 */}
+        {prefs.layers.length > 0 && (
+          <section className="card space-y-2">
+            <p className="font-serif text-[1rem] font-semibold">叠加结论</p>
+            {findings.length === 0 ? (
+              <p className="text-[0.8125rem] text-ink-mute">
+                叠上{prefs.layers.map((l) => LAYER_LABEL[l]).join('、')}之后，没有旺星正落旺向、五黄叠临或一四同宫这几种需要特别留意或可借用的组合。
+              </p>
+            ) : (
+              <ul className="space-y-2">
+                {findings.map((f, i) => (
+                  <li key={i} className="text-[0.8125rem] leading-relaxed">
+                    <span className={`mr-1.5 rounded px-1.5 py-0.5 text-[0.6875rem] ${LEVEL_TONE[f.level]}`}>{f.level}</span>
+                    <b>{f.title}</b>
+                    <p className="mt-0.5 text-ink-soft">{f.basis}</p>
+                  </li>
+                ))}
+              </ul>
+            )}
+            {tc && prefs.layers.includes('时') && (
+              <p className="text-[0.6875rem] text-ink-mute">
+                时星依{tc.shiChen.basisUsed}、子时{timeOpts.dayChange}（与「即时飞星」页设置相同），{tc.shiChen.zhi}时到{' '}
+                {`${String(tc.shiChen.end.getHours()).padStart(2, '0')}:${String(tc.shiChen.end.getMinutes()).padStart(2, '0')}`} 止，之后自动换盘。
+              </p>
+            )}
+            <p className="text-[0.6875rem] leading-relaxed text-ink-mute">
+              叠星以房屋中心立极分九宫，站在屋子中央附近看方位较准。只取四条各派分歧较小的组合：旺星临旺向、旺星临向星五黄、五黄叠临与二五交加、一四同宫；二黑单独一颗在九运算不算凶，各派说法不一，此处不单独判。
+            </p>
+          </section>
+        )}
 
         {/* 立盘年份 */}
         <section className="card space-y-2">
