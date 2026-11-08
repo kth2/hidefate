@@ -9,11 +9,13 @@
  */
 
 import { useRouter } from 'next/navigation';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import {
   COMMERCIAL_TYPES,
   GRID_LAYOUT,
   MOUNTAINS,
+  norm360,
+  northFromFacing,
   OUTER_PALACES,
   PALACE_DIRECTION,
   PALACE_FAMILY,
@@ -34,6 +36,7 @@ import { AppBar } from '../../components/mobile/ui';
 import { RoomEditor } from '../../components/mobile/RoomEditor';
 import { DirectionPicker, toSitting, type MeasureEnd } from '../../components/mobile/DirectionPicker';
 import { db, newId, type StoredProperty } from '../../lib/db';
+import { downscaleImage } from '../../lib/image';
 import { useProperty } from '../../lib/PropertyContext';
 
 type EntryMode = '九宫格' | '户型图' | '罗盘实测';
@@ -63,6 +66,41 @@ export default function NewPropertyPage() {
   const [missing, setMissing] = useState<MissingCorner[]>([]);
   const [xingShi, setXingShi] = useState<XingShiItem[]>([]);
   const [photo, setPhoto] = useState<string | null>(null);
+  const [photoSize, setPhotoSize] = useState<{ width: number; height: number } | null>(null);
+  const [photoBusy, setPhotoBusy] = useState(false);
+
+  /** 选了图：缩小后存进状态，建好房屋时一并写入户型图表。 */
+  async function pickPhoto(f: File | undefined) {
+    if (!f) return;
+    setPhotoBusy(true);
+    try {
+      const img = await downscaleImage(f);
+      setPhoto(img.dataUrl);
+      setPhotoSize({ width: img.width, height: img.height });
+    } catch (e) {
+      setError(e instanceof Error ? e.message : String(e));
+    } finally {
+      setPhotoBusy(false);
+    }
+  }
+
+  // 从「十秒起盘」「罗盘起盘」带过来的坐山度数与立盘年（/new?deg=327.4&year=2026）
+  useEffect(() => {
+    try {
+      const q = new URLSearchParams(window.location.search);
+      const d = Number(q.get('deg'));
+      const y = Number(q.get('year'));
+      if (q.get('deg') != null && Number.isFinite(d) && d >= 0 && d < 360) {
+        setEnd('坐山');
+        setUseDegree(true);
+        setDegree(Math.round(d * 10) / 10);
+        setEntryMode('罗盘实测');
+      }
+      if (q.get('year') != null && Number.isInteger(y) && y >= 1864 && y <= 2200) setMoveInYear(y);
+    } catch {
+      /* 忽略 */
+    }
+  }, []);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -128,9 +166,23 @@ export default function NewPropertyPage() {
         updatedAt: now,
       };
       await db().properties.put(rec);
+      if (photo && photoSize) {
+        // 默认假设「向」在图下方；到叠盘页一键改
+        const sitDeg = typeof sitting === 'number' ? sitting : MOUNTAINS.find((m) => m.name === sitting)?.center ?? 0;
+        await db().plans.put({
+          propertyId: rec.id,
+          image: photo,
+          width: photoSize.width,
+          height: photoSize.height,
+          polygon: [],
+          northImageAngle: northFromFacing(norm360(sitDeg + 180), 180),
+          pins: [],
+          updatedAt: now,
+        });
+      }
       setActive(rec.id);
       reload();
-      router.push('/house');
+      router.push(photo ? '/floorplan' : '/house');
     } catch (e) {
       setError(e instanceof Error ? e.message : String(e));
       setSaving(false);
@@ -150,7 +202,7 @@ export default function NewPropertyPage() {
       <AppBar
         title="建立房屋"
         subtitle={`第 ${step + 1} / ${STEPS.length} 步 · ${STEPS[step]}`}
-        back={step === 0 ? '/me' : undefined}
+        back={step === 0 ? '/' : undefined}
         right={
           step > 0 ? (
             <button type="button" className="btn btn-sm" onClick={() => setStep((s) => s - 1)}>
@@ -198,19 +250,13 @@ export default function NewPropertyPage() {
             {entryMode === '户型图' && (
               <div className="card">
                 <label className="btn btn-primary btn-block cursor-pointer">
-                  {photo ? '重新拍摄' : '打开相机拍摄'}
+                  {photoBusy ? '处理中…' : photo ? '重新拍摄' : '打开相机拍摄'}
                   <input
                     type="file"
                     accept="image/*"
                     capture="environment"
                     className="hidden"
-                    onChange={(e) => {
-                      const f = e.target.files?.[0];
-                      if (!f) return;
-                      const reader = new FileReader();
-                      reader.onload = () => setPhoto(String(reader.result));
-                      reader.readAsDataURL(f);
-                    }}
+                    onChange={(e) => void pickPhoto(e.target.files?.[0])}
                   />
                 </label>
                 <label className="btn btn-block mt-2 cursor-pointer">
@@ -219,20 +265,14 @@ export default function NewPropertyPage() {
                     type="file"
                     accept="image/*"
                     className="hidden"
-                    onChange={(e) => {
-                      const f = e.target.files?.[0];
-                      if (!f) return;
-                      const reader = new FileReader();
-                      reader.onload = () => setPhoto(String(reader.result));
-                      reader.readAsDataURL(f);
-                    }}
+                    onChange={(e) => void pickPhoto(e.target.files?.[0])}
                   />
                 </label>
                 {photo && (
                   // eslint-disable-next-line @next/next/no-img-element
                   <img src={photo} alt="户型图" className="mt-3 w-full rounded-xl border border-rice-line" />
                 )}
-                <p className="card-sub mt-2">照片只存在本机，不会上传。稍后在第 4 步把房间落到九宫上。</p>
+                <p className="card-sub mt-2">照片只存在本机，不会上传。建好后会进入「户型图叠盘」：二十四山叠在图上，直接在图上点房间。</p>
               </div>
             )}
           </div>

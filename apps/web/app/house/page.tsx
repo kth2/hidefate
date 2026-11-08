@@ -187,6 +187,13 @@ export default function HousePage() {
       />
 
       <div className="space-y-4 px-4 py-4">
+        <Link href="/floorplan" className="card flex items-center gap-3 py-3 active:bg-rice-deep/40">
+          <div className="min-w-0 flex-1">
+            <p className="text-[0.9375rem] font-semibold">户型图叠盘</p>
+            <p className="mt-0.5 text-[0.75rem] text-ink-mute">二十四山与飞星叠在户型图上，在图上点房间自动归宫</p>
+          </div>
+          <span className="text-ink-mute">→</span>
+        </Link>
         <div className="seg-row">
           {(['九宫', '峦头', '吉方', '布局', '预测', '化解'] as View[]).map((v) => (
             <button key={v} type="button" className={`seg ${view === v ? 'seg-on' : ''}`} onClick={() => setView(v)}>
