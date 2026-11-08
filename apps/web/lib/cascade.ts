@@ -25,7 +25,7 @@ export interface DeletionImpact {
 
 const tables = () => {
   const d = db();
-  return [d.properties, d.members, d.cures, d.scenarios, d.residences, d.predictions, d.quiets, d.posteriors];
+  return [d.properties, d.members, d.cures, d.scenarios, d.residences, d.predictions, d.quiets, d.posteriors, d.plans];
 };
 
 /** 一组人名下的个人资料（居住史、账本、平安记录、后验）。 */

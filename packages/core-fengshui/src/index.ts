@@ -22,3 +22,4 @@ export * from './provenance.js';
 export * from './timeStars.js';
 export * from './almanac.js';
 export * from './overlay.js';
+export * from './floorPlan.js';

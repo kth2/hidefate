@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { DEFAULT_SCHOOL, resolveSchool } from '@hidefate/core-fengshui';
 import { EXPORT_VERSION, buildExport, parseImport } from './db';
 
-const empty = { properties: [], members: [], cures: [], scenarios: [], residences: [], predictions: [], quiets: [], divinations: [] };
+const empty = { properties: [], members: [], cures: [], scenarios: [], residences: [], predictions: [], quiets: [], divinations: [], plans: [] };
 
 describe('导出与导入（第零期审计 D5）', () => {
   it('v3 含占局盘面与门派设置，往返不失真', () => {
@@ -13,6 +13,12 @@ describe('导出与导入（第零期审计 D5）', () => {
     expect(back.version).toBe(EXPORT_VERSION);
     expect(back.divinations).toEqual(div);
     expect(back.school).toEqual(school);
+  });
+
+  it('v4 含户型图，往返不失真', () => {
+    const plans = [{ propertyId: 'p1', image: 'data:image/jpeg;base64,AA==', width: 10, height: 10, polygon: [], northImageAngle: 0, pins: [{ roomId: 'r1', x: 1, y: 2 }], updatedAt: '2026-11-08T00:00:00.000Z' }];
+    const back = parseImport(JSON.stringify(buildExport({ ...empty, plans }, DEFAULT_SCHOOL, new Date())));
+    expect(back.plans).toEqual(plans);
   });
 
   it('导出内容不含 AI Key 一类的设置', () => {

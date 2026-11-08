@@ -85,6 +85,28 @@ export interface StoredDivinationRow {
   chartJson: string;
 }
 
+/**
+ * 户型图与叠盘设定。一处房屋一张图，与 properties 分表 ——
+ * 图片动辄几百 KB，不该在每次读房屋清单时一并载入。
+ * 房间的宫位仍以 property.rooms 为准；这里只多记房间钉在图上的位置，换定向时可重新归宫。
+ */
+export interface StoredPlan {
+  propertyId: string;
+  /** 缩小后的 JPEG data URL（长边不超过 1600px）。 */
+  image: string;
+  width: number;
+  height: number;
+  /** 外墙多边形（图片像素）。未描时为空，视作整张图。 */
+  polygon: [number, number][];
+  /** 太极点；未设时取外墙重心。 */
+  taiji?: [number, number];
+  /** 北在图上的角度（图正上方 0°，顺时针）。 */
+  northImageAngle: number;
+  /** 房间钉在图上的位置。roomId 对应 property.rooms[].id。 */
+  pins: { roomId: string; x: number; y: number }[];
+  updatedAt: string;
+}
+
 export interface AppSettings {
   key: 'settings';
   /** AI 供应商配置（全部可留空，不影响任何离线推算）。 */
@@ -127,6 +149,7 @@ class HideFateDB extends Dexie {
   quiets!: Table<StoredQuiet, string>;
   posteriors!: Table<StoredPosterior, string>;
   divinations!: Table<StoredDivinationRow, string>;
+  plans!: Table<StoredPlan, string>;
 
   constructor() {
     super('hidefate');
@@ -147,6 +170,10 @@ class HideFateDB extends Dexie {
     // v3：占局盘面。
     this.version(3).stores({
       divinations: 'id, key, castAt, status, category',
+    });
+    // v4：户型图。只加表，旧表不动。
+    this.version(4).stores({
+      plans: 'propertyId, updatedAt',
     });
   }
 }
@@ -170,8 +197,8 @@ export function newId(prefix: string): string {
   return `${prefix}-${rand}`;
 }
 
-/** 导出文件格式版本。v3：补上占局盘面与门派设置（第零期审计 D5）。 */
-export const EXPORT_VERSION = 3;
+/** 导出文件格式版本。v3：补上占局盘面与门派设置（第零期审计 D5）；v4：户型图。 */
+export const EXPORT_VERSION = 4;
 
 export interface ExportShape {
   version?: number;
@@ -185,6 +212,8 @@ export interface ExportShape {
   quiets?: StoredQuiet[];
   /** v3 起：占局盘面。账本里的占局预测要靠它回看盘面。 */
   divinations?: StoredDivinationRow[];
+  /** v4 起：户型图与叠盘设定。 */
+  plans?: StoredPlan[];
   /** v3 起：门派设置。 */
   school?: Partial<SchoolSettings>;
 }
@@ -217,7 +246,7 @@ export function parseImport(json: string): ExportShape {
 /** 导出全部资料为 JSON（用户主动触发）。 */
 export async function exportAll(): Promise<string> {
   const d = db();
-  const [properties, members, cures, scenarios, residences, predictions, quiets, divinations] = await Promise.all([
+  const [properties, members, cures, scenarios, residences, predictions, quiets, divinations, plans] = await Promise.all([
     d.properties.toArray(),
     d.members.toArray(),
     d.cures.toArray(),
@@ -226,9 +255,10 @@ export async function exportAll(): Promise<string> {
     d.predictions.toArray(),
     d.quiets.toArray(),
     d.divinations.toArray(),
+    d.plans.toArray(),
   ]);
   const out = buildExport(
-    { properties, members, cures, scenarios, residences, predictions, quiets, divinations },
+    { properties, members, cures, scenarios, residences, predictions, quiets, divinations, plans },
     loadSchool(),
     new Date(),
   );
@@ -243,7 +273,7 @@ export async function importAll(
   const d = db();
   await d.transaction(
     'rw',
-    [d.properties, d.members, d.cures, d.scenarios, d.residences, d.predictions, d.quiets, d.divinations],
+    [d.properties, d.members, d.cures, d.scenarios, d.residences, d.predictions, d.quiets, d.divinations, d.plans],
     async () => {
       if (data.properties?.length) await d.properties.bulkPut(data.properties);
       if (data.members?.length) await d.members.bulkPut(data.members);
@@ -253,6 +283,7 @@ export async function importAll(
       if (data.predictions?.length) await d.predictions.bulkPut(data.predictions);
       if (data.quiets?.length) await d.quiets.bulkPut(data.quiets);
       if (data.divinations?.length) await d.divinations.bulkPut(data.divinations);
+      if (data.plans?.length) await d.plans.bulkPut(data.plans);
     },
   );
   if (data.school) saveSchool(resolveSchool(data.school));

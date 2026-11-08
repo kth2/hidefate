@@ -146,7 +146,7 @@ function FamilyRow({ row }: { row: ReturnType<typeof familyOverview>[number] }) 
 }
 
 export default function HomePage() {
-  const { property, result, members, cures, qiMen, year, monthIndex, loading, properties, school } = useProperty();
+  const { property, result, members, cures, qiMen, year, monthIndex, loading, properties, school, setActive } = useProperty();
   const [span, setSpan] = useState<'year' | 'month'>('year');
 
   const glance = useMemo(() => yearGlance(year), [year]);
@@ -204,6 +204,48 @@ export default function HomePage() {
       <AppBar title="藏聚" subtitle={`${year} 年 · ${periodOfYear(year).label}`} />
 
       <div className="space-y-4 px-4 py-4">
+        {/* 房屋切换与新建 —— 建房不必再绕到「我的」 */}
+        {!loading && properties.length > 0 && (
+          <nav aria-label="切换房屋" className="-mx-4 flex gap-2 overflow-x-auto px-4 pb-1">
+            {properties.map((p) => (
+              <button
+                key={p.id}
+                type="button"
+                onClick={() => setActive(p.id)}
+                aria-pressed={p.id === property?.id}
+                className={`shrink-0 rounded-full border px-3.5 py-2 text-[0.8125rem] ${
+                  p.id === property?.id ? 'border-ink bg-ink text-white' : 'border-rice-line bg-white text-ink-soft'
+                }`}
+              >
+                {p.name}
+              </button>
+            ))}
+            <Link
+              href="/new"
+              className="shrink-0 rounded-full border border-cinnabar/50 bg-cinnabar/[0.06] px-3.5 py-2 text-[0.8125rem] font-medium text-cinnabar"
+            >
+              ＋ 新房屋
+            </Link>
+          </nav>
+        )}
+
+        {!loading && properties.length === 0 && (
+          <section className="rounded-2xl border border-cinnabar/30 bg-white p-4">
+            <p className="font-serif text-[1.0625rem] font-semibold">建立第一处房屋</p>
+            <p className="mt-1 text-[0.8125rem] leading-relaxed text-ink-mute">
+              只要知道大门朝向就能开始；有户型图可直接上传，二十四山会叠在图上。
+            </p>
+            <div className="mt-3 grid grid-cols-2 gap-2">
+              <Link href="/new" className="btn btn-primary text-center">
+                ＋ 新房屋
+              </Link>
+              <Link href="/quick" className="btn text-center">
+                先试十秒起盘
+              </Link>
+            </div>
+          </section>
+        )}
+
         {/* 今年速览 */}
         <section className="rounded-2xl border border-cinnabar/20 bg-gradient-to-br from-cinnabar/[0.06] to-transparent p-4">
           <p className="text-[0.8125rem] text-ink-mute">{year} 年流年星</p>
@@ -242,18 +284,6 @@ export default function HomePage() {
 
         {loading && <Skeleton lines={4} />}
 
-        {!loading && properties.length === 0 && (
-          <Empty
-            title="还没有建立房屋"
-            desc="没有户型图、人不在现场也可以 —— 只要知道大门朝向，就能得到完整分析。"
-            action={
-              <Link href="/new" className="btn btn-primary btn-block">
-                建立第一处房屋
-              </Link>
-            }
-          />
-        )}
-
         {/* 当前房屋概况 */}
         {!loading && property && result && (
           <>
@@ -290,9 +320,14 @@ export default function HomePage() {
                 {result.qiMenEnabled && <span className="tag border-gold/40 bg-gold/10 text-gold">三派合参</span>}
               </div>
 
-              <Link href="/house" className="btn btn-primary btn-block mt-4">
-                查看九宫盘
-              </Link>
+              <div className="mt-4 grid grid-cols-2 gap-2">
+                <Link href="/house" className="btn btn-primary text-center">
+                  查看九宫盘
+                </Link>
+                <Link href="/floorplan" className="btn text-center">
+                  户型图叠盘
+                </Link>
+              </div>
             </section>
 
             {/* 全家今年 —— 这房子对每个人分别有什么影响 */}
@@ -433,7 +468,7 @@ export default function HomePage() {
         )}
 
         {!loading && properties.length > 0 && !property && (
-          <Empty title="尚未选定房屋" desc="到「我的」里选一处房屋作为当前分析对象。" />
+          <Empty title="尚未选定房屋" desc="点上方的房屋名称切换，或「＋ 新房屋」再建一处。" />
         )}
       </div>
     </>
