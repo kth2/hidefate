@@ -34,6 +34,7 @@ import { XingShiPicker } from '../../components/mobile/XingShiPicker';
 import { DirectionPicker, toSitting, type MeasureEnd } from '../../components/mobile/DirectionPicker';
 import { useProperty } from '../../lib/PropertyContext';
 import { db } from '../../lib/db';
+import { NumField } from '../../components/mobile/NumField';
 
 export default function EditPage() {
   const router = useRouter();
@@ -193,12 +194,13 @@ export default function EditPage() {
           </div>
           <div>
             <label className="label">入住 / 落成年（决定元运）</label>
-            <input
-              type="number"
-              inputMode="numeric"
+            <NumField
               className="field text-center font-serif text-xl"
+              min={1864}
+              max={2200}
               value={moveInYear}
-              onChange={(e) => setMoveInYear(Number(e.target.value))}
+              onValue={(n) => n != null && setMoveInYear(n)}
+              aria-label="入住或落成年"
             />
             <p className="mt-1 text-[0.8125rem] text-ink-mute">{periodOfYear(moveInYear).label}</p>
             {periodTransitionNote(moveInYear) && (
@@ -224,12 +226,14 @@ export default function EditPage() {
           {requiresFloor(buildingType) && (
             <div className="mt-3">
               <label className="label">所在楼层</label>
-              <input
-                type="number"
-                inputMode="numeric"
+              <NumField
                 className="field text-center"
-                value={floor}
-                onChange={(e) => setFloor(e.target.value === '' ? '' : Number(e.target.value))}
+                min={-10}
+                max={300}
+                allowEmpty
+                value={floor === '' ? null : floor}
+                onValue={(n) => setFloor(n ?? '')}
+                aria-label="所在楼层"
               />
             </div>
           )}

@@ -81,6 +81,10 @@ body {
     @apply w-full rounded-xl border border-rice-line bg-white px-3.5 py-3 text-base
            outline-none transition focus:border-cinnabar;
   }
+  /* 数字框里是打到一半或超出范围的值：红框提示，离开时还原为最后的合法值 */
+  input[aria-invalid='true'] {
+    @apply border-cinnabar bg-cinnabar/[0.04];
+  }
   .label {
     @apply mb-1.5 block text-[0.8125rem] font-medium text-ink-mute;
   }

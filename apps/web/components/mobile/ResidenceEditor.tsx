@@ -8,6 +8,7 @@
  * 「只记得入住年」也是合法答案，只是那一段不参与学习，界面照实讲。
  */
 
+import { NumField } from './NumField';
 import { useState } from 'react';
 import {
   FIDELITY_CAPABILITY,
@@ -106,22 +107,24 @@ export function ResidenceEditor({
         <div className="flex gap-2">
           <label className="flex-1">
             <span className="mb-1 block text-[0.6875rem] text-ink-mute">从（年）</span>
-            <input
-              type="number"
-              inputMode="numeric"
-              value={draft.fromYear ?? ''}
-              onChange={(e) => setDraft({ ...draft, fromYear: Number(e.target.value) || undefined })}
+            <NumField
+              min={1900}
+              max={2200}
+              allowEmpty
+              value={draft.fromYear}
+              onValue={(n) => setDraft((d) => ({ ...d, fromYear: n ?? undefined }))}
               className="w-full rounded-lg border border-rice-line bg-white px-3 py-2.5 text-[1rem]"
               placeholder="2005"
             />
           </label>
           <label className="flex-1">
             <span className="mb-1 block text-[0.6875rem] text-ink-mute">到（留空＝至今）</span>
-            <input
-              type="number"
-              inputMode="numeric"
-              value={draft.toYear ?? ''}
-              onChange={(e) => setDraft({ ...draft, toYear: Number(e.target.value) || undefined })}
+            <NumField
+              min={1900}
+              max={2200}
+              allowEmpty
+              value={draft.toYear}
+              onValue={(n) => setDraft((d) => ({ ...d, toYear: n ?? undefined }))}
               className="w-full rounded-lg border border-rice-line bg-white px-3 py-2.5 text-[1rem]"
               placeholder="2012"
             />

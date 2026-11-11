@@ -29,6 +29,7 @@ import {
 } from '@hidefate/core-fengshui';
 import { CompassRose } from '../../components/CompassRose';
 import { AppBar, Expandable, SegRow } from '../../components/mobile/ui';
+import { NumField } from '../../components/mobile/NumField';
 import { useCompass } from '../../lib/useCompass';
 
 const PREF_KEY = 'hidefate.now.v1';
@@ -121,10 +122,13 @@ export default function NowPage() {
     return () => window.clearInterval(t);
   }, []);
 
+  // 以最新状态合并：「取得位置」是异步回来的，不能拿按下当时的旧 prefs 覆盖期间的改动
   const setPrefs = (patch: Partial<Prefs>) => {
-    const next = { ...prefs, ...patch };
-    setPrefsState(next);
-    savePrefs(next);
+    setPrefsState((cur) => {
+      const next = { ...cur, ...patch };
+      savePrefs(next);
+      return next;
+    });
   };
 
   const opts = useMemo(
@@ -446,15 +450,16 @@ export default function NowPage() {
             {prefs.hourBasis === '真太阳时' && (
               <div className="space-y-1.5">
                 <div className="flex gap-2">
-                  <input
+                  <NumField
                     className="field"
-                    inputMode="decimal"
-                    placeholder="经度，如 101.69"
-                    value={prefs.longitude ?? ''}
-                    onChange={(e) => {
-                      const v = e.target.value.trim();
-                      setPrefs({ longitude: v === '' || Number.isNaN(Number(v)) ? null : Number(v) });
-                    }}
+                    placeholder="经度，如 101.69（西经填负数）"
+                    aria-label="经度"
+                    decimal
+                    min={-180}
+                    max={180}
+                    allowEmpty
+                    value={prefs.longitude}
+                    onValue={(n) => setPrefs({ longitude: n })}
                   />
                   <button type="button" className="btn btn-sm shrink-0" onClick={locate}>
                     取得位置
@@ -482,17 +487,15 @@ export default function NowPage() {
           <div className="space-y-3">
             <div>
               <label className="label" htmlFor="by">出生年（立春为界；立春前出生请填前一年）</label>
-              <input
+              <NumField
                 id="by"
                 className="field"
-                inputMode="numeric"
                 placeholder="例如 1988"
-                value={prefs.birthYear ?? ''}
-                onChange={(e) => {
-                  const v = e.target.value.trim();
-                  const n = Number(v);
-                  setPrefs({ birthYear: v === '' || !Number.isInteger(n) || n < 1900 || n > 2100 ? null : n });
-                }}
+                min={1900}
+                max={2100}
+                allowEmpty
+                value={prefs.birthYear}
+                onValue={(n) => setPrefs({ birthYear: n })}
               />
               <p className="mt-1 text-[0.75rem] text-ink-mute">
                 {natal

@@ -11,6 +11,7 @@
  *      落空亡线者，纵有旺星亦不聚气，用户须在建档时就知道，而不是事后被埋怨。
  */
 
+import { NumField } from './NumField';
 import { useMemo } from 'react';
 import {
   MOUNTAINS,
@@ -119,13 +120,14 @@ export function DirectionPicker({
             <button type="button" className="btn btn-sm" onClick={() => onDegreeChange(norm360(degree - 0.5))}>
               −0.5°
             </button>
-            <input
-              type="number"
-              inputMode="decimal"
-              step={0.1}
+            <NumField
+              decimal
+              min={0}
+              max={359.9}
               className="field flex-1 text-center"
               value={degree}
-              onChange={(e) => onDegreeChange(Number(e.target.value))}
+              onValue={(n) => n != null && onDegreeChange(n)}
+              aria-label="度数"
             />
             <button type="button" className="btn btn-sm" onClick={() => onDegreeChange(norm360(degree + 0.5))}>
               +0.5°

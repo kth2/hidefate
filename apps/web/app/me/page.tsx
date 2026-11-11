@@ -9,6 +9,7 @@ import { AppBar, Empty, Sheet } from '../../components/mobile/ui';
 import { useProperty } from '../../lib/PropertyContext';
 import { deleteProperty, describeImpact, propertyDeletionImpact } from '../../lib/cascade';
 import { exportAll, importAll } from '../../lib/db';
+import { NumField } from '../../components/mobile/NumField';
 
 export default function MePage() {
   const { properties, property, members, activeId, setActive, reload, year, setYear, enableQiMen, setEnableQiMen } = useProperty();
@@ -83,12 +84,13 @@ export default function MePage() {
             <div className="overflow-hidden rounded-2xl border border-rice-line bg-white">
               <div className="row">
                 <span className="flex-1">分析年份</span>
-                <input
-                  type="number"
-                  inputMode="numeric"
+                <NumField
                   className="w-24 rounded-lg border border-rice-line px-2 py-1.5 text-center text-base"
+                  min={1864}
+                  max={2200}
                   value={year}
-                  onChange={(e) => setYear(Number(e.target.value))}
+                  onValue={(n) => n != null && setYear(n)}
+                  aria-label="分析年份"
                 />
               </div>
               <button type="button" className="row" onClick={() => setEnableQiMen(!enableQiMen)}>

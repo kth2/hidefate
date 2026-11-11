@@ -17,6 +17,7 @@ import { AppBar, Empty, Expandable, Sheet, Skeleton } from '../../components/mob
 import { useProperty } from '../../lib/PropertyContext';
 import { deleteMember, describeImpact, memberDeletionImpact } from '../../lib/cascade';
 import { db, newId, type StoredMember, type StoredProperty } from '../../lib/db';
+import { NumField } from '../../components/mobile/NumField';
 import { ensureResidence, roomsOf, saveOccupancy } from '../../lib/occupancy';
 
 const CONF_TONE: Record<string, string> = {
@@ -386,12 +387,13 @@ function MemberWizard({
         <div className="space-y-3">
           <div>
             <label className="label">出生年（必填）</label>
-            <input
-              type="number"
-              inputMode="numeric"
+            <NumField
               className="field text-center font-serif text-2xl"
+              min={1900}
+              max={2100}
               value={year}
-              onChange={(e) => setYear(Number(e.target.value))}
+              onValue={(n) => n != null && setYear(n)}
+              aria-label="出生年"
             />
           </div>
           <p className="rounded-xl border border-rice-line bg-rice-deep/40 p-3 text-[0.8125rem] leading-relaxed text-ink-soft">
@@ -414,41 +416,41 @@ function MemberWizard({
           <div className="grid grid-cols-3 gap-2">
             <div>
               <label className="label">月</label>
-              <input
-                type="number"
-                inputMode="numeric"
+              <NumField
                 min={1}
                 max={12}
+                allowEmpty
                 className="field text-center"
-                value={month}
-                onChange={(e) => setMonth(e.target.value === '' ? '' : Number(e.target.value))}
+                value={month === '' ? null : month}
+                onValue={(n) => setMonth(n ?? '')}
                 placeholder="—"
+                aria-label="出生月"
               />
             </div>
             <div>
               <label className="label">日</label>
-              <input
-                type="number"
-                inputMode="numeric"
+              <NumField
                 min={1}
                 max={31}
+                allowEmpty
                 className="field text-center"
-                value={day}
-                onChange={(e) => setDay(e.target.value === '' ? '' : Number(e.target.value))}
+                value={day === '' ? null : day}
+                onValue={(n) => setDay(n ?? '')}
                 placeholder="—"
+                aria-label="出生日"
               />
             </div>
             <div>
               <label className="label">时辰</label>
-              <input
-                type="number"
-                inputMode="numeric"
+              <NumField
                 min={0}
                 max={23}
+                allowEmpty
                 className="field text-center"
-                value={hour}
-                onChange={(e) => setHour(e.target.value === '' ? '' : Number(e.target.value))}
+                value={hour === '' ? null : hour}
+                onValue={(n) => setHour(n ?? '')}
                 placeholder="—"
+                aria-label="出生时"
               />
             </div>
           </div>
