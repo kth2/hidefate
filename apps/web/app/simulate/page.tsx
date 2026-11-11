@@ -22,6 +22,7 @@ import {
 } from '@hidefate/core-synthesis';
 import { SwipeCompare } from '../../components/mobile/SwipeCompare';
 import { AppBar, Empty, Expandable, Sheet, Skeleton } from '../../components/mobile/ui';
+import { NumField } from '../../components/mobile/NumField';
 import { useProperty } from '../../lib/PropertyContext';
 
 type Knob = '搬房间' | '改坐向' | '补缺角' | '换楼层' | '谁在家';
@@ -313,13 +314,15 @@ export default function SimulatePage() {
         {knob === '换楼层' && (
           <div>
             <label className="label">楼层（目前 {property.floor ?? '未填'}）</label>
-            <input
-              type="number"
-              inputMode="numeric"
+            <NumField
               className="field text-center font-serif text-2xl"
-              value={changes.floor ?? ''}
+              min={-10}
+              max={300}
+              allowEmpty
+              value={changes.floor}
               placeholder={String(property.floor ?? '')}
-              onChange={(e) => setChanges((c) => ({ ...c, floor: e.target.value === '' ? undefined : Number(e.target.value) }))}
+              onValue={(n) => setChanges((c) => ({ ...c, floor: n ?? undefined }))}
+              aria-label="模拟楼层"
             />
             <p className="mt-2 text-[0.8125rem] leading-relaxed text-ink-mute">
               楼层愈高，地气愈薄：山星（人丁健康）力度递减，向星（财禄）递增。

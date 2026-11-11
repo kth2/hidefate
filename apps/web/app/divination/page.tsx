@@ -28,6 +28,7 @@ import { computeBaziChart } from '@hidefate/core-bazi';
 import { AppBar, Empty, Expandable, Sheet } from '../../components/mobile/ui';
 import { useProperty } from '../../lib/PropertyContext';
 import { db, newId } from '../../lib/db';
+import { NumField } from '../../components/mobile/NumField';
 import {
   loadDivinations,
   restoreDivination,
@@ -239,11 +240,11 @@ export default function DivinationPage() {
             <div className="flex gap-2">
               <label className="flex-1">
                 <span className="mb-1 block text-[0.75rem] text-ink-mute">应期窗口（天）</span>
-                <input
-                  type="number"
-                  inputMode="numeric"
+                <NumField
+                  min={1}
+                  max={3650}
                   value={windowDays}
-                  onChange={(e) => setWindowDays(Number(e.target.value) || 0)}
+                  onValue={(n) => n != null && setWindowDays(n)}
                   className="w-full rounded-lg border border-rice-line bg-white px-3 py-2.5 text-[1rem]"
                 />
               </label>

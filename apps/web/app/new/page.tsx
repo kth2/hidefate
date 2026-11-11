@@ -37,6 +37,7 @@ import { RoomEditor } from '../../components/mobile/RoomEditor';
 import { DirectionPicker, toSitting, type MeasureEnd } from '../../components/mobile/DirectionPicker';
 import { db, newId, type StoredProperty } from '../../lib/db';
 import { downscaleImage } from '../../lib/image';
+import { NumField } from '../../components/mobile/NumField';
 import { useProperty } from '../../lib/PropertyContext';
 
 type EntryMode = '九宫格' | '户型图' | '罗盘实测';
@@ -288,12 +289,13 @@ export default function NewPropertyPage() {
 
             <div>
               <label className="label">入住 / 落成年（立春为年界）</label>
-              <input
-                type="number"
-                inputMode="numeric"
+              <NumField
                 className="field text-center font-serif text-2xl"
+                min={1864}
+                max={2200}
                 value={moveInYear}
-                onChange={(e) => setMoveInYear(Number(e.target.value))}
+                onValue={(n) => n != null && setMoveInYear(n)}
+                aria-label="入住或落成年"
               />
               <p className="mt-1.5 text-[0.8125rem] text-ink-mute">推得元运：{periodOfYear(moveInYear).label}</p>
               {periodTransitionNote(moveInYear) && (
@@ -320,13 +322,15 @@ export default function NewPropertyPage() {
             {requiresFloor(buildingType) && (
               <div>
                 <label className="label">所在楼层（必填）</label>
-                <input
-                  type="number"
-                  inputMode="numeric"
+                <NumField
                   className="field text-center font-serif text-2xl"
-                  value={floor}
-                  onChange={(e) => setFloor(e.target.value === '' ? '' : Number(e.target.value))}
+                  min={-10}
+                  max={300}
+                  allowEmpty
+                  value={floor === '' ? null : floor}
+                  onValue={(n) => setFloor(n ?? '')}
                   placeholder="12"
+                  aria-label="所在楼层"
                 />
                 <p className="mt-1.5 text-[0.8125rem] leading-relaxed text-ink-mute">
                   这个单位在第几层。楼层影响楼层五行，并调节山星（人丁）与向星（财禄）的力度。
