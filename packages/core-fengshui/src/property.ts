@@ -9,6 +9,7 @@
 import { OUTER_PALACES, PALACE_DIRECTION, type PalaceIndex, type WuXing } from './constants.js';
 import type { XingShiItem } from './xingShi.js';
 import type { CubicleSetup } from './scenario.js';
+import type { VoidLineChoice } from './flyingStar.js';
 
 /** 建筑类别。分析规则随类别而变。 */
 export type BuildingType =
@@ -417,6 +418,11 @@ export interface PropertyProfile {
   readonly renovatedYear?: number;
   /** 元运；省略则由 moveInYear 推。 */
   readonly period?: PalaceIndex;
+  /**
+   * 立线落空亡时用哪张盘（风水师或用户择定）。只在空亡线上生效；
+   * 改了度数离开空亡线后自动失效，不必清除。未填 = 未择定。
+   */
+  readonly voidLineChart?: VoidLineChoice;
   readonly missingCorners: readonly MissingCorner[];
   readonly rooms: readonly RoomPlacement[];
   /**

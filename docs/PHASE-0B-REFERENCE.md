@@ -152,3 +152,17 @@
 - Wikipedia "Flying Star Feng Shui" https://en.wikipedia.org/wiki/Flying_Star_Feng_Shui
 - 日本国立天文台《令和9年（2027）暦要項》 https://eco.mtk.nao.ac.jp/koyomi/yoko/2027/rekiyou272.html
 - 香港天文台 HKO Almanac 2024 https://www.hko.gov.hk/tc/gts/astron2024/files/HKO_almanac_2024.pdf
+
+---
+
+## 8. X-5 处理记录（2026-11-21，采纳 F1「并排、不替人选」）
+
+kt 决定：空亡线上并排显示下卦盘与替卦盘，由人择定。
+
+- **引擎**：`buildFlyingStarChart` 改与 `analyzeLine` 共用立线判定。落空亡时盘上多一个 `voidLine`（等级、立线原文、实际用哪张、是否经人择定），推导过程多一行照实说明。
+  新增参数 `voidLineChoice`（只在空亡线上生效）与 `voidLineCharts()`（同时排出两盘、列出星数不同的宫位、标出两盘相同的情形）。
+- **默认不变**：未择定时仍按兼向阈值取盘（即旧行为）。测试逐一核对 0–359.5°（每 0.5°）× 一至九运：星数、格局、出处戳记与旧版完全相同。
+  变的只有文字：空亡读数的推导与置信度依据不再写「已起替卦」，改为「尚未择定，暂按兼向阈值取某盘」。
+- **择定后**：房屋资料存 `voidLineChart`，全 App（合参、逐月、时间轴、一生、对轨、报告）经 `chartOptionsFor` 一致改用该盘；出处戳记加 `;void=xia|ti`；账本 `inputHash` 只在择过盘时加入该项，旧记录哈希不变。度数离开空亡线后择定自动失效。
+- **界面**：十秒起盘、风水页、罗盘页（锁定读数后）并排两盘；户型图页、报告坐向栏照实标「已择定／未择定」；报告总述附只读对照。十秒起盘「存为房屋」会把择定带进建档。
+- **未变**：`reference/observed/discrepancies.json` 的 `I-LINE` 条目是以「立线说不起替」为准统计的，未择定时这些读数仍取替卦，故该统计口径下数字不变；其含义已由「静默矛盾」变为「明示未择定」。

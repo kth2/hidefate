@@ -279,7 +279,12 @@ export function buildAnswerContext(
   const lines: string[] = [];
   lines.push(`# 物业`);
   lines.push(`名称：${s.profile.name}；类别：${s.buildingType}${s.profile.floor != null ? `；楼层：${s.profile.floor}` : ''}`);
-  lines.push(`坐向：坐${s.flyingStar.sitting.mountain.name}（${s.flyingStar.sitting.degree.toFixed(1)}°）向${s.flyingStar.facing.mountain.name}；${s.flyingStar.jianXiang.label}`);
+  lines.push(
+    `坐向：坐${s.flyingStar.sitting.mountain.name}（${s.flyingStar.sitting.degree.toFixed(1)}°）向${s.flyingStar.facing.mountain.name}；` +
+      (s.flyingStar.voidLine
+        ? `${s.flyingStar.voidLine.label}；${s.flyingStar.voidLine.decided ? '经择定用' : '未择定，暂用'}${s.flyingStar.voidLine.choice}盘`
+        : s.flyingStar.jianXiang.label),
+  );
   lines.push(`元运：${s.flyingStar.period.label}；格局：${s.flyingStar.pattern}；八宅：${s.baZhai.label}`);
   lines.push(`分析年：${s.year}；山向奇门层：${s.qiMenEnabled ? '已启用' : '未启用'}`);
   lines.push(`全屋综合分：${s.overallScore.toFixed(3)}（${s.overallRisk}）；整体置信度：${s.confidence.level}`);

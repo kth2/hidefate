@@ -67,6 +67,8 @@ export default function NewPropertyPage() {
   const [missing, setMissing] = useState<MissingCorner[]>([]);
   const [xingShi, setXingShi] = useState<XingShiItem[]>([]);
   const [photo, setPhoto] = useState<string | null>(null);
+  /** 从十秒起盘／罗盘起盘带来的空亡线择盘（/new?void=下卦）。只在坐向仍落空亡线时生效（引擎自会忽略）。 */
+  const [voidPick, setVoidPick] = useState<'下卦' | '替卦' | undefined>(undefined);
   const [photoSize, setPhotoSize] = useState<{ width: number; height: number } | null>(null);
   const [photoBusy, setPhotoBusy] = useState(false);
 
@@ -98,6 +100,8 @@ export default function NewPropertyPage() {
         setEntryMode('罗盘实测');
       }
       if (q.get('year') != null && Number.isInteger(y) && y >= 1864 && y <= 2200) setMoveInYear(y);
+      const v = q.get('void');
+      if (v === '下卦' || v === '替卦') setVoidPick(v);
     } catch {
       /* 忽略 */
     }
@@ -162,6 +166,7 @@ export default function NewPropertyPage() {
         xingShi,
         entryMode,
         enableQiMen,
+        ...(voidPick ? { voidLineChart: voidPick } : {}),
         note: photo ? '已拍摄户型图' : undefined,
         createdAt: now,
         updatedAt: now,

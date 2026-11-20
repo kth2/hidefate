@@ -11,7 +11,7 @@
  */
 
 import type { PalaceIndex } from './constants.js';
-import type { CenterFiveRule, FlyingStarOptions } from './flyingStar.js';
+import type { CenterFiveRule, FlyingStarOptions, VoidLineChoice } from './flyingStar.js';
 import { periodOfYear } from './period.js';
 
 /** 运盘取哪一年。 */
@@ -139,6 +139,8 @@ export interface ChartProfileLike {
   readonly builtYear?: number;
   readonly renovatedYear?: number;
   readonly period?: PalaceIndex;
+  /** 立线落空亡时择定的盘（见 FlyingStarOptions.voidLineChoice）。 */
+  readonly voidLineChart?: VoidLineChoice;
 }
 
 /**
@@ -160,6 +162,7 @@ export function chartOptionsFor(
     moveInYear: chartYear.year,
     centerFiveRule: school.centerFiveRule,
     jianThreshold: school.jianThreshold,
+    ...(p.voidLineChart ? { voidLineChoice: p.voidLineChart } : {}),
     chartYear,
   };
 }

@@ -23,6 +23,7 @@ import {
 import {
   TI_XING,
   analyzeJianXiang,
+  analyzeLine,
   degreeToMountain,
   facingOf,
   mountainOf,
@@ -57,10 +58,34 @@ export interface FlyingStarOptions {
   readonly moveInYear?: number;
   /** 是否起替卦。不给则依兼向阈值自动判定。 */
   readonly useTiXing?: boolean;
+  /**
+   * 立线落空亡时用哪张盘。只在空亡线上生效；不在空亡线上会被忽略。
+   * 不给即「未择定」：沿用兼向阈值的自动判定（与旧行为相同），并在盘上标明未择定。
+   */
+  readonly voidLineChoice?: VoidLineChoice;
   /** 兼向阈值（度），默认 3°。 */
   readonly jianThreshold?: number;
   /** 五入中借宫规则，默认「随运星」。 */
   readonly centerFiveRule?: CenterFiveRule;
+}
+
+/** 空亡线上可取的两张盘。 */
+export type VoidLineChoice = '下卦' | '替卦';
+
+/**
+ * 立线落空亡时，这张盘是怎么取定的（第零期 B · X-5）。
+ *
+ * 空亡线上「下卦」「替卦」何者可用，诸家不一，故引擎不替人选：
+ * 未择定时沿用兼向阈值的旧判定，但必须明说「未择定」；择定后照选的排，并记入出处戳记。
+ */
+export interface VoidLineInfo {
+  readonly grade: '大空亡' | '小空亡';
+  /** 立线判定原文，如「351.5° 落小空亡（差错）——骑壬子两山之缝」。 */
+  readonly label: string;
+  /** 本盘实际用的是哪一张。 */
+  readonly choice: VoidLineChoice;
+  /** 是否经人择定；false = 未择定，暂用自动判定的那张。 */
+  readonly decided: boolean;
 }
 
 /** 单宫飞星四星。 */
@@ -84,6 +109,8 @@ export interface FlyingStarChart {
   readonly jianXiang: JianXiangInfo;
   /** 实际是否起了替卦。 */
   readonly usedTiXing: boolean;
+  /** 立线落空亡时才有：这张盘取的是哪一张、是否经人择定。 */
+  readonly voidLine?: VoidLineInfo;
   readonly centerFiveRule: CenterFiveRule;
   readonly yunPan: StarPlate;
   readonly shanPan: StarPlate;
@@ -188,7 +215,14 @@ export function buildFlyingStarChart(opts: FlyingStarOptions): FlyingStarChart {
 
   const rule = opts.centerFiveRule ?? '随运星';
   const jian = analyzeJianXiang(opts.sitting, opts.jianThreshold ?? 3);
-  const useTi = opts.useTiXing ?? jian.isJian;
+  // 立线与排盘共用同一个判定（X-5）：空亡线上照择定的盘排；未择定则沿用兼向判定，但要标明。
+  const line = analyzeLine(opts.sitting, opts.jianThreshold ?? 3);
+  const onVoid = line.grade === '大空亡' || line.grade === '小空亡';
+  const decided = onVoid && opts.useTiXing == null && opts.voidLineChoice != null;
+  const useTi = opts.useTiXing ?? (decided ? opts.voidLineChoice === '替卦' : jian.isJian);
+  const voidLine: VoidLineInfo | undefined = onVoid
+    ? { grade: line.grade as VoidLineInfo['grade'], label: line.label, choice: useTi ? '替卦' : '下卦', decided }
+    : undefined;
 
   const yunPan = flyFrom(periodInfo.period, '顺');
 
@@ -197,6 +231,13 @@ export function buildFlyingStarChart(opts: FlyingStarOptions): FlyingStarChart {
     `坐山：${sit.mountain.name}（${sit.degree.toFixed(1)}°，${sit.mountain.gua}宫${sit.mountain.yuan}${sit.mountain.yinYang}）；向首：${fac.mountain.name}（${fac.degree.toFixed(1)}°）。`,
     jian.label,
   ];
+  if (voidLine) {
+    derivation.push(
+      voidLine.decided
+        ? `立线：${voidLine.label}。空亡线上下卦、替卦诸家不一，本盘经择定取${voidLine.choice}盘。`
+        : `立线：${voidLine.label}。空亡线上下卦、替卦诸家不一，尚未择定，暂按兼向判定取${voidLine.choice}盘；宜以罗盘复核，或由风水师择一。`,
+    );
+  }
 
   // 山盘
   const sitYunStar = yunPan[sit.mountain.palace];
@@ -241,6 +282,7 @@ export function buildFlyingStarChart(opts: FlyingStarOptions): FlyingStarChart {
     facing: { mountain: fac.mountain, degree: fac.degree },
     jianXiang: jian,
     usedTiXing: useTi,
+    ...(voidLine ? { voidLine } : {}),
     centerFiveRule: rule,
     yunPan,
     shanPan,
@@ -253,6 +295,7 @@ export function buildFlyingStarChart(opts: FlyingStarOptions): FlyingStarChart {
       jianThreshold: opts.jianThreshold ?? 3,
       useTiXing: useTi,
       fiveTiXing: 'period',
+      ...(voidLine?.decided ? { voidLine: voidLine.choice } : {}),
     }),
   };
 }
@@ -293,4 +336,44 @@ export function monthlyPlate(year: number, monthIndex: number): StarPlate {
 /** 便捷：由度数直接得坐山山名。 */
 export function sittingNameOfDegree(deg: number): string {
   return degreeToMountain(deg).name;
+}
+
+/** 空亡线上的两张盘，供并排对照。 */
+export interface VoidLineComparison {
+  readonly grade: VoidLineInfo['grade'];
+  readonly label: string;
+  readonly xiaGua: FlyingStarChart;
+  readonly tiGua: FlyingStarChart;
+  /** 两盘星数完全相同（替星恰等于运星时）—— 此时无须择盘。 */
+  readonly identical: boolean;
+  /** 两盘山星或向星不同的宫位。 */
+  readonly differingPalaces: readonly PalaceIndex[];
+  /** 依传入的参数，实际会用哪一张。 */
+  readonly current: VoidLineChoice;
+  readonly decided: boolean;
+}
+
+/**
+ * 立线落空亡时，同时排出下卦盘与替卦盘（X-5 / PHASE-0B F1）。
+ * 不在空亡线上返回 null。传入的 `useTiXing`、`voidLineChoice` 只用来报告「目前用哪张」，不影响两张盘本身。
+ */
+export function voidLineCharts(opts: FlyingStarOptions): VoidLineComparison | null {
+  const base = buildFlyingStarChart(opts);
+  if (!base.voidLine) return null;
+  const { useTiXing: _u, voidLineChoice: _v, ...rest } = opts;
+  const xiaGua = buildFlyingStarChart({ ...rest, voidLineChoice: '下卦' });
+  const tiGua = buildFlyingStarChart({ ...rest, voidLineChoice: '替卦' });
+  const differingPalaces = PALACE_INDEXES.filter(
+    (p) => xiaGua.palaces[p].shan !== tiGua.palaces[p].shan || xiaGua.palaces[p].xiang !== tiGua.palaces[p].xiang,
+  );
+  return {
+    grade: base.voidLine.grade,
+    label: base.voidLine.label,
+    xiaGua,
+    tiGua,
+    identical: differingPalaces.length === 0,
+    differingPalaces,
+    current: base.voidLine.choice,
+    decided: base.voidLine.decided,
+  };
 }

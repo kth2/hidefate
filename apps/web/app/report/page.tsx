@@ -18,7 +18,9 @@ import {
   PALACE_INDEXES,
   STAR_NAME,
   type PalaceIndex,
+  chartOptionsFor,
   describeSchool,
+  voidLineCharts,
 } from '@hidefate/core-fengshui';
 import {
   RISK_COLOR,
@@ -31,6 +33,7 @@ import {
   type AnalysisInput,
 } from '@hidefate/core-synthesis';
 import { PersonReportPage } from '../../components/PersonReportPage';
+import { VoidLineCompare } from '../../components/mobile/VoidLineCompare';
 import { computeShanXiang, type ShanXiangResult } from '@hidefate/core-qimen';
 import { currentFengShuiTime } from '../../lib/useAnalysis';
 import { useProperty } from '../../lib/PropertyContext';
@@ -88,7 +91,10 @@ export default function ReportPage() {
       const monthly = members.length
         ? monthlyOutlook({ profile: property, members, qiMen: result.qiMenEnabled ? qiMen : null, appliedCures: cures, school }, now.year, now.monthIndex, 12)
         : null;
-      return { result, timeline, fusion, people, monthly };
+      const voidCmp = result.flyingStar.voidLine
+        ? voidLineCharts((({ chartYear: _cy, ...o }) => o)(chartOptionsFor(property, school)))
+        : null;
+      return { result, timeline, fusion, people, monthly, voidCmp };
     } catch {
       return null;
     }
@@ -100,7 +106,7 @@ export default function ReportPage() {
   }
   if (property === null || !data) return <p className="text-sm text-cinnabar">找不到此物业，或推算失败。</p>;
 
-  const { result, timeline, fusion, people, monthly } = data;
+  const { result, timeline, fusion, people, monthly, voidCmp } = data;
   const today = new Date().toISOString().slice(0, 10);
   const monthsOf = (id: string) => monthly?.rows.find((r) => r.memberId === id) ?? null;
 
@@ -186,7 +192,10 @@ export default function ReportPage() {
                 <th>坐向</th>
                 <td>
                   坐{result.flyingStar.sitting.mountain.name}（{result.flyingStar.sitting.degree.toFixed(1)}°）向
-                  {result.flyingStar.facing.mountain.name}　{result.flyingStar.jianXiang.label}
+                  {result.flyingStar.facing.mountain.name}　
+                  {result.flyingStar.voidLine
+                    ? `${result.flyingStar.voidLine.label}；${result.flyingStar.voidLine.decided ? '已择定' : '未择定，暂用'}${result.flyingStar.voidLine.choice}盘（两盘对照见总述）`
+                    : result.flyingStar.jianXiang.label}
                 </td>
               </tr>
               <tr>
@@ -238,6 +247,11 @@ export default function ReportPage() {
       {/* ── 一、总述 ── */}
       <section className="page">
         <h2>{no('summary')}、总述</h2>
+        {voidCmp && (
+          <div className="mb-4">
+            <VoidLineCompare cmp={voidCmp} />
+          </div>
+        )}
         <p className="lead">{result.summary}</p>
 
         <h3>置信度与依据</h3>

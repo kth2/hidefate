@@ -10,8 +10,11 @@ import {
   STAR_META,
   STAR_NAME,
   YOU_NIAN_META,
+  chartOptionsFor,
   floorLevelsOf,
+  voidLineCharts,
   type PalaceIndex,
+  type VoidLineChoice,
 } from '@hidefate/core-fengshui';
 import {
   RISK_COLOR,
@@ -34,6 +37,8 @@ import {
 } from '@hidefate/core-fengshui';
 import { computeComposite } from '@hidefate/core-synthesis';
 import { BigNineGrid, type LayerToggles } from '../../components/mobile/BigNineGrid';
+import { VoidLineCompare } from '../../components/mobile/VoidLineCompare';
+import { db } from '../../lib/db';
 import { AppBar, Empty, Expandable, SegRow, Sheet, Skeleton } from '../../components/mobile/ui';
 import { useProperty } from '../../lib/PropertyContext';
 
@@ -71,8 +76,29 @@ const SCHOOL_TONE: Record<string, string> = {
 };
 
 export default function HousePage() {
-  const { property, result, members, loading, enableQiMen, setEnableQiMen, qiMenLoading, qiMenError, retryQiMen, year } =
+  const { property, result, members, loading, enableQiMen, setEnableQiMen, qiMenLoading, qiMenError, retryQiMen, year, school, reload } =
     useProperty();
+  // 空亡线：下卦、替卦两盘并排（X-5）。择定存进房屋资料，全 App 的分析随之改用该盘。
+  const voidCmp = useMemo(() => {
+    if (!property || !result?.flyingStar.voidLine) return null;
+    try {
+      const { chartYear: _cy, ...opts } = chartOptionsFor(property, school);
+      return voidLineCharts(opts);
+    } catch {
+      return null;
+    }
+  }, [property, result, school]);
+  const [voidBusy, setVoidBusy] = useState(false);
+  async function chooseVoidLine(c: VoidLineChoice | undefined) {
+    if (!property) return;
+    setVoidBusy(true);
+    try {
+      await db().properties.update(property.id, { voidLineChart: c, updatedAt: new Date().toISOString() });
+      reload();
+    } finally {
+      setVoidBusy(false);
+    }
+  }
   const [view, setView] = useState<View>('九宫');
   const [selected, setSelected] = useState<PalaceIndex | null>(null);
   const [layers, setLayers] = useState<LayerToggles>({ feixing: true, bazhai: true, qimen: false });
@@ -233,6 +259,15 @@ export default function HousePage() {
 
         {view === '九宫' && (
           <>
+            {voidCmp && (
+              <VoidLineCompare
+                cmp={voidCmp}
+                onChoose={(c) => void chooseVoidLine(c)}
+                onClear={() => void chooseVoidLine(undefined)}
+                busy={voidBusy}
+              />
+            )}
+
             {/* 图层开关 */}
             <div className="seg-row">
               {(

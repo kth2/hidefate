@@ -27,9 +27,13 @@ import {
   type PalaceIndex,
   type PeriodBasis,
   type PropertyProfile,
+  chartOptionsFor,
+  voidLineCharts,
+  type VoidLineChoice,
 } from '@hidefate/core-fengshui';
 import { buildActionPlan, synthesise, type Action } from '@hidefate/core-synthesis';
 import { BigNineGrid } from '../../components/mobile/BigNineGrid';
+import { VoidLineCompare } from '../../components/mobile/VoidLineCompare';
 import { AppBar, Expandable, SegRow, Sheet } from '../../components/mobile/ui';
 import { useSchool } from '../../lib/schoolStore';
 
@@ -59,6 +63,9 @@ export default function QuickChartPage() {
   const [lookYear, setLookYear] = useState(nowYear);
   const [buildingType, setBuildingType] = useState<BuildingType>('公寓');
   const [sel, setSel] = useState<PalaceIndex | null>(null);
+  /** 空亡线上择定的盘。只对当前度数有效，改度数即清空。 */
+  const [voidPick, setVoidPick] = useState<VoidLineChoice | undefined>(undefined);
+  useEffect(() => setVoidPick(undefined), [degText]);
 
   // 从「罗盘起盘」带过来的坐山度数与立盘年（/quick?deg=327.4&year=2026）
   useEffect(() => {
@@ -91,16 +98,19 @@ export default function QuickChartPage() {
       missingCorners: [],
       rooms: [],
       entryMode: '罗盘实测',
+      ...(voidPick ? { voidLineChart: voidPick } : {}),
     };
     try {
       const result = synthesise({ profile, members: [], year: lookYear, school });
       const plan = buildActionPlan(result);
       const line = analyzeLine(deg!, school.jianThreshold);
-      return { result, plan, line, shaNow: annualSha(lookYear), shaNext: annualSha(lookYear + 1) };
+      const { chartYear: _cy, ...chartOpts } = chartOptionsFor(profile, school);
+      const voidCmp = voidLineCharts(chartOpts);
+      return { result, plan, line, voidCmp, shaNow: annualSha(lookYear), shaNext: annualSha(lookYear + 1) };
     } catch (e) {
       return { error: e instanceof Error ? e.message : String(e) } as const;
     }
-  }, [valid, deg, chartYear, lookYear, buildingType, school]);
+  }, [valid, deg, chartYear, lookYear, buildingType, school, voidPick]);
 
   const sitting = valid ? degreeToMountain(deg!) : null;
   const facing = valid ? facingOf(deg!).mountain : null;
@@ -194,6 +204,8 @@ export default function QuickChartPage() {
               <p className="mt-0.5 text-ink-soft">{data.line.label}</p>
               {data.line.grade !== '下卦' && <p className="mt-1 text-[0.8125rem] text-ink-soft">{data.line.advice}</p>}
             </section>
+
+            {data.voidCmp && <VoidLineCompare cmp={data.voidCmp} onChoose={setVoidPick} onClear={() => setVoidPick(undefined)} />}
 
             {/* 盘 */}
             <section>
@@ -331,7 +343,10 @@ export default function QuickChartPage() {
               {data.result.provenance && <> 计算出处：{data.result.provenance.engine}（{data.result.provenance.ruleSet}）。</>}
             </p>
 
-            <Link href={`/new?deg=${deg!.toFixed(1)}&year=${chartYear}`} className="btn btn-block">
+            <Link
+              href={`/new?deg=${deg!.toFixed(1)}&year=${chartYear}${voidPick ? `&void=${encodeURIComponent(voidPick)}` : ''}`}
+              className="btn btn-block"
+            >
               存为房屋（带入坐 {deg!.toFixed(1)}°、{chartYear} 年），补房间与家人 →
             </Link>
           </>

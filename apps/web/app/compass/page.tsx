@@ -29,8 +29,11 @@ import {
   type OverlayLayer,
   type PalaceIndex,
   type StarPlate,
+  voidLineCharts,
+  type VoidLineChoice,
 } from '@hidefate/core-fengshui';
 import { MountainRing } from '../../components/MountainRing';
+import { VoidLineCompare } from '../../components/mobile/VoidLineCompare';
 import { AppBar, Expandable, SegRow } from '../../components/mobile/ui';
 import { useSchool } from '../../lib/schoolStore';
 import { circularStats, useCompass } from '../../lib/useCompass';
@@ -134,16 +137,21 @@ export default function CompassChartPage() {
   const ringHeading = sensorLive && !useManual ? compass.heading : manual;
 
   const line = useMemo(() => analyzeLine(sittingDeg, school.jianThreshold), [sittingDeg, school.jianThreshold]);
-  const chart = useMemo(
-    () =>
-      buildFlyingStarChart({
-        sitting: sittingDeg,
-        moveInYear: chartYear,
-        centerFiveRule: school.centerFiveRule,
-        jianThreshold: school.jianThreshold,
-      }),
-    [sittingDeg, chartYear, school.centerFiveRule, school.jianThreshold],
+  /** 空亡线上择定的盘，只对择定时那个度数有效（手机一转就失效）。 */
+  const [voidPick, setVoidPick] = useState<{ deg: number; choice: VoidLineChoice } | null>(null);
+  const voidChoice = voidPick && voidPick.deg === sittingDeg ? voidPick.choice : undefined;
+  const chartOpts = useMemo(
+    () => ({
+      sitting: sittingDeg,
+      moveInYear: chartYear,
+      centerFiveRule: school.centerFiveRule,
+      jianThreshold: school.jianThreshold,
+      ...(voidChoice ? { voidLineChoice: voidChoice } : {}),
+    }),
+    [sittingDeg, chartYear, school.centerFiveRule, school.jianThreshold, voidChoice],
   );
+  const chart = useMemo(() => buildFlyingStarChart(chartOpts), [chartOpts]);
+  const voidCmp = useMemo(() => (chart.voidLine ? voidLineCharts(chartOpts) : null), [chart, chartOpts]);
   const period = chart.period.period;
   const sitM = chart.sitting.mountain;
   const facM = chart.facing.mountain;
@@ -251,10 +259,25 @@ export default function CompassChartPage() {
           <div className={`rounded-xl border px-3 py-2 text-[0.8125rem] leading-relaxed ${gradeTone}`}>
             <p className="font-semibold">
               {line.label}
-              {chart.usedTiXing ? ' · 本盘已起替卦' : ' · 本盘用下卦'}
+              {chart.voidLine
+                ? ` · ${chart.voidLine.decided ? '已择定' : '未择定，暂用'}${chart.voidLine.choice}盘`
+                : chart.usedTiXing
+                  ? ' · 本盘已起替卦'
+                  : ' · 本盘用下卦'}
             </p>
             <p className="mt-0.5 text-ink-soft">{line.advice}</p>
           </div>
+
+          {voidCmp &&
+            (locked || !sensorLive || useManual ? (
+              <VoidLineCompare
+                cmp={voidCmp}
+                onChoose={(c) => setVoidPick({ deg: sittingDeg, choice: c })}
+                onClear={() => setVoidPick(null)}
+              />
+            ) : (
+              <p className="text-[0.75rem] text-ink-mute">落在空亡线上：锁定读数后，可把下卦盘与替卦盘并排对照。</p>
+            ))}
 
           {/* 传感器状态 */}
           {compass.status === 'needs-permission' && (
@@ -349,6 +372,7 @@ export default function CompassChartPage() {
           <div className="flex items-baseline justify-between">
             <p className="font-serif text-[1rem] font-semibold">
               {sitM.name}山{facM.name}向 · {chart.usedTiXing ? '替卦' : '下卦'}
+              {chart.voidLine && !chart.voidLine.decided ? '（空亡，未择定）' : ''}
             </p>
             <p className="text-[0.75rem] text-ink-mute">{chart.pattern}</p>
           </div>
@@ -493,7 +517,14 @@ export default function CompassChartPage() {
             <li>手机平放、离身体一臂，顶端对准门外或阳台正中；屋向以纳气口为准，大楼与单元不一时按门派设置取。</li>
             <li>手机读的是磁北，与传统罗盘相同；但钢筋、电梯、电器、磁吸壳都会令读数偏几度到几十度。每山只有 15°，兼向只差 3°，要紧的事务必以罗盘复核。</li>
             <li>读数摆动大时先拿手机在空中画几次「8」字让系统校准，再到离墙一两米处重量。</li>
-            <li>本盘：{chart.usedTiXing ? '偏离中线超过兼向阈值，起替卦' : '下卦正向'}；兼向阈值 {school.jianThreshold}°；五入中「{school.centerFiveRule}」。门派可在「十秒起盘」页改，两页共用同一套设置。</li>
+            <li>
+              本盘：
+              {chart.voidLine
+                ? `落${chart.voidLine.grade}，${chart.voidLine.decided ? '经择定' : '未择定，暂按兼向阈值'}取${chart.voidLine.choice}盘`
+                : chart.usedTiXing
+                  ? '偏离中线超过兼向阈值，起替卦'
+                  : '下卦正向'}
+              ；兼向阈值 {school.jianThreshold}°；五入中「{school.centerFiveRule}」。门派可在「十秒起盘」页改，两页共用同一套设置。</li>
             <li>本次门派：{describeSchool(school).join('；')}。</li>
           </ul>
         </Expandable>

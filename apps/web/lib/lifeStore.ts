@@ -60,6 +60,7 @@ import {
 import { freezePrediction, hashInput, type PredictionDraft, type PredictionRecord } from '@hidefate/core-ledger';
 import { castZiWei, horoscopeAt, type ZiWeiChart } from '@hidefate/core-ziwei';
 import { newId } from './db';
+import { voidLineHashPart } from './hashParts';
 
 export const LIFE_ENGINE_VERSION = 'hidefate/life@1|bazi@0.1|fengshui@0.1|ziwei@0.1|xiangyi@0.1';
 
@@ -510,6 +511,8 @@ export function buildLifeView(input: LifeInput): LifeView {
     })),
     // 只有改过门派才进哈希 —— 全默认时旧记录的哈希不变（第零期审计 D6）。
     ...(schoolHashPart(resolveSchool(input.school)) ? { school: schoolHashPart(resolveSchool(input.school)) } : {}),
+    // 空亡线上择过盘才进哈希 —— 没择过的旧记录哈希不变（X-5）。
+    ...voidLineHashPart(input.residences, input.properties),
   });
 
   // ---- 分段 ----

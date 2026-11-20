@@ -38,6 +38,7 @@ import {
 import { freezePrediction, hashInput, type PredictionDraft, type PredictionRecord } from '@hidefate/core-ledger';
 import { castZiWei } from '@hidefate/core-ziwei';
 import { newId } from './db';
+import { voidLineHashPart } from './hashParts';
 
 /** 引擎签名。改动任一核心包的算法时**必须**手动 bump，否则日后重放会比错东西。 */
 export const ENGINE_VERSION = 'hidefate/retrospect@1|bazi@0.1|fengshui@0.1|ziwei@0.1|xiangyi@0.1';
@@ -206,6 +207,8 @@ export function planRetrospect(input: RetrospectInput): RetrospectPlan {
       propertyId: r.propertyId, fromYear: r.fromYear, toYear: r.toYear, role: r.role, fidelity: r.fidelity,
     })),
     ...(schoolHashPart(resolveSchool(input.school)) ? { school: schoolHashPart(resolveSchool(input.school)) } : {}),
+    // 空亡线上择过盘才进哈希 —— 没择过的旧记录哈希不变（X-5）。
+    ...voidLineHashPart(input.residences, input.properties),
   });
 
   /**
