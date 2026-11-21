@@ -62,10 +62,12 @@ export interface ChartRuleParams {
   readonly useTiXing: boolean;
   /** 五入中逢替卦的取法。引擎目前只实现一种：取元运宫同元龙之山的替星（见 reference/ 差异 X-1）。 */
   readonly fiveTiXing: 'period';
+  /** 空亡线上经人择定的盘。未择定（或不在空亡线上）不写，戳记与旧版相同。 */
+  readonly voidLine?: '下卦' | '替卦';
 }
 
 export function chartRuleSet(p: ChartRuleParams): string {
-  return `xuankong@r${XUANKONG_RULES_REVISION};center5=${p.centerFiveRule};jian=${p.jianThreshold};ti=${p.useTiXing ? 'on' : 'off'};five-ti=${p.fiveTiXing}`;
+  return `xuankong@r${XUANKONG_RULES_REVISION};center5=${p.centerFiveRule};jian=${p.jianThreshold};ti=${p.useTiXing ? 'on' : 'off'};five-ti=${p.fiveTiXing}${p.voidLine ? `;void=${p.voidLine === '替卦' ? 'ti' : 'xia'}` : ''}`;
 }
 
 export function chartProvenance(p: ChartRuleParams): CalcProvenance {

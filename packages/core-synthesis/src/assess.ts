@@ -465,7 +465,14 @@ export function synthesise(input: AnalysisInput): SynthesisResult {
   else { confReasons.push('纯九宫格建档：宫位为均分近似，结论在方位层面成立，房间边界可能与实况有出入。'); }
   if (completeness.missing.length === 0) { confScore += 1; confReasons.push('关键房间（大门/主卧/厨房）均已标注。'); }
   else confReasons.push(`建档尚缺：${completeness.missing.join('；')}。`);
-  if (flyingStar.jianXiang.isJian) confReasons.push(`坐向为兼向（${flyingStar.jianXiang.label}），已起替卦；替卦一派说法不一，此盘按替星入中、阴阳依原山处理。`);
+  const vl = flyingStar.voidLine;
+  if (vl) {
+    // X-5：空亡线上不能再说「已起替卦」了事 —— 照实写用的是哪张盘、是否经人择定。
+    confReasons.push(
+      `立线${vl.label}；空亡线上下卦、替卦诸家不一，` +
+        (vl.decided ? `本盘经择定取${vl.choice}盘。` : `尚未择定，暂按兼向阈值取${vl.choice}盘，结论宜以罗盘复核。`),
+    );
+  } else if (flyingStar.jianXiang.isJian) confReasons.push(`坐向为兼向（${flyingStar.jianXiang.label}），已起替卦；替卦一派说法不一，此盘按替星入中、阴阳依原山处理。`);
   const memberPrecision = input.members.map((m) => m.chart.confidence.factor);
   if (memberPrecision.length > 0) {
     const avg = memberPrecision.reduce((a, b) => a + b, 0) / memberPrecision.length;

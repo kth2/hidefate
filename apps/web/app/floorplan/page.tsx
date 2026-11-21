@@ -614,7 +614,20 @@ export default function FloorPlanPage() {
               {line && (
                 <p className="text-[0.75rem] leading-relaxed text-ink-soft">
                   {line.label}
-                  {chart ? (chart.usedTiXing ? ' · 本盘已起替卦' : ' · 本盘用下卦') : ''}。坐向取自房屋资料，改度数请到
+                  {chart?.voidLine ? (
+                    <>
+                      {` · ${chart.voidLine.decided ? '已择定' : '未择定，暂用'}${chart.voidLine.choice}盘（`}
+                      <Link href="/house" className="text-cinnabar underline underline-offset-2">
+                        到风水页并排对照
+                      </Link>
+                      ）
+                    </>
+                  ) : chart ? (
+                    chart.usedTiXing ? ' · 本盘已起替卦' : ' · 本盘用下卦'
+                  ) : (
+                    ''
+                  )}
+                  。坐向取自房屋资料，改度数请到
                   <Link href="/edit" className="text-cinnabar underline underline-offset-2">
                     修改房屋
                   </Link>
