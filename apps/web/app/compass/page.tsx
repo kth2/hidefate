@@ -470,6 +470,15 @@ export default function CompassChartPage() {
               <p className="text-[0.6875rem] text-ink-mute">
                 时星依{tc.shiChen.basisUsed}、子时{timeOpts.dayChange}（与「即时飞星」页设置相同），{tc.shiChen.zhi}时到{' '}
                 {`${String(tc.shiChen.end.getHours()).padStart(2, '0')}:${String(tc.shiChen.end.getMinutes()).padStart(2, '0')}`} 止，之后自动换盘。
+                {timeOpts.hourBasis === '真太阳时' && tc.shiChen.basisUsed !== '真太阳时' && (
+                  <span className="text-risk-warn">
+                    {' '}已选真太阳时但尚未取得经度，故仍按钟表时间；请到
+                    <Link href="/now" className="underline underline-offset-2">
+                      即时飞星
+                    </Link>
+                    的「时辰依据与子时换日」取得位置。
+                  </span>
+                )}
               </p>
             )}
             <p className="text-[0.6875rem] leading-relaxed text-ink-mute">

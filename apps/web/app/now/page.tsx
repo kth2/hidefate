@@ -465,6 +465,11 @@ export default function NowPage() {
                     取得位置
                   </button>
                 </div>
+                {prefs.longitude == null && (
+                  <p role="status" className="rounded-lg bg-risk-warn/10 px-2.5 py-1.5 text-[0.8125rem] text-ink">
+                    尚未取得经度，目前仍按钟表时间起盘。按「取得位置」，或手动填经度（吉隆坡 101.69）后才会校准。
+                  </p>
+                )}
                 {locMsg && <p className="text-[0.75rem] text-ink-mute">{locMsg}</p>}
                 <p className="text-[0.75rem] text-ink-mute">
                   马来西亚用 UTC+8，但吉隆坡在东经约 101.7°，钟表比真太阳时快约一小时十分钟，常差一个时辰。
